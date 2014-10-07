@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package pages;
+package fr.nemolovich.apps.homeapp.route.pages;
 
 import freemarker.template.Configuration;
 import freemarker.template.SimpleHash;
