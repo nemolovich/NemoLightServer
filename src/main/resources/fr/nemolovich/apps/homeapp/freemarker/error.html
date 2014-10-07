@@ -2,14 +2,21 @@
 <html>
 <head>
 <title>Internal Error</title>
+<script src="/webapp/js/jquery-min.js" type="text/javascript"></script>
 </head>
 <body>
+	<p class="error_desc">
 
-	Oops..
-	<br /> ${error}
-	<br /> Code: ${code}
-	<br /> ${error_details}
-	<br />
+		Oops...<br /> ${error}
+	</p>
+	<p class="error_code">Code: ${code}</p>
+	<p class="error_details">${error_details}</p>
+
+
+	<script type="text/javascript">
+		console.log($(".error_details"));
+	</script>
+
 </body>
 </html>
 

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package fr.nemolovich.apps.homeapp.route;
+package pages;
 
 import freemarker.template.Configuration;
 import freemarker.template.SimpleHash;
@@ -20,7 +20,7 @@ import spark.Response;
 public class HomePage extends FreemarkerRoute {
 
     public HomePage(Configuration config) throws IOException {
-        super("/", "login.ftl", config);
+        super("/", "login.html", config);
     }
 
     @Override
