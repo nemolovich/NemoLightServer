@@ -5,7 +5,6 @@
  */
 package fr.nemolovich.apps.homeapp.route.pages;
 
-import fr.nemolovich.apps.homeapp.config.WebConfig;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -34,7 +33,7 @@ public abstract class FreemarkerRoute extends Route {
      * @throws java.io.IOException
      */
     protected FreemarkerRoute(final String path, final String templateName,
-            Configuration cfg) throws IOException {
+        Configuration cfg) throws IOException {
         super(path);
         template = cfg.getTemplate(templateName);
     }
@@ -47,21 +46,20 @@ public abstract class FreemarkerRoute extends Route {
         } catch (TemplateException | IOException e) {
             // FIXME: MAKE LOGGER WITH FILE
             StringBuilder details = new StringBuilder(e.getMessage()
-                    .concat("<br/>\n"));
+                .concat("<br/>\n"));
             StackTraceElement[] elements = e.getStackTrace();
             for (StackTraceElement element : elements) {
                 details.append("&nbsp;".concat(element.toString())
-                        .concat("<br/>\n"));
+                    .concat("<br/>\n"));
             }
 
             request.session().attribute("error_details", details.toString());
-            response.redirect(WebConfig.getStringValue("page.error")
-                    .concat("/500"));
+            response.redirect("error/500");
         }
         return writer;
     }
 
     protected abstract void doHandle(final Request request, final Response response, final Writer writer)
-            throws IOException, TemplateException;
+        throws IOException, TemplateException;
 
 }

@@ -1,4 +1,4 @@
-package fr.nemolovich.apps.homapp.config.route;
+package fr.nemolovich.apps.homeapp.config.route;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;

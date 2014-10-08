@@ -5,10 +5,18 @@
  */
 package fr.nemolovich.apps.homeapp.deploy;
 
+import fr.nemolovich.apps.homeapp.config.route.RouteElement;
+import fr.nemolovich.apps.homeapp.reflection.AnnotationTypeFilter;
+import fr.nemolovich.apps.homeapp.reflection.ClassPathScanner;
+import fr.nemolovich.apps.homeapp.reflection.SuperClassFilter;
+import fr.nemolovich.apps.homeapp.route.pages.FreemarkerRoute;
+import freemarker.template.Configuration;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -29,18 +37,20 @@ import java.util.logging.Logger;
 public final class DeployResourceManager {
 
     private static final Logger LOGGER = Logger.getLogger(
-            DeployResourceManager.class.getName());
+        DeployResourceManager.class.getName());
     private static final String SRC_FOLDER = "src/main/resources";
     public static final String RESOURCES_FOLDER = "resources/";
     private static final String FILE_PROTOCOL = "file";
     private static final String JAR_PROTOCOL = "jar";
 
+    public static List<FreemarkerRoute> ROUTES = new ArrayList();
+
     public static void initResources(String resourcesPath) {
         URL url = DeployResourceManager.class.getClassLoader()
-                .getResource(resourcesPath);
+            .getResource(resourcesPath);
         if (url == null) {
             url = DeployResourceManager.class.getClassLoader()
-                    .getResource(SRC_FOLDER.concat("/").concat(resourcesPath));
+                .getResource(SRC_FOLDER.concat("/").concat(resourcesPath));
         }
         List<String> files = null;
         if (url != null) {
@@ -56,10 +66,10 @@ public final class DeployResourceManager {
                 }
             } else if (protocol.equalsIgnoreCase(JAR_PROTOCOL)) {
                 String jarPath = "jar:file:/C:/Users/Nemolovich/Desktop/Tests/"
-                        + "HomeApp-0.1-jar-with-dependencies.jar!/fr/"
-                        + "nemolovich/apps/homeapp/";
+                    + "HomeApp-0.1-jar-with-dependencies.jar!/fr/"
+                    + "nemolovich/apps/homeapp/";
                 jarPath = jarPath.substring(JAR_PROTOCOL.length() + 1, jarPath
-                        .indexOf("!"));
+                    .indexOf("!"));
                 if (jarPath.startsWith(FILE_PROTOCOL)) {
                     jarPath = jarPath.substring(FILE_PROTOCOL.length() + 1);
                 }
@@ -71,11 +81,11 @@ public final class DeployResourceManager {
                     basePath = resourcesPath;
                 } catch (IOException ex) {
                     LOGGER.log(Level.SEVERE, "Can not load path from jar file",
-                            ex);
+                        ex);
                 }
             } else {
                 LOGGER.log(Level.SEVERE, "Unknown protocol '".concat(protocol)
-                        .concat("'"));
+                    .concat("'"));
             }
             if (files != null) {
                 deployFiles(files, basePath, protocol);
@@ -88,7 +98,7 @@ public final class DeployResourceManager {
         for (File f : folder.listFiles()) {
             if (f.isDirectory()) {
                 files.addAll(getAllFilesFrom(basePath.concat(f.getName())
-                        .concat("/"), f));
+                    .concat("/"), f));
             } else {
                 if (!f.getName().endsWith(".class")) {
                     files.add(basePath.concat(f.getName()));
@@ -105,9 +115,9 @@ public final class DeployResourceManager {
             String name = entries.nextElement().getName();
             if (name.startsWith(resourcesPath)) {
                 String entry = name.substring(
-                        resourcesPath.length());
+                    resourcesPath.length());
                 if (!entry.isEmpty() && !entry.endsWith("/")
-                        && !entry.endsWith(".class")) {
+                    && !entry.endsWith(".class")) {
                     files.add(entry);
                 }
             }
@@ -116,48 +126,80 @@ public final class DeployResourceManager {
     }
 
     private static void deployFiles(List<String> files, String basePath,
-            String protocol) {
+        String protocol) {
 
         InputStream input = null;
         for (String fileName : files) {
             try {
                 if (protocol.equalsIgnoreCase(FILE_PROTOCOL)) {
                     File f = new File(
-                            basePath.concat(fileName));
+                        basePath.concat(fileName));
                     input = new FileInputStream(f);
                 } else if (protocol.equalsIgnoreCase(JAR_PROTOCOL)) {
                     URL res = DeployResourceManager.class.getClassLoader()
-                            .getResource(basePath.concat(fileName));
+                        .getResource(basePath.concat(fileName));
                     if (res != null) {
                         input = res.openStream();
                     }
                 } else {
                     LOGGER.log(Level.SEVERE, "Unknown protocol '".concat(protocol)
-                            .concat("'"));
+                        .concat("'"));
                     return;
                 }
                 if (input == null) {
                     throw new IOException(
-                            "Can not read input file");
+                        "Can not read input file");
                 }
                 File target = new File(RESOURCES_FOLDER.concat(
-                        fileName));
+                    fileName));
                 if (!target.exists()) {
                     if (!target.getParentFile().mkdirs()
-                            && !target.createNewFile()) {
+                        && !target.createNewFile()) {
                         throw new IOException(
-                                "Can not create target file");
+                            "Can not create target file");
                     }
                 }
                 Files.copy(input, target.toPath(),
-                        StandardCopyOption.REPLACE_EXISTING);
-                LOGGER.log(Level.INFO, "Resources: '"
-                        .concat(fileName).concat("' deployed"));
+                    StandardCopyOption.REPLACE_EXISTING);
+                LOGGER.log(Level.INFO, "Resource '"
+                    .concat(fileName).concat("' deployed."));
             } catch (IOException ex) {
                 LOGGER.log(Level.SEVERE, "Can not deploy resources: '"
-                        .concat(fileName).concat("'"), ex);
+                    .concat(fileName).concat("'"), ex);
             }
         }
+    }
+
+    public static final boolean initialize(Configuration config) {
+        ClassPathScanner scanner = new ClassPathScanner();
+        scanner.addIncludeFilter(new AnnotationTypeFilter(
+            RouteElement.class));
+        scanner.addIncludeFilter(new SuperClassFilter(
+            FreemarkerRoute.class));
+
+        FreemarkerRoute route;
+        for (Class<?> c : scanner
+            .findCandidateComponents("fr.nemolovich.apps.homeapp")) {
+            try {
+                RouteElement annotation
+                    = c.getAnnotation(RouteElement.class);
+                String path = annotation.path();
+                String page = annotation.page();
+                Constructor<?> cst = c.getConstructor(String.class,
+                    String.class, Configuration.class);
+                route = (FreemarkerRoute) cst.newInstance(
+                    path, page, config);
+                ROUTES.add(route);
+                LOGGER.log(Level.INFO, "Resource '".concat(c.getName())
+                    .concat("' has been deployed!"));
+
+            } catch (InstantiationException | IllegalAccessException |
+                IllegalArgumentException | InvocationTargetException |
+                NoSuchMethodException | SecurityException ex) {
+                LOGGER.log(Level.SEVERE, "Error while deploying resources", ex);
+            }
+        }
+        return false;
     }
 
 }

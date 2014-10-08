@@ -871,3 +871,285 @@ freemarker.core.InvalidReferenceException: Expression username is undefined on l
 	at org.eclipse.jetty.server.bio.SocketConnector$ConnectorEndPoint.run(SocketConnector.java:241)
 	at org.eclipse.jetty.util.thread.QueuedThreadPool$3.run(QueuedThreadPool.java:528)
 	at java.lang.Thread.run(Thread.java:745)
+[main] DEBUG fr.nemolovich.apps.homeapp.Launcher  - Log4j appender configuration successfully loaded
+[main] DEBUG fr.nemolovich.apps.homeapp.Launcher  - Log4j appender configuration successfully loaded
+[main] DEBUG fr.nemolovich.apps.homeapp.Launcher  - Log4j appender configuration successfully loaded
+[main] DEBUG freemarker.cache  - Could not find template in cache, creating new one; id=["error.html"["fr_FR",Cp1252,parsed] ]
+[main] DEBUG freemarker.cache  - Compiling FreeMarker template "error.html"["fr_FR",Cp1252,parsed]  from "M:\\Users\\Nemolovich\\Mes Documents\\NetBeansProjects\\HomeAppEAR\\resources\\freemarker\\error.html"
+[main] DEBUG freemarker.cache  - Could not find template in cache, creating new one; id=["login.html"["fr_FR",Cp1252,parsed] ]
+[main] DEBUG freemarker.cache  - Compiling FreeMarker template "login.html"["fr_FR",Cp1252,parsed]  from "M:\\Users\\Nemolovich\\Mes Documents\\NetBeansProjects\\HomeAppEAR\\resources\\freemarker\\login.html"
+[main] DEBUG fr.nemolovich.apps.homeapp.Launcher  - Log4j appender configuration successfully loaded
+[main] DEBUG freemarker.cache  - Could not find template in cache, creating new one; id=["error.html"["fr_FR",Cp1252,parsed] ]
+[main] DEBUG freemarker.cache  - Compiling FreeMarker template "error.html"["fr_FR",Cp1252,parsed]  from "M:\\Users\\Nemolovich\\Mes Documents\\NetBeansProjects\\HomeAppEAR\\resources\\freemarker\\error.html"
+[main] DEBUG freemarker.cache  - Could not find template in cache, creating new one; id=["login.html"["fr_FR",Cp1252,parsed] ]
+[main] DEBUG freemarker.cache  - Compiling FreeMarker template "login.html"["fr_FR",Cp1252,parsed]  from "M:\\Users\\Nemolovich\\Mes Documents\\NetBeansProjects\\HomeAppEAR\\resources\\freemarker\\login.html"
+[main] DEBUG fr.nemolovich.apps.homeapp.Launcher  - Log4j appender configuration successfully loaded
+[main] DEBUG freemarker.cache  - Could not find template in cache, creating new one; id=["error.html"["fr_FR",Cp1252,parsed] ]
+[main] DEBUG freemarker.cache  - Compiling FreeMarker template "error.html"["fr_FR",Cp1252,parsed]  from "M:\\Users\\Nemolovich\\Mes Documents\\NetBeansProjects\\HomeAppEAR\\resources\\freemarker\\error.html"
+[main] DEBUG freemarker.cache  - Could not find template in cache, creating new one; id=["login.html"["fr_FR",Cp1252,parsed] ]
+[main] DEBUG freemarker.cache  - Compiling FreeMarker template "login.html"["fr_FR",Cp1252,parsed]  from "M:\\Users\\Nemolovich\\Mes Documents\\NetBeansProjects\\HomeAppEAR\\resources\\freemarker\\login.html"
+[qtp1892464608-22] ERROR freemarker.runtime  - Template processing error: "Expression username is undefined on line 27, column 81 in login.html."
+
+Expression username is undefined on line 27, column 81 in login.html.
+The problematic instruction:
+----------
+==> ${username} [on line 27, column 79 in login.html]
+----------
+
+Java backtrace for programmers:
+----------
+freemarker.core.InvalidReferenceException: Expression username is undefined on line 27, column 81 in login.html.
+	at freemarker.core.TemplateObject.assertNonNull(TemplateObject.java:125)
+	at freemarker.core.Expression.getStringValue(Expression.java:118)
+	at freemarker.core.Expression.getStringValue(Expression.java:93)
+	at freemarker.core.DollarVariable.accept(DollarVariable.java:76)
+	at freemarker.core.Environment.visit(Environment.java:221)
+	at freemarker.core.MixedContent.accept(MixedContent.java:92)
+	at freemarker.core.Environment.visit(Environment.java:221)
+	at freemarker.core.Environment.process(Environment.java:199)
+	at freemarker.template.Template.process(Template.java:259)
+	at fr.nemolovich.apps.homeapp.route.pages.HomePage.doHandle(HomePage.java:36)
+	at fr.nemolovich.apps.homeapp.route.pages.FreemarkerRoute.handle(FreemarkerRoute.java:46)
+	at spark.webserver.MatcherFilter.doFilter(MatcherFilter.java:133)
+	at spark.webserver.JettyHandler.doHandle(JettyHandler.java:47)
+	at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:188)
+	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:117)
+	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:116)
+	at org.eclipse.jetty.server.Server.handle(Server.java:346)
+	at org.eclipse.jetty.server.HttpConnection.handleRequest(HttpConnection.java:596)
+	at org.eclipse.jetty.server.HttpConnection$RequestHandler.headerComplete(HttpConnection.java:1051)
+	at org.eclipse.jetty.http.HttpParser.parseNext(HttpParser.java:592)
+	at org.eclipse.jetty.http.HttpParser.parseAvailable(HttpParser.java:214)
+	at org.eclipse.jetty.server.HttpConnection.handle(HttpConnection.java:426)
+	at org.eclipse.jetty.server.bio.SocketConnector$ConnectorEndPoint.run(SocketConnector.java:241)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$3.run(QueuedThreadPool.java:528)
+	at java.lang.Thread.run(Thread.java:745)
+[qtp1892464608-22] ERROR freemarker.runtime  - Template processing error: "Expression username is undefined on line 27, column 81 in login.html."
+
+Expression username is undefined on line 27, column 81 in login.html.
+The problematic instruction:
+----------
+==> ${username} [on line 27, column 79 in login.html]
+----------
+
+Java backtrace for programmers:
+----------
+freemarker.core.InvalidReferenceException: Expression username is undefined on line 27, column 81 in login.html.
+	at freemarker.core.TemplateObject.assertNonNull(TemplateObject.java:125)
+	at freemarker.core.Expression.getStringValue(Expression.java:118)
+	at freemarker.core.Expression.getStringValue(Expression.java:93)
+	at freemarker.core.DollarVariable.accept(DollarVariable.java:76)
+	at freemarker.core.Environment.visit(Environment.java:221)
+	at freemarker.core.MixedContent.accept(MixedContent.java:92)
+	at freemarker.core.Environment.visit(Environment.java:221)
+	at freemarker.core.Environment.process(Environment.java:199)
+	at freemarker.template.Template.process(Template.java:259)
+	at fr.nemolovich.apps.homeapp.route.pages.HomePage.doHandle(HomePage.java:36)
+	at fr.nemolovich.apps.homeapp.route.pages.FreemarkerRoute.handle(FreemarkerRoute.java:46)
+	at spark.webserver.MatcherFilter.doFilter(MatcherFilter.java:133)
+	at spark.webserver.JettyHandler.doHandle(JettyHandler.java:47)
+	at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:188)
+	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:117)
+	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:116)
+	at org.eclipse.jetty.server.Server.handle(Server.java:346)
+	at org.eclipse.jetty.server.HttpConnection.handleRequest(HttpConnection.java:596)
+	at org.eclipse.jetty.server.HttpConnection$RequestHandler.headerComplete(HttpConnection.java:1051)
+	at org.eclipse.jetty.http.HttpParser.parseNext(HttpParser.java:592)
+	at org.eclipse.jetty.http.HttpParser.parseAvailable(HttpParser.java:214)
+	at org.eclipse.jetty.server.HttpConnection.handle(HttpConnection.java:426)
+	at org.eclipse.jetty.server.bio.SocketConnector$ConnectorEndPoint.run(SocketConnector.java:241)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$3.run(QueuedThreadPool.java:528)
+	at java.lang.Thread.run(Thread.java:745)
+[main] DEBUG fr.nemolovich.apps.homeapp.Launcher  - Log4j appender configuration successfully loaded
+[main] DEBUG freemarker.cache  - Could not find template in cache, creating new one; id=["error.html"["fr_FR",Cp1252,parsed] ]
+[main] DEBUG freemarker.cache  - Compiling FreeMarker template "error.html"["fr_FR",Cp1252,parsed]  from "M:\\Users\\Nemolovich\\Mes Documents\\NetBeansProjects\\HomeAppEAR\\resources\\freemarker\\error.html"
+[main] DEBUG freemarker.cache  - Could not find template in cache, creating new one; id=["login.html"["fr_FR",Cp1252,parsed] ]
+[main] DEBUG freemarker.cache  - Compiling FreeMarker template "login.html"["fr_FR",Cp1252,parsed]  from "M:\\Users\\Nemolovich\\Mes Documents\\NetBeansProjects\\HomeAppEAR\\resources\\freemarker\\login.html"
+[qtp948317285-17] ERROR freemarker.runtime  - Template processing error: "Expression username is undefined on line 27, column 81 in login.html."
+
+Expression username is undefined on line 27, column 81 in login.html.
+The problematic instruction:
+----------
+==> ${username} [on line 27, column 79 in login.html]
+----------
+
+Java backtrace for programmers:
+----------
+freemarker.core.InvalidReferenceException: Expression username is undefined on line 27, column 81 in login.html.
+	at freemarker.core.TemplateObject.assertNonNull(TemplateObject.java:125)
+	at freemarker.core.Expression.getStringValue(Expression.java:118)
+	at freemarker.core.Expression.getStringValue(Expression.java:93)
+	at freemarker.core.DollarVariable.accept(DollarVariable.java:76)
+	at freemarker.core.Environment.visit(Environment.java:221)
+	at freemarker.core.MixedContent.accept(MixedContent.java:92)
+	at freemarker.core.Environment.visit(Environment.java:221)
+	at freemarker.core.Environment.process(Environment.java:199)
+	at freemarker.template.Template.process(Template.java:259)
+	at fr.nemolovich.apps.homeapp.route.pages.HomePage.doHandle(HomePage.java:36)
+	at fr.nemolovich.apps.homeapp.route.pages.FreemarkerRoute.handle(FreemarkerRoute.java:46)
+	at spark.webserver.MatcherFilter.doFilter(MatcherFilter.java:133)
+	at spark.webserver.JettyHandler.doHandle(JettyHandler.java:47)
+	at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:188)
+	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:117)
+	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:116)
+	at org.eclipse.jetty.server.Server.handle(Server.java:346)
+	at org.eclipse.jetty.server.HttpConnection.handleRequest(HttpConnection.java:596)
+	at org.eclipse.jetty.server.HttpConnection$RequestHandler.headerComplete(HttpConnection.java:1051)
+	at org.eclipse.jetty.http.HttpParser.parseNext(HttpParser.java:592)
+	at org.eclipse.jetty.http.HttpParser.parseAvailable(HttpParser.java:214)
+	at org.eclipse.jetty.server.HttpConnection.handle(HttpConnection.java:426)
+	at org.eclipse.jetty.server.bio.SocketConnector$ConnectorEndPoint.run(SocketConnector.java:241)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$3.run(QueuedThreadPool.java:528)
+	at java.lang.Thread.run(Thread.java:745)
+[qtp948317285-17] ERROR freemarker.runtime  - Template processing error: "Expression username is undefined on line 27, column 81 in login.html."
+
+Expression username is undefined on line 27, column 81 in login.html.
+The problematic instruction:
+----------
+==> ${username} [on line 27, column 79 in login.html]
+----------
+
+Java backtrace for programmers:
+----------
+freemarker.core.InvalidReferenceException: Expression username is undefined on line 27, column 81 in login.html.
+	at freemarker.core.TemplateObject.assertNonNull(TemplateObject.java:125)
+	at freemarker.core.Expression.getStringValue(Expression.java:118)
+	at freemarker.core.Expression.getStringValue(Expression.java:93)
+	at freemarker.core.DollarVariable.accept(DollarVariable.java:76)
+	at freemarker.core.Environment.visit(Environment.java:221)
+	at freemarker.core.MixedContent.accept(MixedContent.java:92)
+	at freemarker.core.Environment.visit(Environment.java:221)
+	at freemarker.core.Environment.process(Environment.java:199)
+	at freemarker.template.Template.process(Template.java:259)
+	at fr.nemolovich.apps.homeapp.route.pages.HomePage.doHandle(HomePage.java:36)
+	at fr.nemolovich.apps.homeapp.route.pages.FreemarkerRoute.handle(FreemarkerRoute.java:46)
+	at spark.webserver.MatcherFilter.doFilter(MatcherFilter.java:133)
+	at spark.webserver.JettyHandler.doHandle(JettyHandler.java:47)
+	at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:188)
+	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:117)
+	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:116)
+	at org.eclipse.jetty.server.Server.handle(Server.java:346)
+	at org.eclipse.jetty.server.HttpConnection.handleRequest(HttpConnection.java:596)
+	at org.eclipse.jetty.server.HttpConnection$RequestHandler.headerComplete(HttpConnection.java:1051)
+	at org.eclipse.jetty.http.HttpParser.parseNext(HttpParser.java:592)
+	at org.eclipse.jetty.http.HttpParser.parseAvailable(HttpParser.java:214)
+	at org.eclipse.jetty.server.HttpConnection.handle(HttpConnection.java:426)
+	at org.eclipse.jetty.server.bio.SocketConnector$ConnectorEndPoint.run(SocketConnector.java:241)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$3.run(QueuedThreadPool.java:528)
+	at java.lang.Thread.run(Thread.java:745)
+[main] DEBUG fr.nemolovich.apps.homeapp.Launcher  - Log4j appender configuration successfully loaded
+[main] DEBUG freemarker.cache  - Could not find template in cache, creating new one; id=["error.html"["fr_FR",Cp1252,parsed] ]
+[main] DEBUG freemarker.cache  - Compiling FreeMarker template "error.html"["fr_FR",Cp1252,parsed]  from "M:\\Users\\Nemolovich\\Mes Documents\\NetBeansProjects\\HomeAppEAR\\resources\\freemarker\\error.html"
+[main] DEBUG freemarker.cache  - Could not find template in cache, creating new one; id=["login.html"["fr_FR",Cp1252,parsed] ]
+[main] DEBUG freemarker.cache  - Compiling FreeMarker template "login.html"["fr_FR",Cp1252,parsed]  from "M:\\Users\\Nemolovich\\Mes Documents\\NetBeansProjects\\HomeAppEAR\\resources\\freemarker\\login.html"
+[qtp1892464608-19] ERROR freemarker.runtime  - Template processing error: "Expression username is undefined on line 27, column 81 in login.html."
+
+Expression username is undefined on line 27, column 81 in login.html.
+The problematic instruction:
+----------
+==> ${username} [on line 27, column 79 in login.html]
+----------
+
+Java backtrace for programmers:
+----------
+freemarker.core.InvalidReferenceException: Expression username is undefined on line 27, column 81 in login.html.
+	at freemarker.core.TemplateObject.assertNonNull(TemplateObject.java:125)
+	at freemarker.core.Expression.getStringValue(Expression.java:118)
+	at freemarker.core.Expression.getStringValue(Expression.java:93)
+	at freemarker.core.DollarVariable.accept(DollarVariable.java:76)
+	at freemarker.core.Environment.visit(Environment.java:221)
+	at freemarker.core.MixedContent.accept(MixedContent.java:92)
+	at freemarker.core.Environment.visit(Environment.java:221)
+	at freemarker.core.Environment.process(Environment.java:199)
+	at freemarker.template.Template.process(Template.java:259)
+	at fr.nemolovich.apps.homeapp.route.pages.HomePage.doHandle(HomePage.java:36)
+	at fr.nemolovich.apps.homeapp.route.pages.FreemarkerRoute.handle(FreemarkerRoute.java:45)
+	at spark.webserver.MatcherFilter.doFilter(MatcherFilter.java:133)
+	at spark.webserver.JettyHandler.doHandle(JettyHandler.java:47)
+	at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:188)
+	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:117)
+	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:116)
+	at org.eclipse.jetty.server.Server.handle(Server.java:346)
+	at org.eclipse.jetty.server.HttpConnection.handleRequest(HttpConnection.java:596)
+	at org.eclipse.jetty.server.HttpConnection$RequestHandler.headerComplete(HttpConnection.java:1051)
+	at org.eclipse.jetty.http.HttpParser.parseNext(HttpParser.java:592)
+	at org.eclipse.jetty.http.HttpParser.parseAvailable(HttpParser.java:214)
+	at org.eclipse.jetty.server.HttpConnection.handle(HttpConnection.java:426)
+	at org.eclipse.jetty.server.bio.SocketConnector$ConnectorEndPoint.run(SocketConnector.java:241)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$3.run(QueuedThreadPool.java:528)
+	at java.lang.Thread.run(Thread.java:745)
+[qtp1892464608-19] ERROR freemarker.runtime  - Template processing error: "Expression username is undefined on line 27, column 81 in login.html."
+
+Expression username is undefined on line 27, column 81 in login.html.
+The problematic instruction:
+----------
+==> ${username} [on line 27, column 79 in login.html]
+----------
+
+Java backtrace for programmers:
+----------
+freemarker.core.InvalidReferenceException: Expression username is undefined on line 27, column 81 in login.html.
+	at freemarker.core.TemplateObject.assertNonNull(TemplateObject.java:125)
+	at freemarker.core.Expression.getStringValue(Expression.java:118)
+	at freemarker.core.Expression.getStringValue(Expression.java:93)
+	at freemarker.core.DollarVariable.accept(DollarVariable.java:76)
+	at freemarker.core.Environment.visit(Environment.java:221)
+	at freemarker.core.MixedContent.accept(MixedContent.java:92)
+	at freemarker.core.Environment.visit(Environment.java:221)
+	at freemarker.core.Environment.process(Environment.java:199)
+	at freemarker.template.Template.process(Template.java:259)
+	at fr.nemolovich.apps.homeapp.route.pages.HomePage.doHandle(HomePage.java:36)
+	at fr.nemolovich.apps.homeapp.route.pages.FreemarkerRoute.handle(FreemarkerRoute.java:45)
+	at spark.webserver.MatcherFilter.doFilter(MatcherFilter.java:133)
+	at spark.webserver.JettyHandler.doHandle(JettyHandler.java:47)
+	at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:188)
+	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:117)
+	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:116)
+	at org.eclipse.jetty.server.Server.handle(Server.java:346)
+	at org.eclipse.jetty.server.HttpConnection.handleRequest(HttpConnection.java:596)
+	at org.eclipse.jetty.server.HttpConnection$RequestHandler.headerComplete(HttpConnection.java:1051)
+	at org.eclipse.jetty.http.HttpParser.parseNext(HttpParser.java:592)
+	at org.eclipse.jetty.http.HttpParser.parseAvailable(HttpParser.java:214)
+	at org.eclipse.jetty.server.HttpConnection.handle(HttpConnection.java:426)
+	at org.eclipse.jetty.server.bio.SocketConnector$ConnectorEndPoint.run(SocketConnector.java:241)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$3.run(QueuedThreadPool.java:528)
+	at java.lang.Thread.run(Thread.java:745)
+[main] DEBUG fr.nemolovich.apps.homeapp.Launcher  - Log4j appender configuration successfully loaded
+[main] DEBUG fr.nemolovich.apps.homeapp.Launcher  - Log4j appender configuration successfully loaded
+[main] DEBUG fr.nemolovich.apps.homeapp.Launcher  - Log4j appender configuration successfully loaded
+[qtp1701111423-21] ERROR freemarker.runtime  - Template processing error: "Expression username is undefined on line 27, column 81 in login.html."
+
+Expression username is undefined on line 27, column 81 in login.html.
+The problematic instruction:
+----------
+==> ${username} [on line 27, column 79 in login.html]
+----------
+
+Java backtrace for programmers:
+----------
+freemarker.core.InvalidReferenceException: Expression username is undefined on line 27, column 81 in login.html.
+	at freemarker.core.TemplateObject.assertNonNull(TemplateObject.java:125)
+	at freemarker.core.Expression.getStringValue(Expression.java:118)
+	at freemarker.core.Expression.getStringValue(Expression.java:93)
+	at freemarker.core.DollarVariable.accept(DollarVariable.java:76)
+	at freemarker.core.Environment.visit(Environment.java:221)
+	at freemarker.core.MixedContent.accept(MixedContent.java:92)
+	at freemarker.core.Environment.visit(Environment.java:221)
+	at freemarker.core.Environment.process(Environment.java:199)
+	at freemarker.template.Template.process(Template.java:259)
+	at fr.nemolovich.apps.homeapp.route.pages.HomePage.doHandle(HomePage.java:36)
+	at fr.nemolovich.apps.homeapp.route.pages.FreemarkerRoute.handle(FreemarkerRoute.java:45)
+	at spark.webserver.MatcherFilter.doFilter(MatcherFilter.java:133)
+	at spark.webserver.JettyHandler.doHandle(JettyHandler.java:47)
+	at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:188)
+	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:117)
+	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:116)
+	at org.eclipse.jetty.server.Server.handle(Server.java:346)
+	at org.eclipse.jetty.server.HttpConnection.handleRequest(HttpConnection.java:596)
+	at org.eclipse.jetty.server.HttpConnection$RequestHandler.headerComplete(HttpConnection.java:1051)
+	at org.eclipse.jetty.http.HttpParser.parseNext(HttpParser.java:592)
+	at org.eclipse.jetty.http.HttpParser.parseAvailable(HttpParser.java:214)
+	at org.eclipse.jetty.server.HttpConnection.handle(HttpConnection.java:426)
+	at org.eclipse.jetty.server.bio.SocketConnector$ConnectorEndPoint.run(SocketConnector.java:241)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$3.run(QueuedThreadPool.java:528)
+	at java.lang.Thread.run(Thread.java:745)

@@ -5,35 +5,35 @@
  */
 package fr.nemolovich.apps.homeapp.route.pages;
 
-import java.io.IOException;
-import java.io.Writer;
-
-import spark.Request;
-import spark.Response;
-import fr.nemolovich.apps.homapp.config.route.RouteElement;
+import fr.nemolovich.apps.homeapp.config.route.RouteElement;
 import freemarker.template.Configuration;
 import freemarker.template.SimpleHash;
 import freemarker.template.TemplateException;
+import java.io.IOException;
+import java.io.Writer;
+import spark.Request;
+import spark.Response;
 
 /**
  *
  * @author Nemolovich
  */
-@RouteElement(path = "/error", page = "error.html")
+@RouteElement(path = "/error/:code", page = "error.html")
 public class ErrorPage extends FreemarkerRoute {
 
-    public ErrorPage(String routePath, String page, Configuration config) throws IOException {
+    public ErrorPage(String routePath, String page, Configuration config)
+        throws IOException {
         super(routePath, page, config);
     }
 
     @Override
     protected void doHandle(Request request, Response response, Writer writer)
-            throws IOException, TemplateException {
+        throws IOException, TemplateException {
         SimpleHash root = new SimpleHash();
         String error = request.params("code");
         root.put("code", error);
-        String details=request.session().attribute("error_details");
-        if(details!=null) {
+        String details = request.session().attribute("error_details");
+        if (details != null) {
             root.put("error_details", details);
             request.session().removeAttribute("error_details");
         } else {

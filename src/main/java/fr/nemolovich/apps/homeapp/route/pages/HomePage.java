@@ -5,14 +5,12 @@
  */
 package fr.nemolovich.apps.homeapp.route.pages;
 
-import fr.nemolovich.apps.homapp.config.route.RouteElement;
+import fr.nemolovich.apps.homeapp.config.route.RouteElement;
 import freemarker.template.Configuration;
 import freemarker.template.SimpleHash;
 import freemarker.template.TemplateException;
-
 import java.io.IOException;
 import java.io.Writer;
-
 import spark.Request;
 import spark.Response;
 
@@ -23,14 +21,15 @@ import spark.Response;
 @RouteElement(path = "/", page = "login.html")
 public class HomePage extends FreemarkerRoute {
 
-    public HomePage(Configuration config) throws IOException {
-        super("/", "login.html", config);
+    public HomePage(String routePath, String page, Configuration config)
+        throws IOException {
+        super(routePath, page, config);
     }
 
     @Override
     protected void doHandle(Request request, Response response, Writer writer)
-            throws IOException, TemplateException {
-        
+        throws IOException, TemplateException {
+
         SimpleHash root = new SimpleHash();
 //        root.put("username", "");
         root.put("login_error", "");
