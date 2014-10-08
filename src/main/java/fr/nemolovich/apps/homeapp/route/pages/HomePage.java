@@ -5,11 +5,14 @@
  */
 package fr.nemolovich.apps.homeapp.route.pages;
 
+import fr.nemolovich.apps.homapp.config.route.RouteElement;
 import freemarker.template.Configuration;
 import freemarker.template.SimpleHash;
 import freemarker.template.TemplateException;
+
 import java.io.IOException;
 import java.io.Writer;
+
 import spark.Request;
 import spark.Response;
 
@@ -17,6 +20,7 @@ import spark.Response;
  *
  * @author Nemolovich
  */
+@RouteElement(path = "/", page = "login.html")
 public class HomePage extends FreemarkerRoute {
 
     public HomePage(Configuration config) throws IOException {

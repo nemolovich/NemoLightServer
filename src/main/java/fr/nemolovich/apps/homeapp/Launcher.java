@@ -5,22 +5,21 @@
  */
 package fr.nemolovich.apps.homeapp;
 
-import fr.nemolovich.apps.homeapp.config.WebConfig;
-import fr.nemolovich.apps.homeapp.deploy.DeployResourceManager;
-import fr.nemolovich.apps.homeapp.route.file.FileRoute;
-import fr.nemolovich.apps.homeapp.route.pages.ErrorPage;
-import fr.nemolovich.apps.homeapp.route.pages.HomePage;
-import freemarker.template.Configuration;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+
 import spark.Request;
 import spark.Response;
 import spark.Route;
 import spark.Spark;
+import fr.nemolovich.apps.homapp.config.route.DeploymentConfig;
+import fr.nemolovich.apps.homeapp.deploy.DeployResourceManager;
+import freemarker.template.Configuration;
 
 /**
  *
@@ -71,6 +70,14 @@ public class Launcher {
             System.out.println(HELP);
             return;
         }
+        
+        boolean templateInit=false;
+        File templateFolder=new File(TEMPLATE_FOLDER);
+        
+        if(templateFolder.exists()) {
+        	config.setDirectoryForTemplateLoading(templateFolder);
+        	templateInit=true;
+        }
 
         for (String arg : args) {
             System.out.println("arg: " + arg);
@@ -90,26 +97,29 @@ public class Launcher {
 
                 Spark.setPort(8081);
                 Spark.get(new Route("") {
-
                     @Override
                     public Object handle(Request rqst, Response rspns) {
                         return "Server started!";
                     }
                 });
 
-                config.setDirectoryForTemplateLoading(new File(TEMPLATE_FOLDER));
-
             } else if (arg.equals("--" + ((String[]) PARAMS.get(2))[0])) {
 
                 System.out.println("Deploy");
+                
+                DeploymentConfig.getInstance().initialize(config);
 
-                Spark.get(new FileRoute("/webapp/js/jquery-min.js",
-                        DeployResourceManager.RESOURCES_FOLDER.concat("webapp/js/")
-                        .concat(WebConfig.getStringValue("jquery.file"))));
-                Spark.get(new HomePage(config));
-                Spark.get(new ErrorPage(config));
+//                Spark.get(new FileRoute("/webapp/js/jquery-min.js",
+//                        DeployResourceManager.RESOURCES_FOLDER.concat("webapp/js/")
+//                        .concat(WebConfig.getStringValue("jquery.file"))));
+//                Spark.get(new HomePage(config));
+//                Spark.get(new ErrorPage(config));
 
             }
+            
+            if(!templateInit&&templateFolder.exists()) {
+            	config.setDirectoryForTemplateLoading(templateFolder);
+            }	
 
         }
 

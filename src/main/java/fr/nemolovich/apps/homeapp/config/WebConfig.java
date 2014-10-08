@@ -25,8 +25,6 @@ public class WebConfig extends ClassConfig {
 
     private WebConfig() {
         super();
-        this.setConfig("page.error", "/error");
-        this.setConfig("page.error.template", "error.html");
         this.setConfig("jquery.file", "jquery-1.11.1.min.js");
     }
 

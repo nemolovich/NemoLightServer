@@ -5,24 +5,25 @@
  */
 package fr.nemolovich.apps.homeapp.route.pages;
 
-import fr.nemolovich.apps.homeapp.config.WebConfig;
+import java.io.IOException;
+import java.io.Writer;
+
+import spark.Request;
+import spark.Response;
+import fr.nemolovich.apps.homapp.config.route.RouteElement;
 import freemarker.template.Configuration;
 import freemarker.template.SimpleHash;
 import freemarker.template.TemplateException;
-import java.io.IOException;
-import java.io.Writer;
-import spark.Request;
-import spark.Response;
 
 /**
  *
  * @author Nemolovich
  */
+@RouteElement(path = "/error", page = "error.html")
 public class ErrorPage extends FreemarkerRoute {
 
-    public ErrorPage(Configuration config) throws IOException {
-        super(WebConfig.getStringValue("page.error").concat("/:code"),
-                WebConfig.getStringValue("page.error.template"), config);
+    public ErrorPage(String routePath, String page, Configuration config) throws IOException {
+        super(routePath, page, config);
     }
 
     @Override
