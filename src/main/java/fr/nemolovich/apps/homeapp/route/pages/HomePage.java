@@ -21,19 +21,19 @@ import spark.Response;
 @RouteElement(path = "/", page = "login.html")
 public class HomePage extends FreemarkerRoute {
 
-    public HomePage(String routePath, String page, Configuration config)
-        throws IOException {
-        super(routePath, page, config);
-    }
+	public HomePage(String routePath, String page, Configuration config)
+			throws IOException {
+		super(routePath, page, config);
+	}
 
-    @Override
-    protected void doHandle(Request request, Response response, Writer writer)
-        throws IOException, TemplateException {
+	@Override
+	protected void doHandle(Request request, Response response, Writer writer)
+			throws IOException, TemplateException {
 
-        SimpleHash root = new SimpleHash();
-//        root.put("username", "");
-        root.put("login_error", "");
-        template.process(root, writer);
-    }
+		SimpleHash root = new SimpleHash();
+		// root.put("username", "");
+		root.put("login_error", "");
+		template.process(root, writer);
+	}
 
 }

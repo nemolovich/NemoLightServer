@@ -5,15 +5,21 @@
  */
 package fr.nemolovich.apps.homeapp;
 
+import fr.nemolovich.apps.homeapp.config.WebConfig;
+import fr.nemolovich.apps.homeapp.constants.HomeAppConstants;
 import fr.nemolovich.apps.homeapp.deploy.DeployResourceManager;
+import fr.nemolovich.apps.homeapp.route.WebRoute;
 import fr.nemolovich.apps.homeapp.route.pages.FreemarkerRoute;
 import freemarker.template.Configuration;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+
 import spark.Spark;
 
 /**
@@ -22,92 +28,86 @@ import spark.Spark;
  */
 public class Launcher {
 
-    private static final Configuration config = new Configuration();
+	private static final Configuration config = new Configuration();
 
-    private static final String CONFIG_FOLDER
-        = DeployResourceManager.RESOURCES_FOLDER.concat("/configs/");
+	private static final Logger LOGGER = Logger.getLogger(Launcher.class);
 
-    private static final String PACKAGE_NAME = "fr/nemolovich/apps/homeapp/";
+	private static final List PARAMS = Arrays.asList(
+			getArray("init", "Initialize resources"),
+			getArray("start", "Start server"),
+			getArray("deploy", "Deploy resources"));
 
-    private static final String TEMPLATE_FOLDER
-        = DeployResourceManager.RESOURCES_FOLDER.concat(
-            "/freemarker/");
+	private static final String HELP;
 
-    private static final Logger LOGGER = Logger.getLogger(Launcher.class);
+	static {
+		StringBuilder help = new StringBuilder(
+				"Usage: Launcher <PARAM> [<OPTIONAL_PARAMS>,]\n");
+		for (Object o : PARAMS) {
+			String[] param = (String[]) o;
+			help.append(String.format("\t--%-15s%-30s%n", param[0], param[1]));
+		}
+		HELP = help.toString();
+	}
 
-    private static final List PARAMS = Arrays.asList(
-        getArray("init", "Initialize resources"),
-        getArray("start", "Start server"),
-        getArray("deploy", "Deploy resources"));
+	private static String[] getArray(String str1, String str2) {
+		String[] a = new String[2];
+		a[0] = str1;
+		a[1] = str2;
+		return a;
+	}
 
-    private static final String HELP;
+	public static void main(String[] args) throws IOException {
 
-    static {
-        StringBuilder help = new StringBuilder(
-            "Usage: Launcher <PARAM> [<OPTIONAL_PARAMS>,]\n");
-        for (Object o : PARAMS) {
-            String[] param = (String[]) o;
-            help.append(String.format("\t--%-15s%-30s%n", param[0], param[1]));
-        }
-        HELP = help.toString();
-    }
+		if (args.length < 1) {
+			System.out.println(HELP);
+			return;
+		}
 
-    private static String[] getArray(String str1, String str2) {
-        String[] a = new String[2];
-        a[0] = str1;
-        a[1] = str2;
-        return a;
-    }
+		boolean templateInit = false;
+		File templateFolder = new File(HomeAppConstants.TEMPLATE_FOLDER);
 
-    public static void main(String[] args) throws IOException {
+		if (templateFolder.exists()) {
+			config.setDirectoryForTemplateLoading(templateFolder);
+			templateInit = true;
+		}
 
-        if (args.length < 1) {
-            System.out.println(HELP);
-            return;
-        }
+		for (String arg : args) {
+			if (arg.equals("--" + ((String[]) PARAMS.get(0))[0])) {
 
-        boolean templateInit = false;
-        File templateFolder = new File(TEMPLATE_FOLDER);
+				System.out.println("Init");
 
-        if (templateFolder.exists()) {
-            config.setDirectoryForTemplateLoading(templateFolder);
-            templateInit = true;
-        }
+				DeployResourceManager
+						.initResources(HomeAppConstants.PACKAGE_NAME);
 
-        for (String arg : args) {
-            if (arg.equals("--" + ((String[]) PARAMS.get(0))[0])) {
+			} else if (arg.equals("--" + ((String[]) PARAMS.get(1))[0])) {
 
-                System.out.println("Init");
+				System.out.println("Start");
 
-                DeployResourceManager.initResources(PACKAGE_NAME);
+				PropertyConfigurator.configure(HomeAppConstants.CONFIG_FOLDER
+						.concat("log4j/log4j.properties"));
+				LOGGER.debug("Log4j appender configuration successfully loaded");
 
-            } else if (arg.equals("--" + ((String[]) PARAMS.get(1))[0])) {
+				Spark.setPort(8081);
 
-                System.out.println("Start");
+				for (WebRoute route : DeployResourceManager.ROUTES) {
+					Spark.get(route);
+				}
 
-                PropertyConfigurator.configure(CONFIG_FOLDER
-                    .concat("log4j/log4j.properties"));
-                LOGGER.debug("Log4j appender configuration successfully loaded");
+			} else if (arg.equals("--" + ((String[]) PARAMS.get(2))[0])) {
 
-                Spark.setPort(8081);
+				System.out.println("Deploy");
 
-                for (FreemarkerRoute route : DeployResourceManager.ROUTES) {
-                    Spark.get(route);
-                }
+				DeployResourceManager.deployWebPages(config);
+				DeployResourceManager.deloyWebApp(WebConfig
+						.getStringValue("deploy.folder"));
 
-            } else if (arg.equals("--" + ((String[]) PARAMS.get(2))[0])) {
+			}
 
-                System.out.println("Deploy");
+			if (!templateInit && templateFolder.exists()) {
+				config.setDirectoryForTemplateLoading(templateFolder);
+			}
 
-                DeployResourceManager.initialize(config);
+		}
 
-            }
-
-            if (!templateInit && templateFolder.exists()) {
-                config.setDirectoryForTemplateLoading(templateFolder);
-            }
-
-        }
-
-    }
+	}
 }

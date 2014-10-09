@@ -5,61 +5,60 @@
  */
 package fr.nemolovich.apps.homeapp.route.pages;
 
-import freemarker.template.Configuration;
-import freemarker.template.Template;
-import freemarker.template.TemplateException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+
 import spark.Request;
 import spark.Response;
-import spark.Route;
+import fr.nemolovich.apps.homeapp.route.WebRoute;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 
 /**
  *
  * @author Nemolovich
  */
-public abstract class FreemarkerRoute extends Route {
+public abstract class FreemarkerRoute extends WebRoute {
 
-    final Template template;
+	private static final Logger LOGGER = Logger
+			.getLogger(FreemarkerRoute.class);
 
-    /**
-     * Constructor
-     *
-     * @param path The route path which is used for matching. (e.g. /hello,
-     * users/:name)
-     * @param templateName
-     * @param cfg
-     * @throws java.io.IOException
-     */
-    protected FreemarkerRoute(final String path, final String templateName,
-        Configuration cfg) throws IOException {
-        super(path);
-        template = cfg.getTemplate(templateName);
-    }
+	final Template template;
 
-    @Override
-    public Object handle(Request request, Response response) {
-        StringWriter writer = new StringWriter();
-        try {
-            doHandle(request, response, writer);
-        } catch (TemplateException | IOException e) {
-            // FIXME: MAKE LOGGER WITH FILE
-            StringBuilder details = new StringBuilder(e.getMessage()
-                .concat("<br/>\n"));
-            StackTraceElement[] elements = e.getStackTrace();
-            for (StackTraceElement element : elements) {
-                details.append("&nbsp;".concat(element.toString())
-                    .concat("<br/>\n"));
-            }
+	protected FreemarkerRoute(final String path, final String templateName,
+			Configuration cfg) throws IOException {
+		super(path);
+		template = cfg.getTemplate(templateName);
+	}
 
-            request.session().attribute("error_details", details.toString());
-            response.redirect("error/500");
-        }
-        return writer;
-    }
+	@Override
+	public Object handle(Request request, Response response) {
+		StringWriter writer = new StringWriter();
+		try {
+			doHandle(request, response, writer);
+		} catch (TemplateException | IOException ex) {
+			LOGGER.log(Level.ERROR, "Error while processing with route", ex);
+			StringBuilder details = new StringBuilder(ex.getMessage().concat(
+					"<br/>\n"));
+			StackTraceElement[] elements = ex.getStackTrace();
+			for (StackTraceElement element : elements) {
+				details.append("&nbsp;".concat(element.toString()).concat(
+						"<br/>\n"));
+			}
 
-    protected abstract void doHandle(final Request request, final Response response, final Writer writer)
-        throws IOException, TemplateException;
+			request.session().attribute("error_details", details.toString());
+			response.redirect("error/500");
+		}
+		return writer;
+	}
+
+	protected abstract void doHandle(final Request request,
+			final Response response, final Writer writer) throws IOException,
+			TemplateException;
 
 }

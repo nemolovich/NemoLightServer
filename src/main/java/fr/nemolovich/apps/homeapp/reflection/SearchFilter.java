@@ -11,5 +11,5 @@ package fr.nemolovich.apps.homeapp.reflection;
  * @author Nemolovich
  */
 public abstract class SearchFilter {
-    public abstract boolean filterMatches(Class<?> clazz);
+	public abstract boolean filterMatches(Class<?> clazz);
 }

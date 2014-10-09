@@ -5,14 +5,9 @@
  */
 package fr.nemolovich.apps.homeapp.deploy;
 
-import fr.nemolovich.apps.homeapp.config.route.RouteElement;
-import fr.nemolovich.apps.homeapp.reflection.AnnotationTypeFilter;
-import fr.nemolovich.apps.homeapp.reflection.ClassPathScanner;
-import fr.nemolovich.apps.homeapp.reflection.SuperClassFilter;
-import fr.nemolovich.apps.homeapp.route.pages.FreemarkerRoute;
-import freemarker.template.Configuration;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
@@ -30,176 +25,233 @@ import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import fr.nemolovich.apps.homeapp.config.route.RouteElement;
+import fr.nemolovich.apps.homeapp.constants.HomeAppConstants;
+import fr.nemolovich.apps.homeapp.reflection.AnnotationTypeFilter;
+import fr.nemolovich.apps.homeapp.reflection.ClassPathScanner;
+import fr.nemolovich.apps.homeapp.reflection.SuperClassFilter;
+import fr.nemolovich.apps.homeapp.route.WebRoute;
+import fr.nemolovich.apps.homeapp.route.file.FileRoute;
+import fr.nemolovich.apps.homeapp.route.pages.FreemarkerRoute;
+import freemarker.template.Configuration;
+
 /**
  *
  * @author Nemolovich
  */
 public final class DeployResourceManager {
 
-    private static final Logger LOGGER = Logger.getLogger(
-        DeployResourceManager.class.getName());
-    private static final String SRC_FOLDER = "src/main/resources";
-    public static final String RESOURCES_FOLDER = "resources/";
-    private static final String FILE_PROTOCOL = "file";
-    private static final String JAR_PROTOCOL = "jar";
+	private static final Logger LOGGER = Logger
+			.getLogger(DeployResourceManager.class.getName());
 
-    public static List<FreemarkerRoute> ROUTES = new ArrayList();
+	public static List<WebRoute> ROUTES = new ArrayList();
 
-    public static void initResources(String resourcesPath) {
-        URL url = DeployResourceManager.class.getClassLoader()
-            .getResource(resourcesPath);
-        if (url == null) {
-            url = DeployResourceManager.class.getClassLoader()
-                .getResource(SRC_FOLDER.concat("/").concat(resourcesPath));
-        }
-        List<String> files = null;
-        if (url != null) {
-            String basePath = null;
-            String protocol = url.getProtocol();
-            if (protocol.equalsIgnoreCase(FILE_PROTOCOL)) {
-                try {
-                    File path = new File(url.toURI());
-                    files = getAllFilesFrom("", path);
-                    basePath = url.toURI().getPath().substring(1);
-                } catch (URISyntaxException ex) {
-                    LOGGER.log(Level.SEVERE, "Can not load path as folder", ex);
-                }
-            } else if (protocol.equalsIgnoreCase(JAR_PROTOCOL)) {
-                String jarPath = "jar:file:/C:/Users/Nemolovich/Desktop/Tests/"
-                    + "HomeApp-0.1-jar-with-dependencies.jar!/fr/"
-                    + "nemolovich/apps/homeapp/";
-                jarPath = jarPath.substring(JAR_PROTOCOL.length() + 1, jarPath
-                    .indexOf("!"));
-                if (jarPath.startsWith(FILE_PROTOCOL)) {
-                    jarPath = jarPath.substring(FILE_PROTOCOL.length() + 1);
-                }
-                jarPath = jarPath.substring(1);
-                JarFile jar;
-                try {
-                    jar = new JarFile(URLDecoder.decode(jarPath, "UTF-8"));
-                    files = getAllFilesFrom(jar, resourcesPath);
-                    basePath = resourcesPath;
-                } catch (IOException ex) {
-                    LOGGER.log(Level.SEVERE, "Can not load path from jar file",
-                        ex);
-                }
-            } else {
-                LOGGER.log(Level.SEVERE, "Unknown protocol '".concat(protocol)
-                    .concat("'"));
-            }
-            if (files != null) {
-                deployFiles(files, basePath, protocol);
-            }
-        }
-    }
+	public static void initResources(String resourcesPath) {
+		URL url = DeployResourceManager.class.getClassLoader().getResource(
+				resourcesPath);
+		if (url == null) {
+			url = DeployResourceManager.class.getClassLoader().getResource(
+					HomeAppConstants.SRC_FOLDER.concat("/").concat(
+							resourcesPath));
+		}
+		List<String> files = null;
+		if (url != null) {
+			String basePath = null;
+			String protocol = url.getProtocol();
+			if (protocol.equalsIgnoreCase(HomeAppConstants.FILE_PROTOCOL)) {
+				try {
+					File path = new File(url.toURI());
+					files = getAllFilesFrom("", path);
+					basePath = url.toURI().getPath().substring(1);
+				} catch (URISyntaxException ex) {
+					LOGGER.log(Level.SEVERE, "Can not load path as folder", ex);
+				}
+			} else if (protocol.equalsIgnoreCase(HomeAppConstants.JAR_PROTOCOL)) {
+				// protocol = HomeAppConstants.JAR_PROTOCOL;
+				// String jarPath = "jar:file:/D:/Users/bgohier/Desktop/Tests/"
+				// + "HomeApp-0.1-jar-with-dependencies.jar!/fr/"
+				// + "nemolovich/apps/homeapp/";
+				String jarPath = null;
+				try {
+					jarPath = url.toURI().toString();
+				} catch (URISyntaxException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				jarPath = jarPath.substring(
+						HomeAppConstants.JAR_PROTOCOL.length() + 1,
+						jarPath.indexOf("!"));
+				if (jarPath.startsWith(HomeAppConstants.FILE_PROTOCOL)) {
+					jarPath = jarPath.substring(HomeAppConstants.FILE_PROTOCOL
+							.length() + 1);
+				}
+				jarPath = jarPath.substring(1);
+				JarFile jar;
+				try {
+					jar = new JarFile(URLDecoder.decode(jarPath, "UTF-8"));
+					files = getAllFilesFrom(jar, resourcesPath);
+					basePath = resourcesPath;
+				} catch (IOException ex) {
+					LOGGER.log(Level.SEVERE, "Can not load path from jar file",
+							ex);
+				}
+			} else {
+				LOGGER.log(Level.SEVERE, "Unknown protocol '".concat(protocol)
+						.concat("'"));
+			}
+			if (files != null) {
+				deployFiles(files, basePath, protocol);
+			}
+		}
+	}
 
-    private static List<String> getAllFilesFrom(String basePath, File folder) {
-        List<String> files = new ArrayList<>();
-        for (File f : folder.listFiles()) {
-            if (f.isDirectory()) {
-                files.addAll(getAllFilesFrom(basePath.concat(f.getName())
-                    .concat("/"), f));
-            } else {
-                if (!f.getName().endsWith(".class")) {
-                    files.add(basePath.concat(f.getName()));
-                }
-            }
-        }
-        return files;
-    }
+	private static List<String> getAllFilesFrom(String basePath, File folder) {
+		List<String> files = new ArrayList<>();
+		for (File f : folder.listFiles()) {
+			if (f.isDirectory()) {
+				files.addAll(getAllFilesFrom(basePath.concat(f.getName())
+						.concat("/"), f));
+			} else {
+				if (!f.getName().endsWith(".class")) {
+					files.add(basePath.concat(f.getName()));
+				}
+			}
+		}
+		return files;
+	}
 
-    private static List<String> getAllFilesFrom(JarFile jar, String resourcesPath) {
-        List<String> files = new ArrayList<>();
-        Enumeration<JarEntry> entries = jar.entries();
-        while (entries.hasMoreElements()) {
-            String name = entries.nextElement().getName();
-            if (name.startsWith(resourcesPath)) {
-                String entry = name.substring(
-                    resourcesPath.length());
-                if (!entry.isEmpty() && !entry.endsWith("/")
-                    && !entry.endsWith(".class")) {
-                    files.add(entry);
-                }
-            }
-        }
-        return files;
-    }
+	private static List<String> getAllFilesFrom(JarFile jar,
+			String resourcesPath) {
+		List<String> files = new ArrayList<>();
+		Enumeration<JarEntry> entries = jar.entries();
+		while (entries.hasMoreElements()) {
+			String name = entries.nextElement().getName();
+			if (name.startsWith(resourcesPath)) {
+				String entry = name.substring(resourcesPath.length());
+				if (!entry.isEmpty() && !entry.endsWith("/")
+						&& !entry.endsWith(".class")) {
+					files.add(entry);
+				}
+			}
+		}
+		return files;
+	}
 
-    private static void deployFiles(List<String> files, String basePath,
-        String protocol) {
+	private static void deployFiles(List<String> files, String basePath,
+			String protocol) {
 
-        InputStream input = null;
-        for (String fileName : files) {
-            try {
-                if (protocol.equalsIgnoreCase(FILE_PROTOCOL)) {
-                    File f = new File(
-                        basePath.concat(fileName));
-                    input = new FileInputStream(f);
-                } else if (protocol.equalsIgnoreCase(JAR_PROTOCOL)) {
-                    URL res = DeployResourceManager.class.getClassLoader()
-                        .getResource(basePath.concat(fileName));
-                    if (res != null) {
-                        input = res.openStream();
-                    }
-                } else {
-                    LOGGER.log(Level.SEVERE, "Unknown protocol '".concat(protocol)
-                        .concat("'"));
-                    return;
-                }
-                if (input == null) {
-                    throw new IOException(
-                        "Can not read input file");
-                }
-                File target = new File(RESOURCES_FOLDER.concat(
-                    fileName));
-                if (!target.exists()) {
-                    if (!target.getParentFile().mkdirs()
-                        && !target.createNewFile()) {
-                        throw new IOException(
-                            "Can not create target file");
-                    }
-                }
-                Files.copy(input, target.toPath(),
-                    StandardCopyOption.REPLACE_EXISTING);
-                LOGGER.log(Level.INFO, "Resource '"
-                    .concat(fileName).concat("' deployed."));
-            } catch (IOException ex) {
-                LOGGER.log(Level.SEVERE, "Can not deploy resources: '"
-                    .concat(fileName).concat("'"), ex);
-            }
-        }
-    }
+		InputStream input = null;
+		for (String fileName : files) {
+			try {
+				if (protocol.equalsIgnoreCase(HomeAppConstants.FILE_PROTOCOL)) {
+					File f = new File(basePath.concat(fileName));
+					input = new FileInputStream(f);
+				} else if (protocol
+						.equalsIgnoreCase(HomeAppConstants.JAR_PROTOCOL)) {
+					URL res = DeployResourceManager.class.getClassLoader()
+							.getResource(basePath.concat(fileName));
+					if (res != null) {
+						input = res.openStream();
+					}
+				} else {
+					LOGGER.log(Level.SEVERE,
+							"Unknown protocol '".concat(protocol).concat("'"));
+					return;
+				}
+				if (input == null) {
+					throw new IOException("Can not read input file");
+				}
+				File target = new File(
+						HomeAppConstants.RESOURCES_FOLDER.concat(fileName));
+				if (!target.exists()) {
+					if (!target.getParentFile().mkdirs()
+							&& !target.createNewFile()) {
+						throw new IOException("Can not create target file");
+					}
+				}
+				Files.copy(input, target.toPath(),
+						StandardCopyOption.REPLACE_EXISTING);
+				LOGGER.log(Level.INFO,
+						"Resource '".concat(fileName).concat("' deployed."));
+			} catch (IOException ex) {
+				LOGGER.log(
+						Level.SEVERE,
+						"Can not deploy resources: '".concat(fileName).concat(
+								"'"), ex);
+			}
+		}
+	}
 
-    public static final boolean initialize(Configuration config) {
-        ClassPathScanner scanner = new ClassPathScanner();
-        scanner.addIncludeFilter(new AnnotationTypeFilter(
-            RouteElement.class));
-        scanner.addIncludeFilter(new SuperClassFilter(
-            FreemarkerRoute.class));
+	public static final boolean deployWebPages(Configuration config) {
+		ClassPathScanner scanner = new ClassPathScanner();
+		scanner.addIncludeFilter(new AnnotationTypeFilter(RouteElement.class));
+		scanner.addIncludeFilter(new SuperClassFilter(FreemarkerRoute.class));
 
-        FreemarkerRoute route;
-        for (Class<?> c : scanner
-            .findCandidateComponents("fr.nemolovich.apps.homeapp")) {
-            try {
-                RouteElement annotation
-                    = c.getAnnotation(RouteElement.class);
-                String path = annotation.path();
-                String page = annotation.page();
-                Constructor<?> cst = c.getConstructor(String.class,
-                    String.class, Configuration.class);
-                route = (FreemarkerRoute) cst.newInstance(
-                    path, page, config);
-                ROUTES.add(route);
-                LOGGER.log(Level.INFO, "Resource '".concat(c.getName())
-                    .concat("' has been deployed!"));
+		FreemarkerRoute route;
+		for (Class<?> c : scanner
+				.findCandidateComponents("fr.nemolovich.apps.homeapp")) {
+			try {
+				RouteElement annotation = c.getAnnotation(RouteElement.class);
+				String path = annotation.path();
+				String page = annotation.page();
+				Constructor<?> cst = c.getConstructor(String.class,
+						String.class, Configuration.class);
+				route = (FreemarkerRoute) cst.newInstance(path, page, config);
+				ROUTES.add(route);
+				LOGGER.log(
+						Level.INFO,
+						"Resource '".concat(c.getName()).concat(
+								"' has been deployed!"));
 
-            } catch (InstantiationException | IllegalAccessException |
-                IllegalArgumentException | InvocationTargetException |
-                NoSuchMethodException | SecurityException ex) {
-                LOGGER.log(Level.SEVERE, "Error while deploying resources", ex);
-            }
-        }
-        return false;
-    }
+			} catch (InstantiationException | IllegalAccessException
+					| IllegalArgumentException | InvocationTargetException
+					| NoSuchMethodException | SecurityException ex) {
+				LOGGER.log(Level.SEVERE, "Error while deploying resources", ex);
+			}
+		}
+		return false;
+	}
+
+	public static void deloyWebApp(String deployFolderPath) {
+		File deployFolder = new File(deployFolderPath);
+		try {
+			if (!deployFolder.exists() || !deployFolder.isDirectory()) {
+				throw new FileNotFoundException("The deploy folder '".concat(
+						deployFolderPath).concat("' can not be located"));
+			}
+			FileRoute route;
+			for (File f : getAllFile(deployFolder,
+					HomeAppConstants.RECURSIVE_SEARCH)) {
+				String uriPath = f.toURI().toString();
+				route = new FileRoute(uriPath.substring(uriPath
+						.lastIndexOf(deployFolderPath)
+						+ (deployFolderPath.length())), f);
+				ROUTES.add(route);
+				LOGGER.log(
+						Level.INFO,
+						"Resource '".concat(f.getName()).concat(
+								"' has been deployed!"));
+			}
+		} catch (FileNotFoundException ex) {
+			LOGGER.log(Level.SEVERE, "Error while deploying webapp", ex);
+		}
+	}
+
+	private static List<File> getAllFile(File root) {
+		return getAllFile(root, HomeAppConstants.DEFAULT_SEARCH);
+	}
+
+	private static final List<File> getAllFile(File root, int options) {
+		List<File> files = new ArrayList();
+		for (File f : root.listFiles()) {
+			if (f.isFile()) {
+				files.add(f);
+			} else if (f.isDirectory()
+					&& options == HomeAppConstants.RECURSIVE_SEARCH) {
+				files.addAll(getAllFile(f, options));
+			}
+		}
+		return files;
+	}
 
 }

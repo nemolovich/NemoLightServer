@@ -13,31 +13,32 @@ import java.util.Map;
  */
 public class WebConfig extends ClassConfig {
 
-    private static final WebConfig INSTANCE;
+	private static final WebConfig INSTANCE;
 
-    static {
-        INSTANCE = new WebConfig();
-    }
+	static {
+		INSTANCE = new WebConfig();
+	}
 
-    public static WebConfig getInstance() {
-        return INSTANCE;
-    }
+	public static WebConfig getInstance() {
+		return INSTANCE;
+	}
 
-    private WebConfig() {
-        super();
-        this.setConfig("jquery.file", "jquery-1.11.1.min.js");
-    }
+	private WebConfig() {
+		super();
+		this.setConfig("jquery.file", "jquery-1.11.1.min.js");
+		this.setConfig("deploy.folder", "resources/webapp");
+	}
 
-    @Override
-    public Map<String, Object> getConfigs() {
-        return super.getConfigs();
-    }
+	@Override
+	public Map<String, Object> getConfigs() {
+		return super.getConfigs();
+	}
 
-    public static final Object getValue(String name) {
-        return INSTANCE.get(name);
-    }
+	public static final Object getValue(String name) {
+		return INSTANCE.get(name);
+	}
 
-    public static final String getStringValue(String name) {
-        return INSTANCE.getString(name);
-    }
+	public static final String getStringValue(String name) {
+		return INSTANCE.getString(name);
+	}
 }
