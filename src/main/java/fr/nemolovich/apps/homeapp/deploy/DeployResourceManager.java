@@ -14,13 +14,10 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,6 +30,7 @@ import fr.nemolovich.apps.homeapp.reflection.SuperClassFilter;
 import fr.nemolovich.apps.homeapp.route.WebRoute;
 import fr.nemolovich.apps.homeapp.route.file.FileRoute;
 import fr.nemolovich.apps.homeapp.route.pages.FreemarkerRoute;
+import fr.nemolovich.apps.homeapp.utils.Utils;
 import freemarker.template.Configuration;
 
 /**
@@ -61,40 +59,15 @@ public final class DeployResourceManager {
 			if (protocol.equalsIgnoreCase(HomeAppConstants.FILE_PROTOCOL)) {
 				try {
 					File path = new File(url.toURI());
-					files = getAllFilesFrom("", path);
+					files = Utils.getAllFilesFrom("", path);
 					basePath = url.toURI().getPath().substring(1);
 				} catch (URISyntaxException ex) {
 					LOGGER.log(Level.SEVERE, "Can not load path as folder", ex);
 				}
 			} else if (protocol.equalsIgnoreCase(HomeAppConstants.JAR_PROTOCOL)) {
-				// protocol = HomeAppConstants.JAR_PROTOCOL;
-				// String jarPath = "jar:file:/D:/Users/bgohier/Desktop/Tests/"
-				// + "HomeApp-0.1-jar-with-dependencies.jar!/fr/"
-				// + "nemolovich/apps/homeapp/";
-				String jarPath = null;
-				try {
-					jarPath = url.toURI().toString();
-				} catch (URISyntaxException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				jarPath = jarPath.substring(
-						HomeAppConstants.JAR_PROTOCOL.length() + 1,
-						jarPath.indexOf("!"));
-				if (jarPath.startsWith(HomeAppConstants.FILE_PROTOCOL)) {
-					jarPath = jarPath.substring(HomeAppConstants.FILE_PROTOCOL
-							.length() + 1);
-				}
-				jarPath = jarPath.substring(1);
-				JarFile jar;
-				try {
-					jar = new JarFile(URLDecoder.decode(jarPath, "UTF-8"));
-					files = getAllFilesFrom(jar, resourcesPath);
-					basePath = resourcesPath;
-				} catch (IOException ex) {
-					LOGGER.log(Level.SEVERE, "Can not load path from jar file",
-							ex);
-				}
+				JarFile jar = Utils.extractJar(url);
+				files = Utils.getAllFilesFrom(jar, resourcesPath, HomeAppConstants.EXCLUDE_CLASS_FILES);
+				basePath = resourcesPath;
 			} else {
 				LOGGER.log(Level.SEVERE, "Unknown protocol '".concat(protocol)
 						.concat("'"));
@@ -103,38 +76,6 @@ public final class DeployResourceManager {
 				deployFiles(files, basePath, protocol);
 			}
 		}
-	}
-
-	private static List<String> getAllFilesFrom(String basePath, File folder) {
-		List<String> files = new ArrayList<>();
-		for (File f : folder.listFiles()) {
-			if (f.isDirectory()) {
-				files.addAll(getAllFilesFrom(basePath.concat(f.getName())
-						.concat("/"), f));
-			} else {
-				if (!f.getName().endsWith(".class")) {
-					files.add(basePath.concat(f.getName()));
-				}
-			}
-		}
-		return files;
-	}
-
-	private static List<String> getAllFilesFrom(JarFile jar,
-			String resourcesPath) {
-		List<String> files = new ArrayList<>();
-		Enumeration<JarEntry> entries = jar.entries();
-		while (entries.hasMoreElements()) {
-			String name = entries.nextElement().getName();
-			if (name.startsWith(resourcesPath)) {
-				String entry = name.substring(resourcesPath.length());
-				if (!entry.isEmpty() && !entry.endsWith("/")
-						&& !entry.endsWith(".class")) {
-					files.add(entry);
-				}
-			}
-		}
-		return files;
 	}
 
 	private static void deployFiles(List<String> files, String basePath,

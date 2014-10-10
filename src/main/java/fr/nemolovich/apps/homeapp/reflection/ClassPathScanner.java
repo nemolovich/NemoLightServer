@@ -9,8 +9,12 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import fr.nemolovich.apps.homeapp.constants.HomeAppConstants;
+import fr.nemolovich.apps.homeapp.utils.Utils;
 
 public class ClassPathScanner {
 
@@ -85,13 +89,25 @@ public class ClassPathScanner {
 			}
 			String path = packageName.replace('.', '/');
 			Enumeration<URL> resources = classLoader.getResources(path);
-			List<File> dirs = new ArrayList();
+			List<String> files = new ArrayList();
 			while (resources.hasMoreElements()) {
 				URL resource = resources.nextElement();
-				dirs.add(new File(resource.toURI()));
+				String protocol = resource.getProtocol();
+				if (protocol.equalsIgnoreCase(HomeAppConstants.FILE_PROTOCOL)) {
+					File f = new File(resource.toURI());
+					files.addAll(Utils.getAllFilesFrom("", f));
+				} else if (protocol
+						.equalsIgnoreCase(HomeAppConstants.JAR_PROTOCOL)) {
+					JarFile jar = Utils.extractJar(resource);
+					files.addAll(Utils.getAllFilesFrom(jar, path));
+				}
 			}
-			for (File directory : dirs) {
-				loadClasses(directory, packageName);
+			for (String f : files) {
+				System.out.println("File: " + f);
+				// loadClasses(directory, packageName);
+				if (false) {
+					throw new ClassNotFoundException();
+				}
 			}
 		} catch (IOException | ClassNotFoundException | URISyntaxException ex) {
 			LOGGER.log(Level.SEVERE,
