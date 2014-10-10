@@ -35,4 +35,16 @@ public interface HomeAppConstants {
 	public static final int DEFAULT_SEARCH = 0;
 	public static final int RECURSIVE_SEARCH = 1;
 
+
+	/* ***********************
+	 * Resources search options
+	 * 
+	 * ***********************
+	 */
+	public static final int INCLUDE_ALL = 2;
+	public static final int ONLY_CLASS_FILES = 4;
+	public static final int EXCLUDE_CLASS_FILES = 8;
+	public static final int ONLY_FOLDERS = 16;
+	public static final int EXCLUDE_FOLDERS = 32;
+
 }
