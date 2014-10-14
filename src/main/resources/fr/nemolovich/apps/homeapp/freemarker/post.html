@@ -24,21 +24,24 @@
 		<table>
 			<tr>
 				<td class="label">Username</td>
-				<td><input type="text" name="name" value="${username}">
-				</td>
-				<td class="error"></td>
+				<td><input type="text" name="name" value=""></td>
 			</tr>
 
 			<tr>
 				<td class="label">Password</td>
 				<td><input type="password" name="password" value=""></td>
-				<td class="error">${login_error}</td>
 			</tr>
 
 		</table>
 
 		<input type="submit">
 	</form>
+	<div>
+		<p>
+			Previous values: <br /> Name: ${name} <br /> Password:
+			${password}
+		<p />
+	</div>
 </body>
 
 </html>

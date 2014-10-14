@@ -31,7 +31,7 @@ public class HomePage extends FreemarkerRoute {
 			throws IOException, TemplateException {
 
 		SimpleHash root = new SimpleHash();
-		// root.put("username", "");
+		root.put("username", "");
 		root.put("login_error", "");
 		template.process(root, writer);
 	}

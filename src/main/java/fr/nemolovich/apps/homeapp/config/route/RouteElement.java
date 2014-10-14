@@ -6,6 +6,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import fr.nemolovich.apps.homeapp.constants.RouteElementMethod;
+
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Inherited
@@ -13,4 +15,6 @@ public @interface RouteElement {
 	String path();
 
 	String page();
+
+	RouteElementMethod method() default RouteElementMethod.GET;
 }
