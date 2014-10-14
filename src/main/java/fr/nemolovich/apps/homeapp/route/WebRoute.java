@@ -6,12 +6,12 @@ import spark.Route;
 
 public abstract class WebRoute extends Route {
 
-	public WebRoute(String path) {
-		super(path);
+    public WebRoute(String path) {
+        super(path);
 
-	}
+    }
 
-	@Override
-	public abstract Object handle(Request request, Response response);
+    @Override
+    public abstract Object handle(Request request, Response response);
 
 }

@@ -25,7 +25,7 @@ public class TestSearch {
     public static void init() throws IOException {
         jar = new JarFile(
             new File(
-                "D:/Users/bgohier/Desktop/Tests/HomeApp-0.1-jar-with-dependencies.jar"));
+                "C:/Users/Nemolovich/Desktop/Tests/HomeApp-0.1-jar-with-dependencies.jar"));
         assertNotNull(jar);
     }
 
