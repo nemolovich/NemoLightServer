@@ -22,7 +22,6 @@ public abstract class WebRouteServlet {
 
     private final FreemarkerWebRoute getRoute;
     private final FreemarkerWebRoute postRoute;
-    private final FreemarkerWebRoute putRoute;
 
     protected final Template template;
 
@@ -44,14 +43,6 @@ public abstract class WebRouteServlet {
                 doPost(request, response, writer);
             }
         };
-        this.putRoute = new FreemarkerWebRoute(path, config) {
-
-            @Override
-            protected void doHandle(Request request, Response response,
-                Writer writer) throws IOException, TemplateException {
-                doPut(request, response, writer);
-            }
-        };
         this.template = config.getTemplate(templateName);
     }
 
@@ -61,19 +52,12 @@ public abstract class WebRouteServlet {
     protected abstract void doPost(Request request, Response response,
         Writer writer) throws TemplateException, IOException;
 
-    protected abstract void doPut(Request request, Response response,
-        Writer writer) throws TemplateException, IOException;
-
     public final FreemarkerWebRoute getGetRoute() {
         return this.getRoute;
     }
 
     public final FreemarkerWebRoute getPostRoute() {
         return this.postRoute;
-    }
-
-    public final FreemarkerWebRoute getPutRoute() {
-        return this.putRoute;
     }
 
 }

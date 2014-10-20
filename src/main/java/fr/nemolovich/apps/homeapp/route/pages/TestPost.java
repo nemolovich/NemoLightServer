@@ -43,10 +43,4 @@ public class TestPost extends WebRouteServlet {
         template.process(root, writer);
     }
 
-    @Override
-    protected void doPut(Request request, Response response, Writer writer) 
-        throws TemplateException, IOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
 }

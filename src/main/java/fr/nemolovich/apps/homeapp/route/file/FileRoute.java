@@ -1,12 +1,18 @@
 package fr.nemolovich.apps.homeapp.route.file;
 
 import fr.nemolovich.apps.homeapp.route.WebRoute;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringWriter;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.FileImageOutputStream;
+import javax.imageio.stream.ImageOutputStream;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import spark.Request;
@@ -36,11 +42,29 @@ public class FileRoute extends WebRoute {
             return null;
         }
 
+        int width = 200, height = 200;
+        BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+
+        Graphics2D ig2 = bi.createGraphics();
+        ig2.fillRect(0, 0, width - 1, height - 1);
+        ImageWriter w = (ImageWriter) ImageIO.getImageWritersByFormatName(
+            "PNG").next();
+        ImageOutputStream ios;
+        try {
+            ios = ImageIO.createImageOutputStream(this.file);
+            w.setOutput(ios);
+            w.write(bi);
+        } catch (IOException ex) {
+            java.util.logging.Logger.getLogger(FileRoute.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+
+        Object o=w.getOutput();
+        
         StringWriter writer = new StringWriter();
 
         String line;
         try {
-            while ((line = reader.readLine()) != null) {
+            while ((line = ((FileImageOutputStream)o).readLine()) != null) {
                 writer.write(String.format("%s%n", line));
                 writer.flush();
             }
@@ -49,7 +73,7 @@ public class FileRoute extends WebRoute {
         } catch (IOException e) {
             LOGGER.log(Level.ERROR, "Error while reading file", e);
         }
-
+        
         return writer;
     }
 }

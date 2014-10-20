@@ -212,7 +212,6 @@ public final class DeployResourceManager {
         for (WebRouteServlet servlet : DeployResourceManager.SERVLETS) {
             Spark.get(servlet.getGetRoute());
             Spark.post(servlet.getPostRoute());
-            Spark.put(servlet.getPutRoute());
         }
         for (FileRoute route:FILES) {
             Spark.get(route);
