@@ -51,10 +51,4 @@ public class ErrorPage extends WebRouteServlet {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    @Override
-    protected void doPut(Request request, Response response, Writer writer)
-        throws TemplateException, IOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
 }

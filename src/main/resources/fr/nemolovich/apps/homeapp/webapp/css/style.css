@@ -1,0 +1,87 @@
+body {
+	font-family:					helvetica, arial, san-serif;
+	background-image:				url('/img/background.png');
+	background-position:			top center;
+	background-repeat:				repeat-y;
+	background-size:				100%;
+	width:							100%;
+	height:							auto;
+	margin:							auto;
+}
+
+.content {
+	background:						rgba(240,240,240,0.8);
+	width:							80%;
+	min-height:						94%;
+	margin:							0;
+	margin:							auto;
+	margin-top:						1.5%;
+	margin-bottom:					1.5%;
+	padding:						35px;
+	-webkit-border-radius:			8px;
+	-webkit-box-shadow:				inset 10px 10px 30px rgba(240, 240, 240, 0.99),
+									inset -10px -10px 30px rgba(150, 150, 150, 0.99),
+									rgba(240,240,240,0.4) 0px 0px 20px;
+}
+
+:-webkit-any(button,
+             input[type='button'],
+             input[type='submit']):not(.custom-appearance):not(.link-button),
+select,
+input[type='checkbox'],
+input[type='radio'] {
+  -webkit-appearance:				none;
+  -webkit-user-select:				none;
+  background-image:					-webkit-linear-gradient(#EDEDED, #EDEDED 38%, #DEDEDE);
+  border: 							1px solid rgba(0, 0, 0, 0.25);
+  border-radius: 					2px;
+  box-shadow: 						0 1px 0 rgba(0, 0, 0, 0.08),
+									inset 0 1px 2px rgba(255, 255, 255, 0.75);
+  color: 							#444444;
+  font: 							inherit;
+  margin: 							0 1px 0 0;
+  outline: 							none;
+  text-shadow: 						0 1px 0 rgb(240, 240, 240);
+}
+
+:-webkit-any(button,
+             input[type='button'],
+             input[type='submit']):not(.custom-appearance):not(.link-button),
+select {
+  min-height: 						2em;
+  min-width: 						4em;
+  padding-bottom: 					px;
+}
+
+:-webkit-any(button,
+             input[type='button'],
+             input[type='submit']):not(.custom-appearance):not(.link-button) {
+  -webkit-padding-end: 				10px;
+  -webkit-padding-start: 			10px;
+}
+
+select {
+  -webkit-appearance: 				none;
+  -webkit-padding-end: 				20px;
+  -webkit-padding-start: 			6px;
+  /* OVERRIDE */
+  background-image: 				url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAAICAQAAACxSAwfAAAAUklEQVQY02P4z0AMRGZGMaShwCisyhITmb8huMzfEhOxKvuvsGAh208Ik+3ngoX/FbBbClcIUcSAw21QhXxfIIrwKAMpfNsEUYRXGVCEFc6CQwBqq4CCCtU4VgAAAABJRU5ErkJggg=='),
+									-webkit-linear-gradient(#ededed, #ededed 38%, #dedede);
+  background-position: 				right center;
+  background-repeat: 				no-repeat;
+}
+
+table {
+	border-collapse:				collapse;
+	border-color:					#999999;
+	margin-top:						.5em;
+}
+
+th {
+	background-color:				#BBBBBB;
+	color:							#000000;
+}
+
+td,th {
+	padding:						.25em;
+}

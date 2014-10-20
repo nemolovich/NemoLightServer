@@ -1,0 +1,38 @@
+
+<html><head>
+	<title>CE</title>
+	<link id="favicon" rel="icon" type="image/png" sizes="16x16">
+	<link id="favicon2x" rel="icon" type="image/png" sizes="32x32">
+	<link type="text/css" rel="stylesheet" href="/css/style.css"/>
+	<script src="/js/jquery-1.11.1.min.js" type="text/javascript"></script>
+	<script src="/js/ajaxRequester.js" type="text/javascript"></script>
+	</head>
+	<body>
+		<div class="content">
+			<!--420x280-->
+			
+			<button type="button"
+                                onclick="javascript:request('hello');">
+                            test? oO??
+			</button>
+			<embed type="application/x-vlc-plugin"
+					pluginspage="http://www.videolan.org"
+					version="VideoLAN.VLCPlugin.2" 
+					name="vlc"
+					id="vlc"
+					width="${pi_camera_width}"
+					height="${pi_camera_height}"
+					loop="0"
+					autoplay="1"
+					toolbar="0"
+					allowfullscreen="0"
+					windowless="0"
+					branding="0"
+					mute="1"
+					controls="0"
+					bgcolor="#606060"
+					target="${pi_camera_protocol}://${pi_camera_server}:${pi_camera_port}/">
+			</embed>
+		</div>
+	</body>
+</html>
