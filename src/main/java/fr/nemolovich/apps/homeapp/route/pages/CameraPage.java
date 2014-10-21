@@ -24,49 +24,49 @@ import spark.Response;
 @RouteElement(path = "/camera/:size", page = "camera.html")
 public class CameraPage extends WebRouteServlet {
 
-	private String cameraServer;
-	private int cameraPort;
-	private String cameraProtocol;
+    private String cameraServer;
+    private int cameraPort;
+    private String cameraProtocol;
 
-	private static final Pattern DIMENSION = Pattern
-			.compile("^(?<width>\\d{2,})x(?<height>\\d{2,})$");
+    public static final Pattern CAMERA_DIMENSION = Pattern
+        .compile("^(?<width>\\d{2,4})x(?<height>\\d{2,4})$");
 
-	public CameraPage(String path, String templateName, Configuration config)
-			throws IOException {
-		super(path, templateName, config);
-		this.cameraServer = "localhost";
-		this.cameraPort = 5000;
-		this.cameraProtocol = "rtsp";
-	}
+    public CameraPage(String path, String templateName, Configuration config)
+        throws IOException {
+        super(path, templateName, config);
+        this.cameraServer = "localhost";
+        this.cameraPort = 5000;
+        this.cameraProtocol = "rtsp";
+    }
 
-	@Override
-	protected void doGet(Request request, Response response, Writer writer)
-			throws TemplateException, IOException {
-		SimpleHash root = new SimpleHash();
-		String size = request.params("size");
+    @Override
+    protected void doGet(Request request, Response response, Writer writer)
+        throws TemplateException, IOException {
+        SimpleHash root = new SimpleHash();
+        String size = request.params("size");
 
-		Matcher matcher = DIMENSION.matcher(size);
+        Matcher matcher = CAMERA_DIMENSION.matcher(size);
 
-		String cameraWidth;
-		String cameraHeight;
-		if (matcher.matches()) {
-			cameraWidth = matcher.group("width");
-			cameraHeight = matcher.group("height");
-		} else {
-			cameraWidth = "420";
-			cameraHeight = "280";
-		}
-		root.put("pi_camera_width", cameraWidth);
-		root.put("pi_camera_height", cameraHeight);
-		root.put("pi_camera_protocol", this.cameraProtocol);
-		root.put("pi_camera_server", this.cameraServer);
-		root.put("pi_camera_port", String.valueOf(this.cameraPort));
-		template.process(root, writer);
-	}
+        String cameraWidth;
+        String cameraHeight;
+        if (matcher.matches()) {
+            cameraWidth = matcher.group("width");
+            cameraHeight = matcher.group("height");
+        } else {
+            cameraWidth = "420";
+            cameraHeight = "280";
+        }
+        root.put("pi_camera_width", cameraWidth);
+        root.put("pi_camera_height", cameraHeight);
+        root.put("pi_camera_protocol", this.cameraProtocol);
+        root.put("pi_camera_server", this.cameraServer);
+        root.put("pi_camera_port", String.valueOf(this.cameraPort));
+        template.process(root, writer);
+    }
 
-	@Override
-	protected void doPost(Request request, Response response, Writer writer)
-			throws TemplateException, IOException {
-	}
+    @Override
+    protected void doPost(Request request, Response response, Writer writer)
+        throws TemplateException, IOException {
+    }
 
 }

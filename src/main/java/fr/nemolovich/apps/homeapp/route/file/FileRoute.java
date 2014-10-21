@@ -1,92 +1,109 @@
 package fr.nemolovich.apps.homeapp.route.file;
 
-import java.io.BufferedReader;
+import fr.nemolovich.apps.homeapp.route.WebRoute;
+import fr.nemolovich.apps.homeapp.route.file.mimetype.ForcedMimeType;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.StringWriter;
-
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
 import spark.Request;
 import spark.Response;
-import fr.nemolovich.apps.homeapp.route.WebRoute;
 
 public class FileRoute extends WebRoute {
 
-	private final File file;
-	private static final Logger LOGGER = Logger.getLogger(FileRoute.class);
+    private final File file;
+    private static final Logger LOGGER = Logger.getLogger(FileRoute.class);
+    private static final List<ForcedMimeType> FORCED_MIMETYPES;
 
-	public FileRoute(String route, File file) {
-		super(route);
-		this.file = file;
-		if (this.file == null || !this.file.exists()) {
-			LOGGER.log(Level.ERROR, "Can not load file '"
-					.concat(file.getPath()).concat("'"));
-		}
-	}
+    static {
+        FORCED_MIMETYPES = new ArrayList<>();
+        FORCED_MIMETYPES.add(
+            ForcedMimeType.newInstance(".js", "application/javascript"));
+    }
 
-	@Override
-	public Object handle(Request request, Response response) {
-		try {
-			if (this.file.getName().toLowerCase().endsWith(".png")) {
-				return this.deployPNGFile(request, response);
-			} else {
-				return this.deployTextFile(request, response);
-			}
-		} catch (IOException e) {
-			LOGGER.log(Level.ERROR, "Error while reading file", e);
-		}
-		return null;
+    private static boolean isForcedExtensions(String path) {
+        boolean result = false;
+        for (String ext : getForcedExtensions()) {
+            if (path.toLowerCase().endsWith(ext.toLowerCase())) {
+                result = true;
+                break;
+            }
+        }
+        return result;
+    }
 
-	}
+    private static List<String> getForcedExtensions() {
+        List<String> extensions = new ArrayList<>();
+        for (ForcedMimeType mimeType : FORCED_MIMETYPES) {
+            extensions.add(mimeType.getExtension());
+        }
+        return extensions;
+    }
 
-	private final Object deployTextFile(Request request, Response response)
-			throws IOException {
+    private static String getMimeType(String path) {
+        String result = null;
+        for (ForcedMimeType mimeType : FORCED_MIMETYPES) {
+            if (path.toLowerCase().endsWith(mimeType.getExtension()
+                .toLowerCase())) {
+                result = mimeType.getMimeType();
+                break;
+            }
+        }
+        return result;
+    }
 
-		BufferedReader reader;
-		try {
-			reader = new BufferedReader(new FileReader(this.file));
-		} catch (FileNotFoundException ex) {
-			LOGGER.log(Level.ERROR, "Can not find file", ex);
-			return null;
-		}
+    public FileRoute(String route, File file) {
+        super(route);
+        this.file = file;
+        if (this.file == null || !this.file.exists()) {
+            LOGGER.log(Level.ERROR, "Can not load file '"
+                .concat(file.getPath()).concat("'"));
+        }
+    }
 
-		StringWriter writer = new StringWriter();
+    @Override
+    public Object handle(Request request, Response response) {
+        try {
+            this.deployFile(request, response);
+        } catch (IOException e) {
+            LOGGER.log(Level.ERROR, "Error while reading file", e);
+        }
+        return null;
 
-		String line;
-		while ((line = reader.readLine()) != null) {
-			writer.write(String.format("%s%n", line));
-			writer.flush();
-		}
-		writer.close();
-		reader.close();
+    }
 
-		return writer;
-	}
+    private void deployFile(Request request, Response response)
+        throws IOException {
 
-	private final Object deployPNGFile(Request request, Response response)
-			throws IOException {
+        HttpServletResponse resp = response.raw();
 
-		HttpServletResponse resp = response.raw();
+        String fileName = this.file.getName();
 
-		resp.setContentType("image/png");
+        String mimeType;
+        if (isForcedExtensions(fileName)) {
+            mimeType = getMimeType(fileName);
+        } else {
+            mimeType = Files.probeContentType(this.file.toPath());
+            mimeType = mimeType == null ? "text/plain" : mimeType;
+        }
 
-		FileInputStream in = new FileInputStream(this.file);
-
-		OutputStream out = resp.getOutputStream();
-
-		byte[] buf = new byte[2048];
-		int count = 0;
-		while ((count = in.read(buf)) >= 0) {
-			out.write(buf, 0, count);
-		}
-		return null;
-	}
+        resp.setContentType(mimeType);
+        OutputStream out;
+        try (FileInputStream in = new FileInputStream(this.file)) {
+            out = resp.getOutputStream();
+            byte[] buf = new byte[2048];
+            int count;
+            while ((count = in.read(buf)) >= 0) {
+                out.write(buf, 0, count);
+            }
+            in.close();
+        }
+        out.close();
+    }
 }

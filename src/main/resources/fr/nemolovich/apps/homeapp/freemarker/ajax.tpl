@@ -1,4 +1,7 @@
-response: {
-	action:		${action}
-	value:		${value}
+/*
+* Ajax packet template
+*/
+{
+	"action":		"${action}",
+	"value":		${value}
 }
