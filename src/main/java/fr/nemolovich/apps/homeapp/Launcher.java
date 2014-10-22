@@ -11,9 +11,8 @@ import fr.nemolovich.apps.homeapp.deploy.DeployResourceManager;
 import freemarker.template.Configuration;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import org.apache.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 /**
@@ -24,81 +23,98 @@ public class Launcher {
 
     private static final Configuration config = new Configuration();
 
-    private static final Logger LOGGER = Logger.getLogger(Launcher.class);
-
-    private static final List PARAMS = Arrays.asList(
-        getArray("init", "Initialize resources"),
-        getArray("start", "Start server"),
-        getArray("deploy", "Deploy resources"));
-
-    private static final String HELP;
-
-    static {
-        StringBuilder help = new StringBuilder(
-            "Usage: Launcher <PARAM> [<OPTIONAL_PARAMS>,]\n");
-        for (Object o : PARAMS) {
-            String[] param = (String[]) o;
-            help.append(String.format("\t--%-15s%-30s%n", param[0], param[1]));
-        }
-        HELP = help.toString();
-    }
-
-    private static String[] getArray(String str1, String str2) {
-        String[] a = new String[2];
-        a[0] = str1;
-        a[1] = str2;
-        return a;
-    }
+    private static final Logger LOGGER = Logger.getLogger(
+        Launcher.class.getName());
 
     public static void main(String[] args) throws IOException {
 
-        if (args.length < 1) {
-            System.out.println(HELP);
-            return;
+        boolean extract = false;
+        int adminport = 8081;
+        int port = 8080;
+        if (args.length > 0) {
+            boolean needPort = false;
+            boolean needAdminPort = false;
+            for (String arg : args) {
+                if (arg.startsWith("--port")) {
+                    needPort = true;
+                } else if (needPort) {
+                    try {
+                        port = Integer.parseInt(arg);
+                    } catch (NumberFormatException e) {
+                        LOGGER.log(Level.SEVERE, "Incorrect port parameter", e);
+                    }
+                    needPort = false;
+                } else if (arg.equals("--extract")) {
+                    extract = true;
+                } else if (arg.equals("--admin-port")) {
+                    needAdminPort = true;
+                } else if (needAdminPort) {
+                    try {
+                        adminport = Integer.parseInt(arg);
+                    } catch (NumberFormatException e) {
+                        LOGGER.log(Level.SEVERE,
+                            "Incorrect admin port parameter", e);
+                    }
+                    needAdminPort = false;
+                } else {
+                    LOGGER.log(Level.SEVERE,
+                        "Unknown parameter '".concat(arg).concat("'"));
+                }
+            }
         }
 
-        boolean templateInit = false;
         File templateFolder = new File(HomeAppConstants.TEMPLATE_FOLDER);
 
-        if (templateFolder.exists()) {
-            config.setDirectoryForTemplateLoading(templateFolder);
-            templateInit = true;
-        }
+        if (extract) {
 
-        for (String arg : args) {
-            if (arg.equals("--" + ((String[]) PARAMS.get(0))[0])) {
+            LOGGER.log(Level.INFO, "Extracting files from archive...");
 
-                System.out.println("Init");
+            DeployResourceManager
+                .initResources(HomeAppConstants.PACKAGE_NAME);
 
-                DeployResourceManager
-                    .initResources(HomeAppConstants.PACKAGE_NAME);
-
-            } else if (arg.equals("--" + ((String[]) PARAMS.get(1))[0])) {
-
-                System.out.println("Start");
-
-                PropertyConfigurator.configure(HomeAppConstants.CONFIG_FOLDER
-                    .concat("log4j/log4j.properties"));
-                LOGGER.debug("Log4j appender configuration successfully loaded");
-
-                
-                DeployResourceManager.startServer();
-
-            } else if (arg.equals("--" + ((String[]) PARAMS.get(2))[0])) {
-
-                System.out.println("Deploy");
-
-                DeployResourceManager.deployWebPages(config);
-                DeployResourceManager.deloyWebApp(WebConfig
-                    .getStringValue("deploy.folder"));
-
-            }
-
-            if (!templateInit && templateFolder.exists()) {
-                config.setDirectoryForTemplateLoading(templateFolder);
-            }
+            LOGGER.log(Level.INFO, "Extraction completed!");
 
         }
+
+        LOGGER.log(Level.INFO,
+            "Configuring log file...");
+
+        PropertyConfigurator.configure(HomeAppConstants.CONFIG_FOLDER.concat(HomeAppConstants.LOGGER_FILE_PATH));
+        org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(Launcher.class);
+
+        log.info(
+            "Log4j appender configuration successfully loaded");
+
+        log.info(
+            "Log file settings set from '".concat(
+                HomeAppConstants.CONFIG_FOLDER.concat(
+                    HomeAppConstants.LOGGER_FILE_PATH)).concat("'"));
+
+        log.info(
+            "Setting freemarker templates folder to '"
+            .concat(templateFolder.getAbsolutePath()).concat("'"));
+
+        config.setDirectoryForTemplateLoading(templateFolder);
+
+        log.info(
+            "Deploying resources...");
+
+        DeployResourceManager.deployWebPages(config);
+
+        DeployResourceManager.deloyWebApp(WebConfig.getStringValue("deploy.folder"));
+
+        log.info(
+            "Resources deployed!");
+
+        log.info(
+            "Starting server on port [".concat(String.valueOf(port))
+            .concat("]..."));
+        DeployResourceManager.startServer(port, adminport);
+
+        log.info(
+            "Server started on port [".concat(String.valueOf(port))
+            .concat("]..."));
 
     }
+
 }

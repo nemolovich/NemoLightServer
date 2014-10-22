@@ -13,8 +13,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.jar.JarFile;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
 
 public class ClassPathScanner {
 
@@ -27,8 +26,7 @@ public class ClassPathScanner {
         try {
             f = ClassLoader.class.getDeclaredField("classes");
         } catch (NoSuchFieldException | SecurityException ex) {
-            LOGGER.log(Level.SEVERE, "Can not initialize ClassLoader classes",
-                ex);
+            LOGGER.error("Can not initialize ClassLoader classes", ex);
             System.exit(1);
         }
         GET_CLASSES = f;
@@ -50,7 +48,7 @@ public class ClassPathScanner {
                     .getClassLoader()));
             GET_CLASSES.setAccessible(false);
         } catch (IllegalArgumentException | IllegalAccessException | SecurityException ex) {
-            LOGGER.log(Level.SEVERE, "Can not retreive ClassLoader classes", ex);
+            LOGGER.error("Can not retreive ClassLoader classes", ex);
             System.exit(1);
         }
     }
@@ -119,9 +117,8 @@ public class ClassPathScanner {
             }
         } catch (IOException | ClassNotFoundException | URISyntaxException |
             SearchFileOptionException ex) {
-            LOGGER.log(Level.SEVERE,
-                "The classes could not be load from package '"
-                + packageName + "'", ex);
+            LOGGER.error("The classes could not be load from package '".concat(
+                packageName).concat("'"), ex);
         }
     }
 

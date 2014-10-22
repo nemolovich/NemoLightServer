@@ -11,8 +11,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
 
 public final class Utils {
 
@@ -26,7 +25,7 @@ public final class Utils {
             System.out.println(jarURL.toURI().toString());
             jarPath = jarURL.toURI().toString();
         } catch (URISyntaxException ex) {
-            LOGGER.log(Level.SEVERE, "The JAR URI can not be used", ex);
+            LOGGER.error("The JAR URI can not be used", ex);
             return null;
         }
         jarPath = jarPath.substring(HomeAppConstants.JAR_PROTOCOL.length() + 1,
@@ -42,7 +41,7 @@ public final class Utils {
         try {
             jar = new JarFile(URLDecoder.decode(jarPath, "UTF-8"));
         } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, "Can not load path from JAR file", ex);
+            LOGGER.error("Can not load path from JAR file", ex);
         }
 
         return jar;

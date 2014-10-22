@@ -11,6 +11,6 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface RouteElement {
 	String path();
-
 	String page();
+        boolean login() default false;
 }

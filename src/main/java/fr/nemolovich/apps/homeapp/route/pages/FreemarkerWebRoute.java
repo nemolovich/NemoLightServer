@@ -31,7 +31,7 @@ public abstract class FreemarkerWebRoute extends WebRoute {
     }
 
     @Override
-    public Object handle(Request request, Response response) {
+    public Object doHandle(Request request, Response response) {
         StringWriter writer = new StringWriter();
         try {
             doHandle(request, response, writer);

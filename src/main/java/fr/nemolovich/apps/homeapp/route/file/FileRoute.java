@@ -27,6 +27,15 @@ public class FileRoute extends WebRoute {
             ForcedMimeType.newInstance(".js", "application/javascript"));
     }
 
+    public FileRoute(String route, File file) {
+        super(route);
+        this.file = file;
+        if (this.file == null || !this.file.exists()) {
+            LOGGER.log(Level.ERROR, "Can not load file '"
+                .concat(file.getPath()).concat("'"));
+        }
+    }
+
     private static boolean isForcedExtensions(String path) {
         boolean result = false;
         for (String ext : getForcedExtensions()) {
@@ -58,17 +67,8 @@ public class FileRoute extends WebRoute {
         return result;
     }
 
-    public FileRoute(String route, File file) {
-        super(route);
-        this.file = file;
-        if (this.file == null || !this.file.exists()) {
-            LOGGER.log(Level.ERROR, "Can not load file '"
-                .concat(file.getPath()).concat("'"));
-        }
-    }
-
     @Override
-    public Object handle(Request request, Response response) {
+    public Object doHandle(Request request, Response response) {
         try {
             this.deployFile(request, response);
         } catch (IOException e) {

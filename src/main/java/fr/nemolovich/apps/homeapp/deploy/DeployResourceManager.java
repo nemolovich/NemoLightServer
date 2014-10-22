@@ -5,11 +5,13 @@
  */
 package fr.nemolovich.apps.homeapp.deploy;
 
+import fr.nemolovich.apps.homeapp.admin.AdminConnection;
 import fr.nemolovich.apps.homeapp.config.route.RouteElement;
 import fr.nemolovich.apps.homeapp.constants.HomeAppConstants;
 import fr.nemolovich.apps.homeapp.reflection.AnnotationTypeFilter;
 import fr.nemolovich.apps.homeapp.reflection.ClassPathScanner;
 import fr.nemolovich.apps.homeapp.reflection.SuperClassFilter;
+import fr.nemolovich.apps.homeapp.route.WebRoute;
 import fr.nemolovich.apps.homeapp.route.WebRouteServlet;
 import fr.nemolovich.apps.homeapp.route.file.FileRoute;
 import fr.nemolovich.apps.homeapp.utils.SearchFileOptionException;
@@ -29,8 +31,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.jar.JarFile;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
 import spark.Spark;
 
 /**
@@ -43,7 +44,7 @@ public final class DeployResourceManager {
         .getLogger(DeployResourceManager.class.getName());
 
     private static final List<WebRouteServlet> SERVLETS = new ArrayList<>();
-    private static final List<FileRoute> FILES=new ArrayList<>();
+    private static final List<FileRoute> FILES = new ArrayList<>();
 
     public static void initResources(String resourcesPath) {
         URL url = DeployResourceManager.class.getClassLoader().getResource(
@@ -74,11 +75,11 @@ public final class DeployResourceManager {
 
                     basePath = resourcesPath;
                 } else {
-                    LOGGER.log(Level.SEVERE,
+                    LOGGER.error(
                         "Unknown protocol '".concat(protocol).concat("'"));
                 }
             } catch (SearchFileOptionException | URISyntaxException ex) {
-                LOGGER.log(Level.SEVERE, "Error while searching files", ex);
+                LOGGER.error("Error while searching files", ex);
             }
             if (files != null) {
                 extractFiles(files, basePath, protocol);
@@ -103,7 +104,7 @@ public final class DeployResourceManager {
                         input = res.openStream();
                     }
                 } else {
-                    LOGGER.log(Level.SEVERE,
+                    LOGGER.error(
                         "Unknown protocol '".concat(protocol).concat("'"));
                     return;
                 }
@@ -120,11 +121,10 @@ public final class DeployResourceManager {
                 }
                 Files.copy(input, target.toPath(),
                     StandardCopyOption.REPLACE_EXISTING);
-                LOGGER.log(Level.INFO,
+                LOGGER.info(
                     "Resource '".concat(fileName).concat("' extracted."));
             } catch (IOException ex) {
-                LOGGER.log(
-                    Level.SEVERE,
+                LOGGER.error(
                     "Can not extract resources: '".concat(fileName).concat(
                         "'"), ex);
             }
@@ -137,26 +137,37 @@ public final class DeployResourceManager {
         scanner.addIncludeFilter(new SuperClassFilter(WebRouteServlet.class));
 
         WebRouteServlet servlet;
+        boolean loginPageDefined = false;
+
         for (Class<?> c : scanner
             .findCandidateComponents("fr.nemolovich.apps.homeapp")) {
             try {
                 RouteElement annotation = c.getAnnotation(RouteElement.class);
                 String path = annotation.path();
                 String page = annotation.page();
+                boolean isLoginPage = annotation.login();
                 Constructor<?> cst = c.getConstructor(String.class,
                     String.class, Configuration.class);
                 Object o = cst.newInstance(path, page, config);
                 if (o instanceof WebRouteServlet) {
                     servlet = (WebRouteServlet) o;
                     SERVLETS.add(servlet);
-                    LOGGER.log(
-                        Level.INFO,
+                    LOGGER.info(
                         "Resource '".concat(c.getName()).concat(
                             "' has been deployed! [".concat(path).concat("]")));
+                    if (!loginPageDefined && isLoginPage) {
+                        loginPageDefined = true;
+                        WebRoute.setLoginPage(servlet.getPostRoute());
+                        LOGGER.info(
+                            "Resource '".concat(c.getName()).concat(
+                                "' has been set to login page"));
+                    }
                 }
 
-            } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException ex) {
-                LOGGER.log(Level.SEVERE, "Error while deploying resources", ex);
+            } catch (InstantiationException | IllegalAccessException |
+                IllegalArgumentException | InvocationTargetException |
+                NoSuchMethodException | SecurityException ex) {
+                LOGGER.error("Error while deploying resources", ex);
             }
         }
         return false;
@@ -178,14 +189,13 @@ public final class DeployResourceManager {
                     + (deployFolderPath.length()));
                 route = new FileRoute(routePath, f);
                 FILES.add(route);
-                LOGGER.log(
-                    Level.INFO,
+                LOGGER.error(
                     "Resource '".concat(f.getName()).concat(
                         "' has been deployed! [".concat(routePath)
                         .concat("]")));
             }
         } catch (FileNotFoundException ex) {
-            LOGGER.log(Level.SEVERE, "Error while deploying webapp", ex);
+            LOGGER.error("Error while deploying webapp", ex);
         }
     }
 
@@ -207,13 +217,35 @@ public final class DeployResourceManager {
     }
 
     public static void startServer() {
-        Spark.setPort(8080);
+        startServer(8080, 8081);
+    }
+
+    public static void startServer(int port) {
+        startServer(port, 8081);
+    }
+
+    public static void startServer(int port, int adminPort) {
+
+        if (adminPort != port) {
+            AdminConnection ac = new AdminConnection(adminPort);
+            ac.start();
+        } else {
+            LOGGER.error("The admin port can be the same as deployment port");
+        }
+
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                LOGGER.info("Shutting down server... Bye :(");
+            }
+        });
+        Spark.setPort(port);
 
         for (WebRouteServlet servlet : DeployResourceManager.SERVLETS) {
             Spark.get(servlet.getGetRoute());
             Spark.post(servlet.getPostRoute());
         }
-        for (FileRoute route:FILES) {
+        for (FileRoute route : FILES) {
             Spark.get(route);
         }
     }
