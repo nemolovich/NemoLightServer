@@ -1,5 +1,6 @@
 package fr.nemolovich.apps.homeapp.constants;
 
+import java.io.File;
 
 public interface HomeAppConstants {
 
@@ -35,7 +36,6 @@ public interface HomeAppConstants {
 	public static final int DEFAULT_SEARCH = 0;
 	public static final int RECURSIVE_SEARCH = 1;
 
-
 	/* ***********************
 	 * Resources search options
 	 * 
@@ -46,5 +46,15 @@ public interface HomeAppConstants {
 	public static final int EXCLUDE_CLASS_FILES = 8;
 	public static final int ONLY_FOLDERS = 16;
 	public static final int EXCLUDE_FOLDERS = 32;
+
+	/* ***********************
+	 * Security marshaling
+	 * 
+	 * ***********************
+	 */
+	public static final String SECURITY_PATH = RESOURCES_FOLDER
+			.concat("/security/");
+	public static final File SECURITY_CONFIG_FILE = new File(
+			SECURITY_PATH.concat("security.xml"));
 
 }
