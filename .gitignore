@@ -1,4 +1,4 @@
-/target/
-/resources/
-/log/
-/.settings/
+/*/resources/
+/*/target/
+/*/log/
+/*/.settings/
