@@ -58,8 +58,7 @@ public class ClientSocket {
                 throw new IOException("Can not locate the trust store file");
             }
         }
-        System.setProperty("javax.net.ssl.trustStore",
-            path);
+        System.setProperty("javax.net.ssl.trustStore", path);
         System.setProperty("javax.net.ssl.trustStorePassword", this.password);
 
         Security.addProvider(new Provider());

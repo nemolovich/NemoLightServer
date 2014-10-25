@@ -1,0 +1,6 @@
+
+keytool -genkey -keyalg RSA -alias serverkey -keystore server.ks
+
+keytool -export -alias serverkey -keystore server.ks -file sslserver.cer
+
+keytool -importcert -v -alias serverkey -keystore client.ks -keyalg RSA -file sslserver.cer
