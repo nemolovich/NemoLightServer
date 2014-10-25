@@ -5,8 +5,12 @@
  */
 package fr.nemolovich.apps.homeapp.admin;
 
+import com.sun.net.ssl.internal.ssl.Provider;
+import fr.nemolovich.apps.homeapp.constants.HomeAppConstants;
 import java.io.IOException;
-import java.net.ServerSocket;
+import java.security.Security;
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLServerSocketFactory;
 import org.apache.log4j.Logger;
 
 /**
@@ -24,11 +28,21 @@ public class AdminConnection extends Thread {
 
     @Override
     public void run() {
-        ServerSocket socket;
+
+        Security.addProvider(new Provider());
+
+        System.setProperty("javax.net.ssl.keyStore",
+            HomeAppConstants.CONFIG_FOLDER.concat("certificates/server.ks"));
+        System.setProperty("javax.net.ssl.keyStorePassword", "serversslpass");
+
+        SSLServerSocket sslServerSocket;
         try {
             LOGGER.info("Setting administration connection on port ["
                 .concat(String.valueOf(this.port)).concat("]..."));
-            socket = new ServerSocket(this.port);
+            SSLServerSocketFactory sslServerSocketFactory
+                = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
+            sslServerSocket = (SSLServerSocket) sslServerSocketFactory.
+                createServerSocket(this.port);
             LOGGER.info("Administration console is available on port ["
                 .concat(String.valueOf(this.port)).concat("]!"));
         } catch (IOException ex) {
@@ -39,7 +53,7 @@ public class AdminConnection extends Thread {
         LOGGER.info("Waiting for client...");
         while (this.isAlive()) {
             try {
-                new ClientConnection(socket).run();
+                new ClientConnection(sslServerSocket).run();
             } catch (IOException ex) {
                 LOGGER.error("Error while listening", ex);
             }

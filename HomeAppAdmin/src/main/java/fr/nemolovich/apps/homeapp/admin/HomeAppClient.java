@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package fr.nemolovich.apps.homeapp.homeappadmin;
+package fr.nemolovich.apps.homeapp.admin;
 
-import fr.nemolovich.apps.homeapp.homeappadmin.socket.ClientSocket;
+import fr.nemolovich.apps.homeapp.admin.socket.ClientSocket;
 import java.io.IOException;
 import java.util.Scanner;
 
@@ -16,7 +16,7 @@ import java.util.Scanner;
 public class HomeAppClient {
 
     public static void main(String[] args) throws IOException {
-        ClientSocket client = new ClientSocket("localhost", 8081);
+        ClientSocket client = new ClientSocket("localhost", 8081, "serversslpass");
         client.connect();
 
         System.out.println(client.readResponse());

@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
-import java.net.Socket;
+import javax.net.ssl.SSLSocket;
 import org.apache.log4j.Logger;
 
 /**
@@ -28,7 +28,7 @@ public class ClientConnection {
     private final BufferedReader reader;
 
     ClientConnection(ServerSocket socket) throws IOException {
-        Socket client = socket.accept();
+        SSLSocket client = (SSLSocket) socket.accept();
         LOGGER.info("Client connected!");
         this.writer = new PrintWriter(
             client.getOutputStream(), true);

@@ -217,11 +217,11 @@ public final class DeployResourceManager {
     }
 
     public static void startServer() {
-        startServer(8080, 8081);
+        startServer(8080);
     }
 
     public static void startServer(int port) {
-        startServer(port, 8081);
+        startServer(port, 8181);
     }
 
     public static void startServer(int port, int adminPort) {
@@ -236,7 +236,7 @@ public final class DeployResourceManager {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-                LOGGER.info("Server stopped... I'll missed you ;)");
+                LOGGER.info("Server stopped... I'll miss you ;)");
             }
         });
         Spark.setPort(port);
