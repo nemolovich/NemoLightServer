@@ -6,25 +6,30 @@
 package fr.nemolovich.apps.homeapp.admin.commands;
 
 import fr.nemolovich.apps.homeapp.admin.Command;
-import org.apache.log4j.Logger;
 
 /**
  *
  * @author Nemolovich
  */
-public class ShutdownServer extends Command {
+public class AddGroup extends Command {
 
-    private static final Logger LOGGER = Logger.getLogger(ShutdownServer.class);
+    public AddGroup() {
+        super("group_add", "Add a group to security");
+    }
 
-    public ShutdownServer() {
-        super("shutdown_server", "Stop the web server");
+    @Override
+    public String getHelp() {
+        return String.format(
+            "%s%n\tAdd the specific group in security managment%n", getUsage());
+    }
+
+    @Override
+    public String getUsage() {
+        return String.format("%s <GROUP_NAME>", super.getUsage());
     }
 
     @Override
     public String doCommand(String... args) {
-        LOGGER.info(
-            "Server shutting down... bye bye :(");
-        System.exit(0);
         return null;
     }
 

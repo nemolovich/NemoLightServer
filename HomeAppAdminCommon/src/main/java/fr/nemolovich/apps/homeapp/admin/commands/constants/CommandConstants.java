@@ -11,6 +11,7 @@ package fr.nemolovich.apps.homeapp.admin.commands.constants;
  */
 public interface CommandConstants {
 
+    public static final String QUIT_DESC = "Leave admin console";
     public static final String QUIT_COMMAND = "quit";
     public static final String HELP_COMMAND = "help";
     public static final char COMMAND_START = '/';

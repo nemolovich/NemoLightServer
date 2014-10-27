@@ -3,7 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package fr.nemolovich.apps.homeapp.admin.commands;
+package fr.nemolovich.apps.homeapp.admin;
+
+import fr.nemolovich.apps.homeapp.admin.commands.constants.CommandConstants;
 
 /**
  *
@@ -19,18 +21,27 @@ public abstract class Command implements Comparable<Command> {
         this.description = description;
     }
 
-    public String getCommandName() {
+    public final String getCommandName() {
         return this.commandName;
     }
 
-    public String getDescription() {
-        return description;
+    public final String getDescription() {
+        return this.description;
     }
 
-    protected abstract String doCommand(String... args);
+    public String getUsage() {
+        return String.format("Usage: %s%s", CommandConstants.COMMAND_START,
+            this.commandName);
+    }
+
+    public String getHelp() {
+        return String.format("\t%s", this.description);
+    }
+
+    public abstract String doCommand(String... args);
 
     @Override
-    public int compareTo(Command command) {
+    public final int compareTo(Command command) {
         return this.commandName.compareTo(command.commandName);
     }
 

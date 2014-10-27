@@ -6,13 +6,14 @@
 package fr.nemolovich.apps.homeapp.admin;
 
 import fr.nemolovich.apps.homeapp.admin.commands.CommandManager;
-import fr.nemolovich.apps.homeapp.admin.commands.UnkownCommand;
+import fr.nemolovich.apps.homeapp.admin.commands.UnkownCommandException;
 import fr.nemolovich.apps.homeapp.admin.commands.constants.CommandConstants;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
+import java.util.Arrays;
 import javax.net.ssl.SSLSocket;
 import org.apache.log4j.Logger;
 
@@ -38,8 +39,8 @@ public class ClientConnection {
         String listCommand = "";
         try {
             listCommand = CommandManager.execute(CommandConstants.HELP_COMMAND);
-        } catch (UnkownCommand ex) {
-            LOGGER.warn("Can not find help command");
+        } catch (UnkownCommandException ex) {
+            LOGGER.warn("Can not find help command", ex);
         }
 
         this.writer.printf("Welcome on administration management!"
@@ -49,14 +50,17 @@ public class ClientConnection {
     }
 
     public void run() throws IOException {
-        String command = "";
+        String request = "";
         boolean listen = true;
-        while (!command.equals(CommandConstants.QUIT_COMMAND) && listen) {
-            command = this.reader.readLine();
+        while (!request.equals(CommandConstants.QUIT_COMMAND) && listen) {
+            request = this.reader.readLine();
             String response;
-            if (command.startsWith(String.valueOf(
+            if (request.startsWith(String.valueOf(
                 CommandConstants.COMMAND_START))) {
-                command = command.substring(1);
+                request = request.substring(1);
+                String[] line = request.split(" ");
+                String command = line[0];
+                String[] args = Arrays.copyOfRange(line, 1, line.length);
                 LOGGER.info(String.format("Client command: %s", command));
 
                 if (CommandConstants.QUIT_COMMAND.equals(command)) {
@@ -64,13 +68,13 @@ public class ClientConnection {
                     listen = false;
                 } else {
                     try {
-                        response = CommandManager.execute(command);
-                    } catch (UnkownCommand ex) {
+                        response = CommandManager.execute(command, args);
+                    } catch (UnkownCommandException ex) {
                         response = ex.getMessage();
                     }
                 }
             } else {
-                LOGGER.info(String.format("Client message: %s", command));
+                LOGGER.info(String.format("Client message: %s", request));
                 response = "Huhu? oO? What are you saying? ".concat(
                     CommandConstants.HELP_MESSAGE);
             }

@@ -5,6 +5,8 @@
  */
 package fr.nemolovich.apps.homeapp.admin.commands;
 
+import fr.nemolovich.apps.homeapp.admin.Command;
+
 /**
  *
  * @author Nemolovich
@@ -16,7 +18,7 @@ public class SayHello extends Command {
     }
 
     @Override
-    protected String doCommand(String... args) {
+    public String doCommand(String... args) {
         return "Hello guy!";
     }
 

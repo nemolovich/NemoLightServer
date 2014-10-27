@@ -19,6 +19,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -38,6 +41,9 @@ import javax.swing.SwingWorker;
  */
 public class MainFrame extends javax.swing.JFrame {
 
+    private static final Logger LOGGER
+        = Logger.getLogger(MainFrame.class.getName());
+
     private static final String FRAME_ICON = "icon/icon.png";
     private static final String NB_RESOURCES_PATH
         = "/fr/nemolovich/apps/homeapp/admin/gui/";
@@ -47,6 +53,9 @@ public class MainFrame extends javax.swing.JFrame {
         + "\\:(?<port>\\d+)$");
 
     private final ClientSocket socket;
+    private final List<String> commandHistory;
+    private int currentHistoryIndex;
+    private String currentLine;
 
     public final void exit() {
         exit(false);
@@ -69,6 +78,10 @@ public class MainFrame extends javax.swing.JFrame {
     public MainFrame(ClientSocket socket) {
         this.socket = socket;
 
+        this.commandHistory = Collections.synchronizedList(
+            new ArrayList<String>());
+        this.currentHistoryIndex = -1;
+
         setIconImage(Toolkit.getDefaultToolkit().getImage(
             MainFrame.class.getResource(NB_RESOURCES_PATH.concat(FRAME_ICON))));
         this.addWindowListener(new WindowAdapter() {
@@ -89,8 +102,7 @@ public class MainFrame extends javax.swing.JFrame {
         } catch (Exception ex) {
             ((ISocketLogger) this.output).error(
                 String.format("Connection failed. %s%n", ex.getMessage()));
-            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE,
-                "Can not connect to socket", ex);
+            LOGGER.log(Level.SEVERE, "Can not connect to socket", ex);
             exit();
             return;
         }
@@ -101,8 +113,7 @@ public class MainFrame extends javax.swing.JFrame {
             ((ISocketLogger) this.output).error(
                 String.format("Can not read welcome message: %s%n",
                     ex.getMessage()));
-            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE,
-                "Can not read welcome message", ex);
+            LOGGER.log(Level.SEVERE, "Can not read welcome message", ex);
             exit();
         }
 
@@ -126,23 +137,32 @@ public class MainFrame extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("Home Application Administration");
-        setMinimumSize(new java.awt.Dimension(560, 400));
-        setPreferredSize(new java.awt.Dimension(560, 400));
+        setMinimumSize(new java.awt.Dimension(600, 400));
+        setPreferredSize(new java.awt.Dimension(600, 400));
 
         outputScroll.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         outputScroll.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        outputScroll.setAutoscrolls(true);
+        outputScroll.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
         output.setEditable(false);
         output.setBackground(new java.awt.Color(204, 204, 204));
         output.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         output.setFont(new java.awt.Font("Miriam Fixed", 0, 11)); // NOI18N
+        output.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
         outputScroll.setViewportView(output);
 
         commandField.setFont(new java.awt.Font("Miriam Fixed", 0, 12)); // NOI18N
         commandField.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
+        commandField.setFocusTraversalKeysEnabled(false);
         commandField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 commandFieldActionPerformed(evt);
+            }
+        });
+        commandField.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                commandFieldKeyReleased(evt);
             }
         });
 
@@ -218,19 +238,15 @@ public class MainFrame extends javax.swing.JFrame {
     private void quitButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_quitButtonActionPerformed
         if (this.quitAskAction()) {
             try {
-                try {
-                    this.socket.sendRequest(ClientSocket.getQuitCommand());
-                    ((ISocketLogger) this.output).info(String.format("%s%n",
-                        ClientSocket.getQuitCommand()));
-                    ((ISocketLogger) this.output).info(String.format("%s%n",
-                        this.socket.readResponse()));
-                } catch (NullPointerException ex) {
-                }
-                exit(true);
-            } catch (IOException ex) {
-                Logger.getLogger(MainFrame.class.getName()).log(
-                    Level.SEVERE, null, ex);
+                this.socket.sendRequest(ClientSocket.getQuitCommand());
+                ((ISocketLogger) this.output).info(String.format("%s%n",
+                    ClientSocket.getQuitCommand()));
+                ((ISocketLogger) this.output).info(String.format("%s%n",
+                    this.socket.readResponse()));
+            } catch (Exception ex) {
+                LOGGER.log(Level.SEVERE, "Error while sending quit command", ex);
             }
+            exit(true);
         }
     }//GEN-LAST:event_quitButtonActionPerformed
 
@@ -261,7 +277,7 @@ public class MainFrame extends javax.swing.JFrame {
 
                         @Override
                         protected Object doInBackground() throws Exception {
-                            ((ISocketLogger) output).info(String.format(
+                            ((ISocketLogger) output).error(String.format(
                                 "Closing application in 3 secondes%n"));
                             Thread.sleep(3000);
                             return null;
@@ -273,12 +289,52 @@ public class MainFrame extends javax.swing.JFrame {
                         }
                     }.execute();
                 }
+                this.commandHistory.add(command);
+                this.currentHistoryIndex = this.commandHistory.size();
             } catch (IOException ex) {
-                Logger.getLogger(MainFrame.class.getName()).log(
-                    Level.SEVERE, null, ex);
+                LOGGER.log(Level.SEVERE, null, ex);
             }
         }
     }//GEN-LAST:event_commandFieldActionPerformed
+
+    private void commandFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_commandFieldKeyReleased
+        int code = evt.getKeyCode();
+        if (code == KeyEvent.VK_TAB) {
+            this.suggest();
+        } else if (code == KeyEvent.VK_DOWN) {
+            this.selectNextCommand();
+        } else if (code == KeyEvent.VK_UP) {
+            this.selectPreviousCommand();
+        } else {
+            if (this.currentHistoryIndex >= this.commandHistory.size()) {
+                this.currentLine = this.commandField.getText();
+            }
+        }
+    }//GEN-LAST:event_commandFieldKeyReleased
+
+    private void selectPreviousCommand() {
+        if (this.currentHistoryIndex >= 1 && this.commandHistory.size() > 0) {
+            this.currentHistoryIndex--;
+            this.commandField.setText(this.commandHistory.get(
+                this.currentHistoryIndex));
+        }
+    }
+
+    private void selectNextCommand() {
+        if (this.currentHistoryIndex > -1
+            && this.currentHistoryIndex + 1 < this.commandHistory.size()) {
+            this.currentHistoryIndex++;
+            this.commandField.setText(this.commandHistory.get(
+                this.currentHistoryIndex));
+        } else {
+            this.commandField.setText(this.currentLine);
+            this.currentHistoryIndex = this.commandHistory.size();
+        }
+    }
+
+    private void suggest() {
+
+    }
 
     /**
      * @param args the command line arguments

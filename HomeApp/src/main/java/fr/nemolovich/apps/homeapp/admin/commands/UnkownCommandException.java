@@ -9,9 +9,9 @@ package fr.nemolovich.apps.homeapp.admin.commands;
  *
  * @author Nemolovich
  */
-public class UnkownCommand extends Exception {
+public class UnkownCommandException extends Exception {
 
-    public UnkownCommand(String command) {
+    public UnkownCommandException(String command) {
         super("Unknown command '".concat(command).concat("'"));
     }
 

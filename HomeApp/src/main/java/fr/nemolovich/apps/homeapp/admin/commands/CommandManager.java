@@ -5,6 +5,7 @@
  */
 package fr.nemolovich.apps.homeapp.admin.commands;
 
+import fr.nemolovich.apps.homeapp.admin.Command;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -24,6 +25,7 @@ public class CommandManager {
         COMMANDS.add(new HelpCommand());
         COMMANDS.add(new ShutdownServer());
         COMMANDS.add(new SayHello());
+        COMMANDS.add(new AddGroup());
 
         Collections.sort(COMMANDS);
     }
@@ -48,11 +50,11 @@ public class CommandManager {
     }
 
     public static String execute(String commandName, String... args)
-        throws UnkownCommand {
+        throws UnkownCommandException {
         String result;
         Command command = getCommand(commandName);
         if (command == null) {
-            throw new UnkownCommand(commandName);
+            throw new UnkownCommandException(commandName);
         } else {
             result = command.doCommand(args);
         }
