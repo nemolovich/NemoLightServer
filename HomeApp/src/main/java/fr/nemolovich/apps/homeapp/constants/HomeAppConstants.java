@@ -58,6 +58,8 @@ public interface HomeAppConstants {
         .concat("/security/");
     public static final File SECURITY_CONFIG_FILE = new File(
         SECURITY_PATH.concat("security.xml"));
+    public static final File SECURITY_PASSWORDS_FILE = new File(
+            SECURITY_PATH.concat("passwords"));
     public static final String USER_ATTR_NAME = "session_user_attr";
 
 }
