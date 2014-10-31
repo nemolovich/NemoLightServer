@@ -8,7 +8,6 @@ package fr.nemolovich.apps.homeapp.admin.commands;
 import fr.nemolovich.apps.homeapp.admin.Command;
 import fr.nemolovich.apps.homeapp.admin.commands.constants.CommandConstants;
 import fr.nemolovich.apps.homeapp.security.GlobalSecurity;
-import fr.nemolovich.apps.homeapp.security.Group;
 import fr.nemolovich.apps.homeapp.security.SecurityConfiguration;
 import javax.xml.bind.JAXBException;
 import org.apache.log4j.Logger;
@@ -17,18 +16,19 @@ import org.apache.log4j.Logger;
  *
  * @author Nemolovich
  */
-public class AddGroup extends Command {
+public class RemoveGroup extends Command {
 
-    private static final Logger LOGGER = Logger.getLogger(AddGroup.class);
+    private static final Logger LOGGER = Logger.getLogger(RemoveGroup.class);
 
-    public AddGroup() {
-        super("group_add", "Add a group to security");
+    public RemoveGroup() {
+        super("group_rem", "Remove a group from security");
     }
 
     @Override
     public String getHelp() {
         return String.format(
-            "%s%n\tAdd the specific group in security managment%n", getUsage());
+            "%s%n\tDelete the specific group from security managment%n",
+            getUsage());
     }
 
     @Override
@@ -43,16 +43,17 @@ public class AddGroup extends Command {
             returnCode &= CommandConstants.SYNTAX_ERROR_CODE;
         } else {
             String groupName = args[0];
-            if (SecurityConfiguration.getInstance().containsGroup(groupName)) {
-                returnCode &= CommandConstants.GROUP_ALREADY_EXISTS_CODE;
+            if (!SecurityConfiguration.getInstance().containsGroup(groupName)) {
+                returnCode &= CommandConstants.GROUP_DOESNT_EXISTS_CODE;
             } else {
-                SecurityConfiguration.getInstance().addGroup(
-                    new Group(groupName));
-                try {
-                    GlobalSecurity.saveConfig();
-                    returnCode = CommandConstants.SUCCESS_CODE;
-                } catch (JAXBException ex) {
-                    LOGGER.error("Can not save the new group", ex);
+                if (SecurityConfiguration.getInstance().removeGroup(
+                    groupName)) {
+                    try {
+                        GlobalSecurity.saveConfig();
+                        returnCode = CommandConstants.SUCCESS_CODE;
+                    } catch (JAXBException ex) {
+                        LOGGER.error("Can not save the group deletion", ex);
+                    }
                 }
             }
         }

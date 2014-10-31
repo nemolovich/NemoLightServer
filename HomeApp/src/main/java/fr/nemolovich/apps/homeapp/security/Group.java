@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -35,8 +34,8 @@ public class Group implements Serializable {
 		}
 	}
 
-	public void removeUser(User user) {
-		this.users.remove(user);
+	public boolean removeUser(User user) {
+		return this.users.remove(user);
 	}
 
 	/**

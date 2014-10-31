@@ -19,4 +19,12 @@ public interface CommandConstants {
         String.valueOf(COMMAND_START)).concat(HELP_COMMAND)
         .concat("to get some help.");
     public static final char MESSAGE_END = '\\';
+    public static final int SUCCESS_CODE = 0;
+    public static final int EXECUTION_ERROR_CODE = 1;
+    public static final int SYNTAX_ERROR_CODE = 2;
+    public static final int GROUP_ALREADY_EXISTS_CODE = 4;
+    public static final int GROUP_DOESNT_EXISTS_CODE = 8;
+    public static final int USER_ALREADY_EXISTS_CODE = 16;
+    public static final int USER_DOESNT_EXISTS_CODE = 32;
+
 }

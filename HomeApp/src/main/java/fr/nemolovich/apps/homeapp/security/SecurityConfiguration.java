@@ -35,8 +35,8 @@ public class SecurityConfiguration {
     /**
      * @return the group
      */
-    public final ConcurrentLinkedQueue<Group> getGroups() {
-        return groups;
+    public final List<Group> getGroups() {
+        return new ArrayList(this.groups);
     }
 
     /**
@@ -48,12 +48,56 @@ public class SecurityConfiguration {
         }
     }
 
-    /**
-     *
-     * @param group the group to remove
-     */
-    public final void removeGroup(Group group) {
-        this.groups.remove(group);
+    private Group getGroup(String groupName) {
+        Group result = null;
+        for (Group group : this.groups) {
+            if (group.getName().equalsIgnoreCase(groupName)) {
+                result = group;
+                break;
+            }
+        }
+        return result;
+    }
+
+    private User getUser(String userName) {
+        User result = null;
+        grouploop:
+        for (Group group : this.groups) {
+            for (User user : group.getUsers()) {
+                if (user.getName().equalsIgnoreCase(userName)) {
+                    result = user;
+                    break grouploop;
+                }
+            }
+        }
+        return result;
+    }
+
+    public final boolean removeGroup(String groupName) {
+        boolean result = false;
+        Group group = this.getGroup(groupName);
+        if (group != null) {
+            result = this.groups.remove(group);
+        }
+        return result;
+    }
+
+    public final boolean removeUser(String groupName, String userName) {
+        boolean result = false;
+
+        grouploop:
+        for (Group group : this.groups) {
+            if (group.getName().equalsIgnoreCase(groupName)) {
+                for (User user : group.getUsers()) {
+                    if (user.getName().equalsIgnoreCase(userName)) {
+                        result = group.removeUser(user);
+                        break grouploop;
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 
     public List<User> getUsers() {
@@ -62,6 +106,14 @@ public class SecurityConfiguration {
             result.addAll(g.getUsers());
         }
         return result;
+    }
+
+    public final boolean containsGroup(String groupName) {
+        return this.getGroup(groupName) != null;
+    }
+
+    public final void reset() {
+        this.groups.clear();
     }
 
 }
