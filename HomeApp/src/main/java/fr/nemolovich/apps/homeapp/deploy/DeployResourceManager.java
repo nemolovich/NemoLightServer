@@ -189,7 +189,7 @@ public final class DeployResourceManager {
                     + (deployFolderPath.length()));
                 route = new FileRoute(routePath, f);
                 FILES.add(route);
-                LOGGER.error(
+                LOGGER.info(
                     "Resource '".concat(f.getName()).concat(
                         "' has been deployed! [".concat(routePath)
                         .concat("]")));

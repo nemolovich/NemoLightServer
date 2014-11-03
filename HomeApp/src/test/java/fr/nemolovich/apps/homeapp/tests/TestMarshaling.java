@@ -1,13 +1,13 @@
 package fr.nemolovich.apps.homeapp.tests;
 
 import fr.nemolovich.apps.homeapp.admin.commands.AddGroup;
+import fr.nemolovich.apps.homeapp.admin.commands.AddUser;
 import fr.nemolovich.apps.homeapp.admin.commands.RemoveGroup;
 import fr.nemolovich.apps.homeapp.admin.commands.constants.CommandConstants;
 import fr.nemolovich.apps.homeapp.constants.HomeAppConstants;
 import fr.nemolovich.apps.homeapp.security.GlobalSecurity;
-import fr.nemolovich.apps.homeapp.security.Group;
 import fr.nemolovich.apps.homeapp.security.SecurityConfiguration;
-import fr.nemolovich.apps.homeapp.security.User;
+import fr.nemolovich.apps.homeapp.security.SecurityUtils;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -27,18 +27,14 @@ public class TestMarshaling {
 
     @Test
     public void test1() throws JAXBException {
-        Group group1 = new Group("admin");
-        Group group2 = new Group("default");
-//
-        User user1 = new User("root", "root");
-        User user2 = new User("Nemolovich", "root");
 
-        group1.addUser(user1);
-//
-        group2.addUser(user2);
+        SecurityConfiguration.getInstance().addGroup("admin");
+        SecurityConfiguration.getInstance().addGroup("default");
 
-        SecurityConfiguration.getInstance().addGroup(group1);
-        SecurityConfiguration.getInstance().addGroup(group2);
+        SecurityConfiguration.getInstance().addUser("admin", "root",
+            SecurityUtils.getEncryptedPassword("root"));
+        SecurityConfiguration.getInstance().addUser("default", "Nemolovich",
+            SecurityUtils.getEncryptedPassword(""));
 
         GlobalSecurity.saveConfig();
 
@@ -52,7 +48,7 @@ public class TestMarshaling {
 
     }
 
-    @Test
+//    @Test
     public void test2() throws FileNotFoundException, IOException,
         ClassNotFoundException {
 
@@ -65,7 +61,7 @@ public class TestMarshaling {
         System.out.println(passwords);
     }
 
-    @Test
+//    @Test
     public void test3() throws JAXBException {
         SecurityConfiguration.getInstance().reset();
 
@@ -73,11 +69,15 @@ public class TestMarshaling {
 
         AddGroup ag = new AddGroup();
 
-        assertEquals(Integer.parseInt(ag.doCommand("default")),
-            CommandConstants.SUCCESS_CODE);
+        assertEquals(CommandConstants.SUCCESS_CODE,
+            Integer.parseInt(ag.doCommand("default")));
 
-        assertEquals(Integer.parseInt(ag.doCommand("admin")),
-            CommandConstants.SUCCESS_CODE);
+        assertEquals(CommandConstants.SUCCESS_CODE,
+            Integer.parseInt(ag.doCommand("admin")));
+
+        assertEquals(CommandConstants.EXECUTION_ERROR_CODE
+            + CommandConstants.GROUP_ALREADY_EXISTS_CODE,
+            Integer.parseInt(ag.doCommand("admin")));
 
         assertEquals(2, SecurityConfiguration.getInstance().getGroups().size());
 
@@ -92,7 +92,7 @@ public class TestMarshaling {
         assertEquals(2, SecurityConfiguration.getInstance().getGroups().size());
     }
 
-    @Test
+//    @Test
     public void test4() throws JAXBException {
 
         RemoveGroup rg = new RemoveGroup();
@@ -102,8 +102,8 @@ public class TestMarshaling {
         assertTrue(SecurityConfiguration.getInstance()
             .containsGroup("default"));
 
-        assertEquals(Integer.parseInt(rg.doCommand("default")),
-            CommandConstants.SUCCESS_CODE);
+        assertEquals(CommandConstants.SUCCESS_CODE,
+            Integer.parseInt(rg.doCommand("default")));
 
         assertEquals(size - 1,
             SecurityConfiguration.getInstance().getGroups().size());
@@ -118,6 +118,29 @@ public class TestMarshaling {
 
         assertEquals(size - 1,
             SecurityConfiguration.getInstance().getGroups().size());
+    }
+
+//    @Test
+    public void test5() throws JAXBException {
+
+        AddUser au = new AddUser();
+
+        int size = SecurityConfiguration.getInstance().getGroups().size();
+
+        assertTrue(size > 0);
+
+        assertTrue(SecurityConfiguration.getInstance()
+            .containsGroup("admin"));
+
+        assertEquals(CommandConstants.SUCCESS_CODE,
+            Integer.parseInt(au.doCommand("admin", "root",
+                    SecurityUtils.getEncryptedPassword("root"))));
+
+        assertEquals(CommandConstants.EXECUTION_ERROR_CODE
+            + CommandConstants.USER_ALREADY_EXISTS_CODE,
+            Integer.parseInt(au.doCommand("admin", "root",
+                    SecurityUtils.getEncryptedPassword(""))));
+
     }
 
 }

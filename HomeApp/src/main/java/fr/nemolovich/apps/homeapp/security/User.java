@@ -1,7 +1,6 @@
 package fr.nemolovich.apps.homeapp.security;
 
 import java.io.Serializable;
-
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
@@ -9,7 +8,6 @@ import javax.xml.bind.annotation.XmlTransient;
 @XmlRootElement(name = "user")
 public class User implements Serializable {
 	private String name;
-	@XmlTransient
 	private String password;
 
 	private User() {
@@ -40,6 +38,7 @@ public class User implements Serializable {
 	/**
 	 * @return the password
 	 */
+	@XmlTransient
 	public String getPassword() {
 		return password;
 	}

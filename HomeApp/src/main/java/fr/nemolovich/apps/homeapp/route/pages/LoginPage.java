@@ -6,8 +6,11 @@
 package fr.nemolovich.apps.homeapp.route.pages;
 
 import fr.nemolovich.apps.homeapp.config.route.RouteElement;
+import fr.nemolovich.apps.homeapp.constants.HomeAppConstants;
 import fr.nemolovich.apps.homeapp.route.WebRouteServlet;
 import fr.nemolovich.apps.homeapp.security.GlobalSecurity;
+import fr.nemolovich.apps.homeapp.security.SecurityConfiguration;
+import fr.nemolovich.apps.homeapp.security.SecurityUtils;
 import fr.nemolovich.apps.homeapp.security.User;
 import freemarker.template.Configuration;
 import freemarker.template.SimpleHash;
@@ -47,21 +50,28 @@ public class LoginPage extends WebRouteServlet {
         String password = request.queryParams("password");
 
         SimpleHash root = new SimpleHash();
+        root.put("username", name);
+        root.put("login_error", "");
 
         String expectedPass = null;
         for (User u : GlobalSecurity.getUsers()) {
             if (u.getName().equals(name)) {
-                expectedPass = ""+u.getPassword();
+                expectedPass = u.getPassword();
+                break;
             }
         }
+        if (expectedPass != null) {
 
-        String encrypted = GlobalSecurity.getEncryptedPassword(password);
-        encrypted = "root";
+            String encrypted = SecurityUtils.getEncryptedPassword(password);
 
-        if (expectedPass == null || !expectedPass.equals(encrypted)) {
-            root.put("username", name);
-            root.put("login_error",
-                "Login error. Please check your login/password.");
+            if (!expectedPass.equals(encrypted)) {
+                root.put("login_error",
+                    "Login error. Please check your login/password.");
+            } else {
+                User user = SecurityConfiguration.getInstance().getUser(name);
+                request.session(true).attribute(HomeAppConstants.USER_ATTR_NAME,
+                    user);
+            }
         }
 
         template.process(root, writer);

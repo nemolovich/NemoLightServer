@@ -8,7 +8,6 @@ package fr.nemolovich.apps.homeapp.admin.commands;
 import fr.nemolovich.apps.homeapp.admin.Command;
 import fr.nemolovich.apps.homeapp.admin.commands.constants.CommandConstants;
 import fr.nemolovich.apps.homeapp.security.GlobalSecurity;
-import fr.nemolovich.apps.homeapp.security.Group;
 import fr.nemolovich.apps.homeapp.security.SecurityConfiguration;
 import javax.xml.bind.JAXBException;
 import org.apache.log4j.Logger;
@@ -40,19 +39,19 @@ public class AddGroup extends Command {
     public String doCommand(String... args) {
         int returnCode = CommandConstants.EXECUTION_ERROR_CODE;
         if (args.length < 1) {
-            returnCode &= CommandConstants.SYNTAX_ERROR_CODE;
+            returnCode += CommandConstants.SYNTAX_ERROR_CODE;
         } else {
             String groupName = args[0];
             if (SecurityConfiguration.getInstance().containsGroup(groupName)) {
-                returnCode &= CommandConstants.GROUP_ALREADY_EXISTS_CODE;
+                returnCode += CommandConstants.GROUP_ALREADY_EXISTS_CODE;
             } else {
-                SecurityConfiguration.getInstance().addGroup(
-                    new Group(groupName));
-                try {
-                    GlobalSecurity.saveConfig();
-                    returnCode = CommandConstants.SUCCESS_CODE;
-                } catch (JAXBException ex) {
-                    LOGGER.error("Can not save the new group", ex);
+                if (SecurityConfiguration.getInstance().addGroup(groupName)) {
+                    try {
+                        GlobalSecurity.saveConfig();
+                        returnCode = CommandConstants.SUCCESS_CODE;
+                    } catch (JAXBException ex) {
+                        LOGGER.error("Can not save the new group", ex);
+                    }
                 }
             }
         }

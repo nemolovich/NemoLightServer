@@ -5,8 +5,9 @@
  */
 package fr.nemolovich.apps.homeapp.admin.gui;
 
+import fr.nemolovich.apps.homeapp.admin.Command;
 import fr.nemolovich.apps.homeapp.admin.commands.constants.CommandConstants;
-import fr.nemolovich.apps.homeapp.admin.gui.commands.CommandsUtil;
+import fr.nemolovich.apps.homeapp.admin.gui.commands.CommandsUtils;
 import fr.nemolovich.apps.homeapp.admin.socket.ClientSocket;
 import fr.nemolovich.apps.homeapp.admin.socket.ISocketLogger;
 import java.awt.BorderLayout;
@@ -25,6 +26,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -82,7 +84,7 @@ public class MainFrame extends javax.swing.JFrame {
             .synchronizedList(new ArrayList<String>());
         this.currentHistoryIndex = -1;
 
-        CommandsUtil
+        CommandsUtils
             .addCommand(new CommandAdapter("clear", "Clear the console") {
                 @Override
                 public String doCommand(String... args) {
@@ -158,7 +160,6 @@ public class MainFrame extends javax.swing.JFrame {
                 return commandField;
             }
         });
-//        this.commandField.requestFocus();
         try {
             this.socket.setLogger((ISocketLogger) this.output);
             this.socket.connect();
@@ -173,7 +174,7 @@ public class MainFrame extends javax.swing.JFrame {
             ((ISocketLogger) this.output).info(String.format("%s%n",
                 this.socket.readResponse()));
         } catch (IOException ex) {
-            ((ISocketLogger) this.output).error(String.format(
+            ((ISocketLogger) this.output).warning(String.format(
                 "Can not read welcome message: %s%n", ex.getMessage()));
             LOGGER.log(Level.SEVERE, "Can not read welcome message", ex);
             exit();
@@ -184,16 +185,16 @@ public class MainFrame extends javax.swing.JFrame {
                 CommandConstants.HELP_COMMAND));
             String helpMsg = this.socket.readResponse();
             List<String> serverCommands = parseServerCommands(helpMsg);;
-            CommandsUtil.addServerCommand(serverCommands);
+            CommandsUtils.addServerCommand(serverCommands);
         } catch (IOException ex) {
-            ((ISocketLogger) this.output).error(String.format(
+            ((ISocketLogger) this.output).warning(String.format(
                 "Can not retrive server commands: %s%n", ex.getMessage()));
             LOGGER.log(Level.SEVERE, "Can not retrive server commands", ex);
         }
 
     }
 
-    private static final List<String> parseServerCommands(String msg) {
+    private static List<String> parseServerCommands(String msg) {
         List<String> commands = new ArrayList();
         Matcher matcher = SERVER_COMMAND_PATTERN.matcher(msg);
 
@@ -367,37 +368,54 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void commandFieldActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_commandFieldActionPerformed
         String command = this.commandField.getText();
+        String[] args = command.split(" ");
+        String commandName = args[0].substring(1);
+        args = Arrays.copyOfRange(args, 1, args.length);
+        ((ISocketLogger) this.output).info(String.format("%s%n",
+            command));
+        this.commandField.setText("");
         if (!command.isEmpty()) {
-            try {
-                this.socket.sendRequest(command);
+            if (CommandsUtils.getInternalCommands().contains(
+                commandName)) {
+                Command c = CommandsUtils.getInternalCommand(
+                    commandName);
+                c.doCommand(args);
+            } else if (commandName.equals(CommandConstants.HELP_COMMAND)
+                && args.length > 0
+                && CommandsUtils.getInternalCommands().contains(args[0])) {
                 ((ISocketLogger) this.output).info(String.format("%s%n",
-                    command));
-                this.commandField.setText("");
-                ((ISocketLogger) this.output).info(String.format("%s%n",
-                    this.socket.readResponse()));
-                if (command.startsWith(ClientSocket.getQuitCommand())) {
-                    new SwingWorker() {
+                    CommandsUtils.getInternalCommandHelp(args[0])));
+            } else {
+                try {
+                    this.socket.sendRequest(command);
+                    ((ISocketLogger) this.output).info(String.format("%s%n",
+                        this.socket.readResponse()));
+                    if (command.startsWith(ClientSocket.getQuitCommand())) {
+                        new SwingWorker() {
 
-                        @Override
-                        protected Object doInBackground() throws Exception {
-                            ((ISocketLogger) output)
-                                .error(String
-                                    .format("Closing application in 3 secondes%n"));
-                            Thread.sleep(3000);
-                            return null;
-                        }
+                            @Override
+                            protected Object doInBackground() throws Exception {
+                                ((ISocketLogger) output)
+                                    .error(String
+                                        .format("Closing application in 3 secondes%n"));
+                                Thread.sleep(3000);
+                                return null;
+                            }
 
-                        @Override
-                        protected void done() {
-                            exit(true);
-                        }
-                    }.execute();
+                            @Override
+                            protected void done() {
+                                exit(true);
+                            }
+                        }.execute();
+                    }
+                } catch (IOException ex) {
+                    ((ISocketLogger) this.output).error(String.format(
+                        "Communication error: %s%n", ex.getMessage()));
+                    LOGGER.log(Level.SEVERE, null, ex);
                 }
-                this.commandHistory.add(command);
-                this.currentHistoryIndex = this.commandHistory.size();
-            } catch (IOException ex) {
-                LOGGER.log(Level.SEVERE, null, ex);
             }
+            this.commandHistory.add(command);
+            this.currentHistoryIndex = this.commandHistory.size();
         }
     }// GEN-LAST:event_commandFieldActionPerformed
 
@@ -441,7 +459,7 @@ public class MainFrame extends javax.swing.JFrame {
         if (line.length() > 0 && line.charAt(0) == CommandConstants.COMMAND_START) {
             line = line.substring(1);
             List<String> suggestions = new ArrayList();
-            for (String cmd : CommandsUtil.getAvailableCommands()) {
+            for (String cmd : CommandsUtils.getAvailableCommands()) {
                 if (cmd.startsWith(line)) {
                     suggestions.add(String.format("%s%s ",
                         CommandConstants.COMMAND_START, cmd));
@@ -450,7 +468,7 @@ public class MainFrame extends javax.swing.JFrame {
             if (suggestions.size() == 1) {
                 this.commandField.setText(suggestions.get(0));
             } else if (suggestions.size() > 1 && suggestions.size()
-                < CommandsUtil.getAvailableCommands().size()) {
+                < CommandsUtils.getAvailableCommands().size()) {
                 StringBuilder display = new StringBuilder();
                 display.append(String.format("Available commmands:%n"));
                 for (String cmd : suggestions) {

@@ -40,12 +40,17 @@ public class SecurityConfiguration {
     }
 
     /**
-     * @param group the group to add
+     * @param groupName the name of the group to add
+     * @return {@link Boolean boolean} - <code>true</code> if the group has been
+     * added in the security configuration, <code>false</code> otherwise.
      */
-    public final void addGroup(Group group) {
+    public final boolean addGroup(String groupName) {
+        boolean result = false;
+        Group group = new Group(groupName);
         if (!this.groups.contains(group)) {
-            this.groups.add(group);
+            result = this.groups.add(group);
         }
+        return result;
     }
 
     private Group getGroup(String groupName) {
@@ -59,7 +64,7 @@ public class SecurityConfiguration {
         return result;
     }
 
-    private User getUser(String userName) {
+    public User getUser(String userName) {
         User result = null;
         grouploop:
         for (Group group : this.groups) {
@@ -71,6 +76,18 @@ public class SecurityConfiguration {
             }
         }
         return result;
+    }
+
+    public final boolean addUser(String groupName, String userName,
+        String password) {
+        boolean added = false;
+        Group group = getGroup(groupName);
+        if (group != null) {
+            if (!group.containsUser(userName)) {
+                added = group.addUser(userName, password);
+            }
+        }
+        return added;
     }
 
     public final boolean removeGroup(String groupName) {
@@ -90,7 +107,7 @@ public class SecurityConfiguration {
             if (group.getName().equalsIgnoreCase(groupName)) {
                 for (User user : group.getUsers()) {
                     if (user.getName().equalsIgnoreCase(userName)) {
-                        result = group.removeUser(user);
+                        result = group.removeUser(user.getName());
                         break grouploop;
                     }
                 }
@@ -114,6 +131,11 @@ public class SecurityConfiguration {
 
     public final void reset() {
         this.groups.clear();
+    }
+
+    public boolean containsUser(String groupName, String userName) {
+        Group group = this.getGroup(groupName);
+        return group != null && group.containsUser(userName);
     }
 
 }

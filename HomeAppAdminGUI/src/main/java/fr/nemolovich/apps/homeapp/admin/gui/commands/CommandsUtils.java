@@ -15,7 +15,7 @@ import java.util.List;
  *
  * @author Nemolovich
  */
-public class CommandsUtil {
+public class CommandsUtils {
 
     private static final List<Command> INTERNAL_COMMANDS;
     private static final List<String> SERVER_COMMANDS;
@@ -53,6 +53,29 @@ public class CommandsUtil {
         for (Command command : INTERNAL_COMMANDS) {
             if (command.getCommandName().equalsIgnoreCase(commandName)) {
                 result = command.getHelp();
+                break;
+            }
+        }
+        return result;
+    }
+
+    private static List<String> getInternaleCommandNames() {
+        List<String> result = new ArrayList<>();
+        for (Command command : INTERNAL_COMMANDS) {
+            result.add(command.getCommandName());
+        }
+        return result;
+    }
+
+    public static List<String> getInternalCommands() {
+        return getInternaleCommandNames();
+    }
+
+    public static Command getInternalCommand(String commandName) {
+        Command result = null;
+        for (Command command : INTERNAL_COMMANDS) {
+            if (command.getCommandName().equals(commandName)) {
+                result = command;
                 break;
             }
         }

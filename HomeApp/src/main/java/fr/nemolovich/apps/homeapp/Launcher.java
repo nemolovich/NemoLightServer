@@ -8,11 +8,14 @@ package fr.nemolovich.apps.homeapp;
 import fr.nemolovich.apps.homeapp.config.WebConfig;
 import fr.nemolovich.apps.homeapp.constants.HomeAppConstants;
 import fr.nemolovich.apps.homeapp.deploy.DeployResourceManager;
+import fr.nemolovich.apps.homeapp.security.GlobalSecurity;
+import fr.nemolovich.apps.homeapp.security.SecurityConfiguration;
 import freemarker.template.Configuration;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.bind.JAXBException;
 import org.apache.log4j.PropertyConfigurator;
 
 /**
@@ -29,6 +32,7 @@ public class Launcher {
     public static void main(String[] args) throws IOException {
 
         boolean extract = false;
+        boolean securityDisabled = false;
         int adminport = 8081;
         int port = 8080;
         if (args.length > 0) {
@@ -48,6 +52,8 @@ public class Launcher {
                     extract = true;
                 } else if (arg.equals("--admin-port")) {
                     needAdminPort = true;
+                } else if (arg.equals("--disable-security")) {
+                    securityDisabled = true;
                 } else if (needAdminPort) {
                     try {
                         adminport = Integer.parseInt(arg);
@@ -67,23 +73,40 @@ public class Launcher {
 
         if (extract) {
 
-            LOGGER.log(Level.INFO, "Extracting files from archive...");
+            LOGGER.info("Extracting files from archive...");
 
             DeployResourceManager
                 .initResources(HomeAppConstants.PACKAGE_NAME);
 
-            LOGGER.log(Level.INFO, "Extraction completed!");
+            LOGGER.info("Extraction completed!");
 
         }
 
-        LOGGER.log(Level.INFO,
-            "Configuring log file...");
+        LOGGER.info("Configuring log file...");
 
-        PropertyConfigurator.configure(HomeAppConstants.CONFIG_FOLDER.concat(HomeAppConstants.LOGGER_FILE_PATH));
-        org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(Launcher.class);
+        PropertyConfigurator.configure(
+            HomeAppConstants.CONFIG_FOLDER.concat(
+                HomeAppConstants.LOGGER_FILE_PATH));
+        org.apache.log4j.Logger log
+            = org.apache.log4j.Logger.getLogger(Launcher.class);
 
-        log.info(
-            "Log4j appender configuration successfully loaded");
+        log.info("Log4j appender configuration successfully loaded");
+
+        if (!securityDisabled) {
+            try {
+                log.info("Enabling security...");
+                SecurityConfiguration.loadConfig(GlobalSecurity.loadConfig());
+                try {
+                    GlobalSecurity.loadPasswords();
+                } catch (IOException | ClassNotFoundException ex) {
+                    log.error("Can not load passwords", ex);
+                }
+                GlobalSecurity.enableSecurity();
+                log.info("Security enabled");
+            } catch (JAXBException ex) {
+                log.error("Can not load security configuration", ex);
+            }
+        }
 
         log.info(
             "Log file settings set from '".concat(
