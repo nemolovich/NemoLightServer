@@ -1,0 +1,16 @@
+
+<div class="header">Hello</div>
+<script type="text/javascript">
+	$(".header").hover(function() {
+		console.log("hover");
+		$(this).animate({
+			"opacity" : "1"
+		}, 100);
+	}, function() {
+		console.log("out");
+		$(this).animate({
+			"opacity" : "0"
+		}, 800);
+	});
+	console.log($(".header"));
+</script>

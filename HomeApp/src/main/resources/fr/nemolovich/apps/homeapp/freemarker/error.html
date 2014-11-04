@@ -10,7 +10,9 @@
 		Oops...<br /> ${error}
 	</p>
 	<p class="error_code">Code: ${code}</p>
-	<p class="error_details">${error_details}</p>
+	<#if error_details??>
+		<p class="error_details">${error_details}</p>
+	</#if>
 
 
 	<script type="text/javascript">

@@ -38,8 +38,6 @@ public class ErrorPage extends WebRouteServlet {
         if (details != null) {
             root.put("error_details", details);
             request.session().removeAttribute("error_details");
-        } else {
-            root.put("error_details", "");
         }
         root.put("error", "System has encountered an error.");
         template.process(root, writer);
@@ -48,7 +46,7 @@ public class ErrorPage extends WebRouteServlet {
     @Override
     protected void doPost(Request request, Response response, Writer writer)
         throws TemplateException, IOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
 }

@@ -51,7 +51,6 @@ public class LoginPage extends WebRouteServlet {
 
         SimpleHash root = new SimpleHash();
         root.put("username", name);
-        root.put("login_error", "");
 
         String expectedPass = null;
         for (User u : GlobalSecurity.getUsers()) {
