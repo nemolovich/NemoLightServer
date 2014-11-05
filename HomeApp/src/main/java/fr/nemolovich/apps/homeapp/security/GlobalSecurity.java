@@ -48,6 +48,10 @@ public class GlobalSecurity {
         SECURED = false;
     }
 
+    public static boolean isEnabled() {
+        return SECURED;
+    }
+
     public static final void saveConfig() throws JAXBException {
         Marshaller m = CONTEXT.createMarshaller();
         if (!HomeAppConstants.SECURITY_CONFIG_FILE.getParentFile().exists()) {

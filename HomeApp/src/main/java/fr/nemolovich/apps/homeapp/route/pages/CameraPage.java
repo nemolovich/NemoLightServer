@@ -24,9 +24,9 @@ import spark.Response;
 @RouteElement(path = "/camera/:size", page = "camera.html")
 public class CameraPage extends WebRouteServlet {
 
-    private String cameraServer;
-    private int cameraPort;
-    private String cameraProtocol;
+    private final String cameraServer;
+    private final int cameraPort;
+    private final String cameraProtocol;
 
     public static final Pattern CAMERA_DIMENSION = Pattern
         .compile("^(?<width>\\d{2,4})x(?<height>\\d{2,4})$");

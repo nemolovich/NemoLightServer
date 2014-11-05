@@ -1,6 +1,7 @@
 package fr.nemolovich.apps.homeapp.route;
 
 import fr.nemolovich.apps.homeapp.constants.HomeAppConstants;
+import fr.nemolovich.apps.homeapp.security.GlobalSecurity;
 import fr.nemolovich.apps.homeapp.security.User;
 import spark.Request;
 import spark.Response;
@@ -11,6 +12,7 @@ public abstract class WebRoute extends Route {
 
     private static WebRoute LOGIN_PAGE;
     private final String route;
+    private boolean secured;
 
     public WebRoute(String path) {
         super(path);
@@ -19,6 +21,14 @@ public abstract class WebRoute extends Route {
 
     public static final void setLoginPage(WebRoute loginPage) {
         LOGIN_PAGE = loginPage;
+    }
+
+    public final void disableSecurity() {
+        this.secured = false;
+    }
+
+    public final void enableSecurity() {
+        this.secured = true;
     }
 
     public final String getPath() {
@@ -33,8 +43,9 @@ public abstract class WebRoute extends Route {
         String loginPath = LOGIN_PAGE == null ? null : LOGIN_PAGE.getPath();
 
         Object result = null;
-        if ((loginPath != null && !loginPath.equals(request.pathInfo()))
-            && user == null) {
+        if (GlobalSecurity.isEnabled() && this.secured
+            && ((loginPath != null && !loginPath.equals(request.pathInfo()))
+            && user == null)) {
             response.redirect(loginPath);
         } else {
             result = doHandle(request, response);

@@ -161,6 +161,8 @@ public final class DeployResourceManager {
                         LOGGER.info(
                             "Resource '".concat(c.getName()).concat(
                                 "' has been set to login page"));
+                    } else if (isLoginPage) {
+                        LOGGER.warn("Login page is already set");
                     }
                 }
 
@@ -188,6 +190,7 @@ public final class DeployResourceManager {
                     .lastIndexOf(deployFolderPath)
                     + (deployFolderPath.length()));
                 route = new FileRoute(routePath, f);
+                route.disableSecurity();
                 FILES.add(route);
                 LOGGER.info(
                     "Resource '".concat(f.getName()).concat(

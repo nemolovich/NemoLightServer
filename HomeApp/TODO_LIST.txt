@@ -1,0 +1,2 @@
+- Use XML file to include/exclude FileRoute security in DeployResourceManager.
+- Fix the input focus lost.

@@ -13,4 +13,5 @@ public @interface RouteElement {
 	String path();
 	String page();
         boolean login() default false;
+        boolean secured() default true;
 }

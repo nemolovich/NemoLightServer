@@ -1,46 +1,37 @@
-<!DOCTYPE html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
 <html>
-<head>
-<title>Login</title>
-<style type="text/css">
-.label {
-	text-align: right
-}
 
-.error {
-	color: red
-}
-</style>
-
+    <head>
+        <#include "header.html">
+    <title>Login</title>
 </head>
 
 <body>
-	Need to Create an account?
-	<a href="/signup">Signup</a>
-	<p>
-	<h2>Login</h2>
-	<form method="post" action="/login">
-		<table>
-			<tr>
-				<td class="label">Username</td>
-				<td><input type="text" name="name" value="${username}">
-				</td>
-				<td class="error"></td>
-			</tr>
+    <div id="content-div">
+        <h2>Login</h2>
+        <form method="post" action="/login">
+            <table>
+                <tr>
+                    <td class="label">Username</td>
+                    <td><input type="text" name="name" value="${username}">
+                    </td>
+                    <td class="error"></td>
+                </tr>
 
-			<tr>
-				<td class="label">Password</td>
-				<td><input type="password" name="password" value=""></td>
-				<#if login_error??>
-					<td class="error">${login_error}</td>
-				</#if>
-			</tr>
+                <tr>
+                    <td class="label">Password</td>
+                    <td><input type="password" name="password" value=""></td>
+                    <#if login_error??>
+                    <td class="error">${login_error}</td>
+                    </#if>
+                </tr>
 
-		</table>
+            </table>
 
-		<input type="submit">
-	</form>
+            <input type="submit">
+        </form>
+    </div>
 </body>
 
 </html>
