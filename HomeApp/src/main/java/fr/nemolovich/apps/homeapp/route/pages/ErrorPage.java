@@ -5,15 +5,15 @@
  */
 package fr.nemolovich.apps.homeapp.route.pages;
 
+import java.io.IOException;
+
+import spark.Request;
+import spark.Response;
 import fr.nemolovich.apps.homeapp.config.route.RouteElement;
 import fr.nemolovich.apps.homeapp.route.WebRouteServlet;
 import freemarker.template.Configuration;
 import freemarker.template.SimpleHash;
 import freemarker.template.TemplateException;
-import java.io.IOException;
-import java.io.Writer;
-import spark.Request;
-import spark.Response;
 
 /**
  *
@@ -28,10 +28,9 @@ public class ErrorPage extends WebRouteServlet {
     }
 
     @Override
-    protected void doGet(Request request, Response response, Writer writer)
+    protected void doGet(Request request, Response response, SimpleHash root)
         throws TemplateException, IOException {
 
-        SimpleHash root = new SimpleHash();
         String error = request.params("code");
         root.put("code", error);
         String details = request.session().attribute("error_details");
@@ -40,11 +39,10 @@ public class ErrorPage extends WebRouteServlet {
             request.session().removeAttribute("error_details");
         }
         root.put("error", "System has encountered an error.");
-        template.process(root, writer);
     }
 
     @Override
-    protected void doPost(Request request, Response response, Writer writer)
+    protected void doPost(Request request, Response response, SimpleHash root)
         throws TemplateException, IOException {
         throw new UnsupportedOperationException("Not supported yet.");
     }

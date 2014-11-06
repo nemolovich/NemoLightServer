@@ -5,16 +5,18 @@
  */
 package fr.nemolovich.apps.homeapp.route.pages;
 
-import fr.nemolovich.apps.homeapp.route.WebRoute;
-import freemarker.template.Configuration;
-import freemarker.template.TemplateException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
 import spark.Request;
 import spark.Response;
+import fr.nemolovich.apps.homeapp.route.WebRoute;
+import freemarker.template.Configuration;
+import freemarker.template.TemplateException;
 
 /**
  *
@@ -52,7 +54,7 @@ public abstract class FreemarkerWebRoute extends WebRoute {
     }
 
     protected abstract void doHandle(final Request request,
-        final Response response, final Writer writer) throws IOException,
+        final Response response, Writer writer) throws IOException,
         TemplateException;
 
 }

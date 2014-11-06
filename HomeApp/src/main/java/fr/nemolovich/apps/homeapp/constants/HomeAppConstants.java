@@ -61,5 +61,12 @@ public interface HomeAppConstants {
     public static final File SECURITY_PASSWORDS_FILE = new File(
             SECURITY_PATH.concat("passwords"));
     public static final String USER_ATTR_NAME = "session_user_attr";
+    
+    /* ***********************
+     * Security users
+     * 
+     * ***********************
+     */
+    public static final String SESSION_USER = "session_user";
 
 }

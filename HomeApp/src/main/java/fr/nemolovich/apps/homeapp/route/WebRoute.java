@@ -10,49 +10,50 @@ import spark.Session;
 
 public abstract class WebRoute extends Route {
 
-    private static WebRoute LOGIN_PAGE;
-    private final String route;
-    private boolean secured;
+	private static WebRoute LOGIN_PAGE;
+	private final String route;
+	private boolean secured;
 
-    public WebRoute(String path) {
-        super(path);
-        this.route = path;
-    }
+	public WebRoute(String path) {
+		super(path);
+		this.route = path;
+	}
 
-    public static final void setLoginPage(WebRoute loginPage) {
-        LOGIN_PAGE = loginPage;
-    }
+	public static final void setLoginPage(WebRoute loginPage) {
+		LOGIN_PAGE = loginPage;
+	}
 
-    public final void disableSecurity() {
-        this.secured = false;
-    }
+	public final void disableSecurity() {
+		this.secured = false;
+	}
 
-    public final void enableSecurity() {
-        this.secured = true;
-    }
+	public final void enableSecurity() {
+		this.secured = true;
+	}
 
-    public final String getPath() {
-        return this.route;
-    }
+	public final String getPath() {
+		return this.route;
+	}
 
-    @Override
-    public final Object handle(Request request, Response response) {
-        Session session = request.session(true);
-        User user = session.attribute(HomeAppConstants.USER_ATTR_NAME);
+	@Override
+	public final Object handle(Request request, Response response) {
+		Session session = request.session(true);
+		User user = session.attribute(HomeAppConstants.USER_ATTR_NAME);
 
-        String loginPath = LOGIN_PAGE == null ? null : LOGIN_PAGE.getPath();
+		String loginPath = LOGIN_PAGE == null ? null : LOGIN_PAGE.getPath();
 
-        Object result = null;
-        if (GlobalSecurity.isEnabled() && this.secured
-            && ((loginPath != null && !loginPath.equals(request.pathInfo()))
-            && user == null)) {
-            response.redirect(loginPath);
-        } else {
-            result = doHandle(request, response);
-        }
-        return result;
-    }
+		Object result = null;
+		if (GlobalSecurity.isEnabled()
+				&& this.secured
+				&& ((loginPath != null && !loginPath.equals(request.pathInfo())) && user == null)) {
+			response.redirect(loginPath);
+		} else {
+			request.attribute(HomeAppConstants.SESSION_USER, user);
+			result = doHandle(request, response);
+		}
+		return result;
+	}
 
-    public abstract Object doHandle(Request request, Response response);
+	public abstract Object doHandle(Request request, Response response);
 
 }
