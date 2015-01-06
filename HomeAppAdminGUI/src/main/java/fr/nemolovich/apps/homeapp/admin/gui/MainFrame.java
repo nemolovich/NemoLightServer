@@ -94,8 +94,8 @@ public class MainFrame extends javax.swing.JFrame {
             });
 
         setIconImage(Toolkit.getDefaultToolkit().getImage(
-            MainFrame.class.getResource(NB_RESOURCES_PATH
-                .concat(FRAME_ICON))));
+            MainFrame.class.getResource(String.format("%s%s", NB_RESOURCES_PATH,
+                    FRAME_ICON))));
         this.addWindowListener(new WindowAdapter() {
 
             @Override

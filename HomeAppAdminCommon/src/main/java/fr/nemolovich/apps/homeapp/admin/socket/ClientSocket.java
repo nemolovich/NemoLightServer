@@ -27,10 +27,10 @@ public class ClientSocket {
     private static final String SSL_CERT_FILE_PATH
         = "security/certificates/client.ks";
     private static final String SSL_CERT_PATH_LOCAL
-        = "resources/".concat(SSL_CERT_FILE_PATH);
+        = String.format("resources/%s", SSL_CERT_FILE_PATH);
     private static final String SSL_CERT_PATH_NB
-        = "src/main/resources/fr/nemolovich/apps/homeapp/admin/"
-        .concat(SSL_CERT_FILE_PATH);
+        = String.format("src/main/resources/fr/nemolovich/apps/homeapp/admin/%s",
+            SSL_CERT_FILE_PATH);
 
     private final String hostname;
     private final int port;
@@ -44,7 +44,6 @@ public class ClientSocket {
         this.hostname = hostname;
         this.port = port;
         this.password = passsword;
-
     }
 
     public void setLogger(ISocketLogger logger) {
@@ -114,7 +113,8 @@ public class ClientSocket {
     }
 
     public static final String getQuitCommand() {
-        return String.valueOf(CommandConstants.COMMAND_START).concat(
+        return String.format("%s%s",
+            String.valueOf(CommandConstants.COMMAND_START),
             CommandConstants.QUIT_COMMAND);
     }
 

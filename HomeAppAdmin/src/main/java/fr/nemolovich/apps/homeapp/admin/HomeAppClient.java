@@ -39,11 +39,11 @@ public class HomeAppClient {
 
         Console console = System.console();
         String password;
-        if (console != null) {
+        if (console == null) {
+            password = args[2];
+        } else {
             System.out.print("Please enter the certificate password: ");
             password = new String(console.readPassword());
-        } else {
-            password = args[2];
         }
 
         ClientSocket client = new ClientSocket(host, port, password);
