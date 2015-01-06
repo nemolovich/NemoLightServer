@@ -51,7 +51,7 @@ public final class DeployResourceManager {
             resourcesPath);
         if (url == null) {
             url = DeployResourceManager.class.getClassLoader().getResource(
-                HomeAppConstants.SRC_FOLDER.concat("/").concat(
+                String.format("%s/%s", HomeAppConstants.SRC_FOLDER,
                     resourcesPath));
         }
         List<String> files = null;
@@ -75,8 +75,8 @@ public final class DeployResourceManager {
 
                     basePath = resourcesPath;
                 } else {
-                    LOGGER.error(
-                        "Unknown protocol '".concat(protocol).concat("'"));
+                    LOGGER.error(String.format("Unknown protocol '%s'",
+                        protocol));
                 }
             } catch (SearchFileOptionException | URISyntaxException ex) {
                 LOGGER.error("Error while searching files", ex);
@@ -94,25 +94,25 @@ public final class DeployResourceManager {
         for (String fileName : files) {
             try {
                 if (protocol.equalsIgnoreCase(HomeAppConstants.FILE_PROTOCOL)) {
-                    File f = new File(basePath.concat(fileName));
+                    File f = new File(String.format("%s%s", basePath, fileName));
                     input = new FileInputStream(f);
                 } else if (protocol
                     .equalsIgnoreCase(HomeAppConstants.JAR_PROTOCOL)) {
                     URL res = DeployResourceManager.class.getClassLoader()
-                        .getResource(basePath.concat(fileName));
+                        .getResource(String.format("%s%s", basePath, fileName));
                     if (res != null) {
                         input = res.openStream();
                     }
                 } else {
-                    LOGGER.error(
-                        "Unknown protocol '".concat(protocol).concat("'"));
+                    LOGGER.error(String.format("Unknown protocol '%s'",
+                        protocol));
                     return;
                 }
                 if (input == null) {
                     throw new IOException("Can not read input file");
                 }
-                File target = new File(
-                    HomeAppConstants.RESOURCES_FOLDER.concat(fileName));
+                File target = new File(String.format("%s%s",
+                    HomeAppConstants.RESOURCES_FOLDER, fileName));
                 if (!target.exists()) {
                     if (!target.getParentFile().mkdirs()
                         && !target.createNewFile()) {
@@ -121,12 +121,11 @@ public final class DeployResourceManager {
                 }
                 Files.copy(input, target.toPath(),
                     StandardCopyOption.REPLACE_EXISTING);
-                LOGGER.info(
-                    "Resource '".concat(fileName).concat("' extracted."));
+                LOGGER.info(String.format("Resource '%s' extracted.",
+                    fileName));
             } catch (IOException ex) {
-                LOGGER.error(
-                    "Can not extract resources: '".concat(fileName).concat(
-                        "'"), ex);
+                LOGGER.error(String.format("Can not extract resources: '%s'",
+                    fileName), ex);
             }
         }
     }
@@ -152,15 +151,15 @@ public final class DeployResourceManager {
                 if (o instanceof WebRouteServlet) {
                     servlet = (WebRouteServlet) o;
                     SERVLETS.add(servlet);
-                    LOGGER.info(
-                        "Resource '".concat(c.getName()).concat(
-                            "' has been deployed! [".concat(path).concat("]")));
+                    LOGGER.info(String.format(
+                        "Resource '%s' has been deployed! [%s]",
+                        c.getName(), path));
                     if (!loginPageDefined && isLoginPage) {
                         loginPageDefined = true;
                         WebRoute.setLoginPage(servlet.getPostRoute());
-                        LOGGER.info(
-                            "Resource '".concat(c.getName()).concat(
-                                "' has been set to login page"));
+                        LOGGER.info(String.format(
+                            "Resource '%s' has been set to login page",
+                            c.getName()));
                     } else if (isLoginPage) {
                         LOGGER.warn("Login page is already set");
                     }
@@ -179,8 +178,9 @@ public final class DeployResourceManager {
         File deployFolder = new File(deployFolderPath);
         try {
             if (!deployFolder.exists() || !deployFolder.isDirectory()) {
-                throw new FileNotFoundException("The deploy folder '".concat(
-                    deployFolderPath).concat("' can not be located"));
+                throw new FileNotFoundException(String.format(
+                    "The deploy folder '%s can not be located",
+                    deployFolderPath));
             }
             FileRoute route;
             for (File f : getAllFile(deployFolder,
@@ -192,10 +192,9 @@ public final class DeployResourceManager {
                 route = new FileRoute(routePath, f);
                 route.disableSecurity();
                 FILES.add(route);
-                LOGGER.info(
-                    "Resource '".concat(f.getName()).concat(
-                        "' has been deployed! [".concat(routePath)
-                        .concat("]")));
+                LOGGER.info(String.format(
+                    "Resource '%s' has been deployed! [%s]", f.getName(),
+                    routePath));
             }
         } catch (FileNotFoundException ex) {
             LOGGER.error("Error while deploying webapp", ex);

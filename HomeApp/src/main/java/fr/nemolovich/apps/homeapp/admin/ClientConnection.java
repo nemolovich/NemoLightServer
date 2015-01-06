@@ -43,9 +43,8 @@ public class ClientConnection {
             LOGGER.warn("Can not find help command", ex);
         }
 
-        this.writer.printf("Welcome on administration management!"
-            .concat(listCommand)
-            .concat(String.valueOf(CommandConstants.MESSAGE_END)));
+        this.writer.printf("Welcome on administration management!%s%s",
+            listCommand, String.valueOf(CommandConstants.MESSAGE_END));
         this.writer.flush();
     }
 
@@ -75,11 +74,11 @@ public class ClientConnection {
                 }
             } else {
                 LOGGER.info(String.format("Client message: %s", request));
-                response = "Huhu? oO? What are you saying? ".concat(
+                response = String.format("Huhu? oO? What are you saying? %s",
                     CommandConstants.HELP_MESSAGE);
             }
-            this.writer.printf(response.concat(String.valueOf(
-                CommandConstants.MESSAGE_END)));
+            this.writer.printf("%s",
+                String.valueOf(CommandConstants.MESSAGE_END));
             this.writer.flush();
         }
         this.close();

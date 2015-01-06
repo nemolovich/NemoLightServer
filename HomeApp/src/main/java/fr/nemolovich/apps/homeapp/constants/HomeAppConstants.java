@@ -14,11 +14,11 @@ public interface HomeAppConstants {
     public static final String SRC_FOLDER = "src/main/resources";
     public static final String RESOURCES_FOLDER = "resources/";
 
-    public static final String CONFIG_FOLDER = RESOURCES_FOLDER
-        .concat("/configs/");
+    public static final String CONFIG_FOLDER = String.format("%s%s",
+        RESOURCES_FOLDER, "/configs/");
 
-    public static final String TEMPLATE_FOLDER = RESOURCES_FOLDER
-        .concat("/freemarker/");
+    public static final String TEMPLATE_FOLDER = String.format("%s%s",
+        RESOURCES_FOLDER, "/freemarker/");
 
     public static String LOGGER_FILE_PATH = "log4j/log4j.properties";
 
@@ -54,12 +54,12 @@ public interface HomeAppConstants {
      * 
      * ***********************
      */
-    public static final String SECURITY_PATH = RESOURCES_FOLDER
-        .concat("/security/");
-    public static final File SECURITY_CONFIG_FILE = new File(
-        SECURITY_PATH.concat("security.xml"));
-    public static final File SECURITY_PASSWORDS_FILE = new File(
-            SECURITY_PATH.concat("passwords"));
+    public static final String SECURITY_PATH = String.format(
+        RESOURCES_FOLDER, "/security/");
+    public static final File SECURITY_CONFIG_FILE = new File(String.format(
+        "%s%s", SECURITY_PATH, "security.xml"));
+    public static final File SECURITY_PASSWORDS_FILE = new File(String.format(
+        "%s%s", SECURITY_PATH, "passwords"));
     public static final String USER_ATTR_NAME = "session_user_attr";
 
 }

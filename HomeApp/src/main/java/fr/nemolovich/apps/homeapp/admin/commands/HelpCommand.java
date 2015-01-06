@@ -28,7 +28,7 @@ public class HelpCommand extends Command {
 
     @Override
     public String getUsage() {
-        return super.getUsage().concat(" [<COMMAND_NAME>]");
+        return String.format("%s [<COMMAND_NAME>]", super.getUsage());
     }
 
     @Override
@@ -38,17 +38,16 @@ public class HelpCommand extends Command {
             StringBuilder listCommand = new StringBuilder();
             listCommand.append("%nAvailable commands:");
             for (Command command : CommandManager.getCommands()) {
-                listCommand.append("%n".concat(
-                    String.format("\t%-20s\t%-40s",
-                        String.valueOf(CommandConstants.COMMAND_START).concat(
-                            command.getCommandName()),
-                        command.getDescription())));
+                listCommand.append(String.format("%n\t%-20s\t%-40s",
+                    String.valueOf(CommandConstants.COMMAND_START).concat(
+                        command.getCommandName()),
+                    command.getDescription()));
             }
-            listCommand.append("%n".concat(
-                String.format("\t%-20s\t%-40s",
+            listCommand.append(
+                String.format("%n\t%-20s\t%-40s",
                     String.valueOf(CommandConstants.COMMAND_START).concat(
                         CommandConstants.QUIT_COMMAND),
-                    CommandConstants.QUIT_DESC)));
+                    CommandConstants.QUIT_DESC));
             result = listCommand.toString();
         } else {
             String commandName = args[0];

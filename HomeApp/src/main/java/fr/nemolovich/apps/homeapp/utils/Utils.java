@@ -102,8 +102,8 @@ public final class Utils {
         for (File f : folder.listFiles()) {
 
             if (f.isDirectory()) {
-                files.addAll(getAllFilesFrom(basePath.concat(f.getName())
-                    .concat("/"), f, options));
+                files.addAll(getAllFilesFrom(String.format("%s%s/", basePath,
+                    f.getName()), f, options));
             } else {
                 String fileName = f.getName();
                 if (!fileName.isEmpty() && !fileName.contains("$")) {
@@ -119,7 +119,7 @@ public final class Utils {
                         get ^= !(exclude_folders & isFolder);
                     }
                     if (get) {
-                        files.add(basePath.concat(f.getName()));
+                        files.add(String.format("%s%s", basePath, f.getName()));
                     }
                 }
             }

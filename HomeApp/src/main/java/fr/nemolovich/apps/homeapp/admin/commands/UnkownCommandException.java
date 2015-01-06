@@ -12,7 +12,7 @@ package fr.nemolovich.apps.homeapp.admin.commands;
 public class UnkownCommandException extends Exception {
 
     public UnkownCommandException(String command) {
-        super("Unknown command '".concat(command).concat("'"));
+        super(String.format("Unknown command '%s'", command));
     }
 
 }

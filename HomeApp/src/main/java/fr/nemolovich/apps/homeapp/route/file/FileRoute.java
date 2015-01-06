@@ -31,8 +31,8 @@ public class FileRoute extends WebRoute {
         super(route);
         this.file = file;
         if (this.file == null || !this.file.exists()) {
-            LOGGER.log(Level.ERROR, "Can not load file '"
-                .concat(file.getPath()).concat("'"));
+            LOGGER.log(Level.ERROR, String.format("Can not load file '%s'",
+                file.getPath()));
         }
     }
 

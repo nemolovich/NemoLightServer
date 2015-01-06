@@ -37,12 +37,12 @@ public abstract class FreemarkerWebRoute extends WebRoute {
             doHandle(request, response, writer);
         } catch (TemplateException | IOException ex) {
             LOGGER.log(Level.ERROR, "Error while processing with route", ex);
-            StringBuilder details = new StringBuilder(ex.getMessage().concat(
-                "<br/>\n"));
+            StringBuilder details = new StringBuilder(String.format("%s<br/>\n",
+                ex.getMessage()));
             StackTraceElement[] elements = ex.getStackTrace();
             for (StackTraceElement element : elements) {
-                details.append("&nbsp;".concat(element.toString()).concat(
-                    "<br/>\n"));
+                details.append(String.format("&nbsp;%s<br/>\n",
+                    element.toString()));
             }
 
             request.session().attribute("error_details", details.toString());

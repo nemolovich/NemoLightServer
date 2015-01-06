@@ -31,23 +31,25 @@ public class AdminConnection extends Thread {
 
         Security.addProvider(new Provider());
 
-        System.setProperty("javax.net.ssl.keyStore",
-            HomeAppConstants.CONFIG_FOLDER.concat("certificates/server.ks"));
+        System.setProperty("javax.net.ssl.keyStore", String.format("%s%s",
+            HomeAppConstants.CONFIG_FOLDER, "certificates/server.ks"));
         System.setProperty("javax.net.ssl.keyStorePassword", "serversslpass");
 
         SSLServerSocket sslServerSocket;
         try {
-            LOGGER.info("Setting administration connection on port ["
-                .concat(String.valueOf(this.port)).concat("]..."));
+            LOGGER.info(String.format(
+                "Setting administration connection on port [%s]...",
+                String.valueOf(this.port)));
             SSLServerSocketFactory sslServerSocketFactory
                 = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
             sslServerSocket = (SSLServerSocket) sslServerSocketFactory.
                 createServerSocket(this.port);
-            LOGGER.info("Administration console is available on port ["
-                .concat(String.valueOf(this.port)).concat("]!"));
+            LOGGER.info(String.format(
+                "Administration console is available on port [%s]!",
+                String.valueOf(this.port)));
         } catch (IOException ex) {
-            LOGGER.error("Can not open socket on port [".concat(
-                String.valueOf(this.port)).concat("]"));
+            LOGGER.error(String.format("Can not open socket on port [%s]",
+                String.valueOf(this.port)));
             return;
         }
         LOGGER.info("Waiting for client...");

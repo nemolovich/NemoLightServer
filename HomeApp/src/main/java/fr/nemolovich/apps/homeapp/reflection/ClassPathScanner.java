@@ -102,7 +102,7 @@ public class ClassPathScanner {
                         HomeAppConstants.ONLY_CLASS_FILES));
                 } else {
                     throw new URISyntaxException(resource.toString(),
-                        "Can not use protocol '".concat(protocol).concat("'"));
+                        String.format("Can not use protocol '%s'", protocol));
                 }
             }
             if (protocol != null) {
@@ -112,13 +112,13 @@ public class ClassPathScanner {
                 } else if (protocol.equalsIgnoreCase(
                     HomeAppConstants.JAR_PROTOCOL)) {
                     loadClasses(files, packageName);
-
                 }
             }
         } catch (IOException | ClassNotFoundException | URISyntaxException |
             SearchFileOptionException ex) {
-            LOGGER.error("The classes could not be load from package '".concat(
-                packageName).concat("'"), ex);
+            LOGGER.error(String.format(
+                "The classes could not be load from package '%s'",
+                packageName), ex);
         }
     }
 
@@ -127,7 +127,7 @@ public class ClassPathScanner {
         List<Class> classes = new ArrayList();
 
         for (String file : files) {
-            String classPath = packageName.concat("/").concat(file);
+            String classPath = String.format("%s/%s", packageName, file);
             classPath = classPath.replaceAll("/", ".");
             classPath = classPath.replaceAll("\\.{2}", ".");
             if (classPath.endsWith(".class")) {

@@ -63,8 +63,8 @@ public class Launcher {
                     }
                     needAdminPort = false;
                 } else {
-                    LOGGER.log(Level.SEVERE,
-                        "Unknown parameter '".concat(arg).concat("'"));
+                    LOGGER.log(Level.SEVERE, String.format(
+                        "Unknown parameter '%s'", arg));
                 }
             }
         }
@@ -84,9 +84,9 @@ public class Launcher {
 
         LOGGER.info("Configuring log file...");
 
-        PropertyConfigurator.configure(
-            HomeAppConstants.CONFIG_FOLDER.concat(
-                HomeAppConstants.LOGGER_FILE_PATH));
+        PropertyConfigurator.configure(String.format("%s%s",
+            HomeAppConstants.CONFIG_FOLDER,
+            HomeAppConstants.LOGGER_FILE_PATH));
         org.apache.log4j.Logger log
             = org.apache.log4j.Logger.getLogger(Launcher.class);
 
@@ -108,35 +108,31 @@ public class Launcher {
             }
         }
 
-        log.info(
-            "Log file settings set from '".concat(
-                HomeAppConstants.CONFIG_FOLDER.concat(
-                    HomeAppConstants.LOGGER_FILE_PATH)).concat("'"));
+        log.info(String.format(
+            "Log file settings set from '%s%s'",
+            HomeAppConstants.CONFIG_FOLDER,
+            HomeAppConstants.LOGGER_FILE_PATH));
 
-        log.info(
-            "Setting freemarker templates folder to '"
-            .concat(templateFolder.getAbsolutePath()).concat("'"));
+        log.info(String.format(
+            "Setting freemarker templates folder to '%s'",
+            templateFolder.getAbsolutePath()));
 
         config.setDirectoryForTemplateLoading(templateFolder);
 
-        log.info(
-            "Deploying resources...");
+        log.info("Deploying resources...");
 
         DeployResourceManager.deployWebPages(config);
 
         DeployResourceManager.deloyWebApp(WebConfig.getStringValue("deploy.folder"));
 
-        log.info(
-            "Resources deployed!");
+        log.info("Resources deployed!");
 
-        log.info(
-            "Starting server on port [".concat(String.valueOf(port))
-            .concat("]..."));
+        log.info(String.format("Starting server on port [%s]...",
+            String.valueOf(port)));
         DeployResourceManager.startServer(port, adminport);
 
-        log.info(
-            "Server started on port [".concat(String.valueOf(port))
-            .concat("]!"));
+        log.info(String.format("Server started on port [%s]!",
+            String.valueOf(port)));
 
     }
 
