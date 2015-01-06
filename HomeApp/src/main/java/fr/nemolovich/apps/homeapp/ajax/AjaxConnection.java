@@ -5,18 +5,19 @@
  */
 package fr.nemolovich.apps.homeapp.ajax;
 
+import java.io.IOException;
+import java.util.regex.Matcher;
+
+import org.json.JSONObject;
+
+import spark.Request;
+import spark.Response;
 import fr.nemolovich.apps.homeapp.config.route.RouteElement;
 import fr.nemolovich.apps.homeapp.route.WebRouteServlet;
 import fr.nemolovich.apps.homeapp.route.pages.CameraPage;
 import freemarker.template.Configuration;
 import freemarker.template.SimpleHash;
 import freemarker.template.TemplateException;
-import java.io.IOException;
-import java.io.Writer;
-import java.util.regex.Matcher;
-import org.json.JSONObject;
-import spark.Request;
-import spark.Response;
 
 /**
  *
@@ -34,15 +35,13 @@ public class AjaxConnection extends WebRouteServlet {
     }
 
     @Override
-    protected void doGet(Request request, Response response, Writer writer)
+    protected void doGet(Request request, Response response, SimpleHash root)
         throws TemplateException, IOException {
     }
 
     @Override
-    protected void doPost(Request request, Response response, Writer writer)
+    protected void doPost(Request request, Response response, SimpleHash root)
         throws TemplateException, IOException {
-
-        SimpleHash root = new SimpleHash();
 
         String value = request.raw().getParameter("value");
         String bean = request.raw().getParameter("bean");
@@ -62,7 +61,6 @@ public class AjaxConnection extends WebRouteServlet {
             root.put(VALUE_KEY, value);
         }
 
-        template.process(root, writer);
     }
 
 }

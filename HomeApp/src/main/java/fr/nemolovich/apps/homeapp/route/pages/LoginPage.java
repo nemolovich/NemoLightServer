@@ -5,6 +5,10 @@
  */
 package fr.nemolovich.apps.homeapp.route.pages;
 
+import java.io.IOException;
+
+import spark.Request;
+import spark.Response;
 import fr.nemolovich.apps.homeapp.config.route.RouteElement;
 import fr.nemolovich.apps.homeapp.constants.HomeAppConstants;
 import fr.nemolovich.apps.homeapp.route.WebRouteServlet;
@@ -15,10 +19,6 @@ import fr.nemolovich.apps.homeapp.security.User;
 import freemarker.template.Configuration;
 import freemarker.template.SimpleHash;
 import freemarker.template.TemplateException;
-import java.io.IOException;
-import java.io.Writer;
-import spark.Request;
-import spark.Response;
 
 /**
  *
@@ -33,23 +33,19 @@ public class LoginPage extends WebRouteServlet {
     }
 
     @Override
-    protected void doGet(Request request, Response response, Writer writer)
+    protected void doGet(Request request, Response response, SimpleHash root)
         throws TemplateException, IOException {
-
-        SimpleHash root = new SimpleHash();
         root.put("username", "");
         root.put("login_error", "");
-        template.process(root, writer);
     }
 
     @Override
-    protected void doPost(Request request, Response response, Writer writer)
+    protected void doPost(Request request, Response response, SimpleHash root)
         throws TemplateException, IOException {
 
         String name = request.queryParams("name");
         String password = request.queryParams("password");
 
-        SimpleHash root = new SimpleHash();
         root.put("username", name);
 
         String expectedPass = null;
@@ -72,8 +68,6 @@ public class LoginPage extends WebRouteServlet {
                     user);
             }
         }
-
-        template.process(root, writer);
     }
 
 }
