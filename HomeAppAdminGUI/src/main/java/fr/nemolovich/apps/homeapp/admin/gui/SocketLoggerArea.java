@@ -21,65 +21,77 @@ import javax.swing.text.StyleContext;
  */
 public class SocketLoggerArea extends JTextPane implements ISocketLogger {
 
-	/**
-	 * UID
-	 */
-	private static final long serialVersionUID = -6321326856343873689L;
-	private static final StyleContext sc = new StyleContext();
-	private static final Style DEFAULT_STYLE = sc
-			.getStyle(StyleContext.DEFAULT_STYLE);
-	private static final Style ERROR_STYLE = sc.addStyle("ERROR_STYLE",
-			DEFAULT_STYLE);
-	private static final Style WARNING_STYLE = sc.addStyle("WARNING_STYLE",
-			DEFAULT_STYLE);
+    /**
+     * UID
+     */
+    private static final long serialVersionUID = -6321326856343873689L;
+    private static final StyleContext sc = new StyleContext();
+    private static final Style DEFAULT_STYLE = sc
+        .getStyle(StyleContext.DEFAULT_STYLE);
+    private static final Style FINE_STYLE = sc.addStyle("FINE_STYLE",
+        DEFAULT_STYLE);
+    private static final Style ERROR_STYLE = sc.addStyle("ERROR_STYLE",
+        DEFAULT_STYLE);
+    private static final Style WARNING_STYLE = sc.addStyle("WARNING_STYLE",
+        DEFAULT_STYLE);
 
-	static {
-		StyleConstants.setForeground(ERROR_STYLE, Color.decode("#8A0808"));
-		StyleConstants.setForeground(WARNING_STYLE, Color.decode("#8A4B08"));
-	}
+    static {
+        StyleConstants.setForeground(FINE_STYLE, Color.decode("#088A08"));
+        StyleConstants.setForeground(ERROR_STYLE, Color.decode("#8A0808"));
+        StyleConstants.setForeground(WARNING_STYLE, Color.decode("#8A4B08"));
+    }
 
-	@Override
-	public void info(String message) {
-		this.write(message, Level.INFO);
-	}
+    @Override
+    public void fine(String message) {
+        this.write(message, Level.FINE);
+    }
 
-	@Override
-	public void error(String message) {
-		this.write(message, Level.ERROR);
-	}
+    @Override
+    public void info(String message) {
+        this.write(message, Level.INFO);
+    }
 
-	@Override
-	public void warning(String message) {
-		this.write(message, Level.WARNING);
-	}
+    @Override
+    public void error(String message) {
+        this.write(message, Level.ERROR);
+    }
 
-	@Override
-	public void write(String message, Level level) {
+    @Override
+    public void warning(String message) {
+        this.write(message, Level.WARNING);
+    }
 
-		Style style;
-		switch (level) {
-		case INFO:
-			style = DEFAULT_STYLE;
-			break;
-		case WARNING:
-			style = WARNING_STYLE;
-			break;
-		case ERROR:
-			style = ERROR_STYLE;
-			break;
-		default:
-			style = DEFAULT_STYLE;
-			break;
-		}
+    @Override
+    public void write(String message, Level level) {
 
-		try {
-			this.getDocument().insertString(this.getDocument().getLength(),
-					message, style);
-		} catch (BadLocationException ex) {
-			Logger.getLogger(SocketLoggerArea.class.getName()).log(
-					java.util.logging.Level.SEVERE, null, ex);
-		}
+        Style style;
+        switch (level) {
+            case FINE:
+                style = FINE_STYLE;
+                break;
+            case INFO:
+                style = DEFAULT_STYLE;
+                break;
+            case WARNING:
+                style = WARNING_STYLE;
+                break;
+            case ERROR:
+                style = ERROR_STYLE;
+                break;
+            default:
+                style = DEFAULT_STYLE;
+                break;
+        }
 
-	}
+        try {
+            this.getDocument().insertString(this.getDocument().getLength(),
+                message, style);
+        } catch (BadLocationException ex) {
+            Logger.getLogger(SocketLoggerArea.class.getName()).log(
+                java.util.logging.Level.SEVERE, null, ex);
+        }
+
+        this.setCaretPosition(this.getDocument().getLength());
+    }
 
 }

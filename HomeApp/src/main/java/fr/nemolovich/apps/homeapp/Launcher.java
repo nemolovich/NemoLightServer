@@ -31,6 +31,7 @@ public class Launcher {
 
     public static void main(String[] args) throws IOException {
 
+        Thread.currentThread().setName("Server");
         boolean extract = false;
         boolean securityDisabled = false;
         int adminport = 8081;

@@ -36,7 +36,7 @@ public class HelpCommand extends Command {
         String result = null;
         if (args.length == 0) {
             StringBuilder listCommand = new StringBuilder();
-            listCommand.append("%nAvailable commands:");
+            listCommand.append("Available commands:");
             for (Command command : CommandManager.getCommands()) {
                 listCommand.append(String.format("%n\t%-20s\t%-40s",
                     String.valueOf(CommandConstants.COMMAND_START).concat(
@@ -48,7 +48,7 @@ public class HelpCommand extends Command {
                     String.valueOf(CommandConstants.COMMAND_START).concat(
                         CommandConstants.QUIT_COMMAND),
                     CommandConstants.QUIT_DESC));
-            result = listCommand.toString();
+            result = String.format(listCommand.toString());
         } else {
             String commandName = args[0];
             if (commandName.equals(CommandConstants.QUIT_COMMAND)) {

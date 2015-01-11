@@ -57,7 +57,8 @@ public class RemoveGroup extends Command {
                 }
             }
         }
-        return String.valueOf(returnCode);
+        return String.format("%s:%d", CommandConstants.CODE_RESPONSE,
+            returnCode);
     }
 
 }

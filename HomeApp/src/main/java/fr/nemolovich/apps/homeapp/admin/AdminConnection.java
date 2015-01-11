@@ -29,6 +29,7 @@ public class AdminConnection extends Thread {
     @Override
     public void run() {
 
+        Thread.currentThread().setName("AdminSession");
         Security.addProvider(new Provider());
 
         System.setProperty("javax.net.ssl.keyStore", String.format("%s%s",

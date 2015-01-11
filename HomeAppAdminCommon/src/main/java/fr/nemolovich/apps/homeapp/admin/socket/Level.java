@@ -10,6 +10,7 @@ package fr.nemolovich.apps.homeapp.admin.socket;
  * @author Nemolovich
  */
 public enum Level {
+    FINE,
     INFO,
     ERROR,
     WARNING

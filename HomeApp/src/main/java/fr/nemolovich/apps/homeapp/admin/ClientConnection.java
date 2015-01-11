@@ -77,7 +77,7 @@ public class ClientConnection {
                 response = String.format("Huhu? oO? What are you saying? %s",
                     CommandConstants.HELP_MESSAGE);
             }
-            this.writer.printf("%s",
+            this.writer.printf("%s%s", response,
                 String.valueOf(CommandConstants.MESSAGE_END));
             this.writer.flush();
         }

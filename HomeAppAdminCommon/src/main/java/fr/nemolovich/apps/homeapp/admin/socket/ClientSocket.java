@@ -15,6 +15,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.Security;
+import java.util.regex.Matcher;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
@@ -98,8 +99,50 @@ public class ClientSocket {
             }
             result.append(c);
         }
+        String response = result.toString();
+        Matcher matcher = CommandConstants.CODE_RESPONSE_PATTERN.matcher(
+            response);
+        if (matcher.find()) {
+            String codeValue = matcher.group("code");
+            if (codeValue != null) {
+                int code = Integer.valueOf(codeValue);
+                boolean error = false;
+                boolean warning = false;
+                if ((code | CommandConstants.EXECUTION_ERROR_CODE) == code) {
+                    error = true;
+                }
+                if ((code | CommandConstants.EXECUTION_WARNING_CODE) == code) {
+                    warning = true;
+                }
+                if (error) {
+                    response = "ERROR: ";
+                } else if (warning) {
+                    response = "WARNING: ";
+                } else {
+                    response = "INFO: ";
+                }
+                if (code == CommandConstants.SUCCESS_CODE) {
+                    response += "Command succeed";
+                }
+                if ((code | CommandConstants.SYNTAX_ERROR_CODE) == code) {
+                    response += "Syntax error";
+                }
+                if ((code | CommandConstants.GROUP_ALREADY_EXISTS_CODE) == code) {
+                    response += "The group already exists";
+                }
+                if ((code | CommandConstants.GROUP_DOESNT_EXISTS_CODE) == code) {
+                    response += "The group does not exist";
+                }
+                if ((code | CommandConstants.USER_ALREADY_EXISTS_CODE) == code) {
+                    response += "The user already exists";
+                }
+                if ((code | CommandConstants.USER_DOESNT_EXISTS_CODE) == code) {
+                    response += "The user does not exist";
+                }
+            }
+        }
 
-        return result.toString();
+        return response;
     }
 
     public void sendRequest(String message) throws IOException {

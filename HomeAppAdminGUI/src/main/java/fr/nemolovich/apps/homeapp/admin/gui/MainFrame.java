@@ -318,7 +318,6 @@ public class MainFrame extends javax.swing.JFrame {
         );
 
         pack();
-        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     public final void exit() {
@@ -544,6 +543,9 @@ public class MainFrame extends javax.swing.JFrame {
         JPasswordField passwordField = new JPasswordField();
         controls.add(passwordField);
         panel.add(controls, BorderLayout.CENTER);
+
+        hostField.setText("localhost:8081");
+        passwordField.setText("serversslpass");
 
         String host;
 

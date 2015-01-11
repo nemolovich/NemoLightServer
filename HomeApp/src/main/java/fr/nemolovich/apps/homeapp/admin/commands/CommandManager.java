@@ -26,6 +26,9 @@ public class CommandManager {
         COMMANDS.add(new ShutdownServer());
         COMMANDS.add(new SayHello());
         COMMANDS.add(new AddGroup());
+        COMMANDS.add(new AddUser());
+        COMMANDS.add(new RemoveGroup());
+        COMMANDS.add(new ListGroup());
 
         Collections.sort(COMMANDS);
     }

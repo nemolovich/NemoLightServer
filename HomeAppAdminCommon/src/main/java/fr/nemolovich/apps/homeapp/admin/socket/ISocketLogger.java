@@ -11,6 +11,8 @@ package fr.nemolovich.apps.homeapp.admin.socket;
  */
 public interface ISocketLogger {
 
+    public void fine(String message);
+
     public void info(String message);
 
     public void error(String message);
