@@ -54,8 +54,8 @@ public final class DeployResourceManager {
                 String.format("%s/%s", HomeAppConstants.SRC_FOLDER,
                     resourcesPath));
         }
-        List<String> files = null;
         if (url != null) {
+            List<String> files = null;
             String basePath = null;
             String protocol = url.getProtocol();
             try {
@@ -174,7 +174,7 @@ public final class DeployResourceManager {
         return false;
     }
 
-    public static void deloyWebApp(String deployFolderPath) {
+    public static void deployWebApp(String deployFolderPath) {
         File deployFolder = new File(deployFolderPath);
         try {
             if (!deployFolder.exists() || !deployFolder.isDirectory()) {
@@ -183,7 +183,7 @@ public final class DeployResourceManager {
                     deployFolderPath));
             }
             FileRoute route;
-            for (File f : getAllFile(deployFolder,
+            for (File f : getAllFiles(deployFolder,
                 HomeAppConstants.RECURSIVE_SEARCH)) {
                 String uriPath = f.toURI().toString();
                 String routePath = uriPath.substring(uriPath
@@ -201,18 +201,18 @@ public final class DeployResourceManager {
         }
     }
 
-    private static List<File> getAllFile(File root) {
-        return getAllFile(root, HomeAppConstants.DEFAULT_SEARCH);
+    private static List<File> getAllFiles(File root) {
+        return getAllFiles(root, HomeAppConstants.DEFAULT_SEARCH);
     }
 
-    private static List<File> getAllFile(File root, int options) {
+    private static List<File> getAllFiles(File root, int options) {
         List<File> files = new ArrayList();
         for (File f : root.listFiles()) {
             if (f.isFile()) {
                 files.add(f);
             } else if (f.isDirectory()
                 && options == HomeAppConstants.RECURSIVE_SEARCH) {
-                files.addAll(getAllFile(f, options));
+                files.addAll(getAllFiles(f, options));
             }
         }
         return files;
@@ -232,7 +232,7 @@ public final class DeployResourceManager {
             AdminConnection ac = new AdminConnection(adminPort);
             ac.start();
         } else {
-            LOGGER.error("The admin port can be the same as deployment port");
+            LOGGER.error("The admin port can not be the same as deployment port");
         }
 
         Runtime.getRuntime().addShutdownHook(new Thread() {

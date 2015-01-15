@@ -28,10 +28,12 @@ public class Group implements Serializable {
         this.name = name;
     }
 
-    public void addUser(User user) {
+    public boolean addUser(User user) {
+        boolean result = false;
         if (!this.users.contains(user)) {
-            this.users.add(user);
+            result = this.users.add(user);
         }
+        return result;
     }
 
     public boolean removeUser(String userName) {

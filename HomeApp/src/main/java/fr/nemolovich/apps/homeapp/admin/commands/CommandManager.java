@@ -27,8 +27,11 @@ public class CommandManager {
         COMMANDS.add(new SayHello());
         COMMANDS.add(new AddGroup());
         COMMANDS.add(new AddUser());
+        COMMANDS.add(new MoveUser());
         COMMANDS.add(new RemoveGroup());
+        COMMANDS.add(new RemoveUser());
         COMMANDS.add(new ListGroup());
+        COMMANDS.add(new ListUser());
 
         Collections.sort(COMMANDS);
     }

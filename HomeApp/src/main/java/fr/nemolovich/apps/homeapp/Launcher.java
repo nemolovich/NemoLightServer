@@ -124,7 +124,7 @@ public class Launcher {
 
         DeployResourceManager.deployWebPages(config);
 
-        DeployResourceManager.deloyWebApp(WebConfig.getStringValue("deploy.folder"));
+        DeployResourceManager.deployWebApp(WebConfig.getStringValue("deploy.folder"));
 
         log.info("Resources deployed!");
 

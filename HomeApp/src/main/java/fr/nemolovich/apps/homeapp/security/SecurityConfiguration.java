@@ -90,6 +90,22 @@ public class SecurityConfiguration {
         return added;
     }
 
+    public final boolean moveUser(String srcGroup, String userName,
+        String dstGroup) {
+        boolean moved = false;
+        Group fromGroup = getGroup(srcGroup);
+        Group toGroup = getGroup(dstGroup);
+        if (fromGroup != null) {
+            if (fromGroup.containsUser(userName)) {
+                User user = getUser(userName);
+                if (fromGroup.removeUser(userName)) {
+                    moved = toGroup.addUser(user);
+                }
+            }
+        }
+        return moved;
+    }
+
     public final boolean removeGroup(String groupName) {
         boolean result = false;
         Group group = this.getGroup(groupName);

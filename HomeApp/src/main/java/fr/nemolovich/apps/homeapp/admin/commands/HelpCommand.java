@@ -21,7 +21,7 @@ public class HelpCommand extends Command {
     @Override
     public String getHelp() {
         StringBuilder result = new StringBuilder();
-        result.append(String.format("%s%n\t%s", getUsage(),
+        result.append(String.format("%s%n\t%s%n", getUsage(),
             this.getDescription()));
         return result.toString();
     }
@@ -52,7 +52,7 @@ public class HelpCommand extends Command {
         } else {
             String commandName = args[0];
             if (commandName.equals(CommandConstants.QUIT_COMMAND)) {
-                result = String.format("\t%s", CommandConstants.QUIT_DESC);
+                result = String.format("\t%s%n", CommandConstants.QUIT_DESC);
             } else {
                 boolean found = false;
                 for (Command command : CommandManager.getCommands()) {
@@ -63,7 +63,8 @@ public class HelpCommand extends Command {
                     }
                 }
                 if (!found) {
-                    result = new UnkownCommandException(commandName).getMessage();
+                    result = String.format("%s%n",
+                        new UnkownCommandException(commandName).getMessage());
                 }
             }
         }

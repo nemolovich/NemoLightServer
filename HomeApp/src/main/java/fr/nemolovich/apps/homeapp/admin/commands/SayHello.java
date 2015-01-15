@@ -18,6 +18,11 @@ public class SayHello extends Command {
     }
 
     @Override
+    public String getHelp() {
+        return String.format("\t%s%n", this.getDescription());
+    }
+
+    @Override
     public String doCommand(String... args) {
         return "Hello guy!";
     }
