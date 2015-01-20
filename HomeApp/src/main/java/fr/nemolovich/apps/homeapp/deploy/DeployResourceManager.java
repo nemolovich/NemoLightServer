@@ -238,6 +238,7 @@ public final class DeployResourceManager {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
+                Thread.currentThread().setName("Shutdown-Hook");
                 LOGGER.info("Server stopped... I'll miss you ;)");
             }
         });

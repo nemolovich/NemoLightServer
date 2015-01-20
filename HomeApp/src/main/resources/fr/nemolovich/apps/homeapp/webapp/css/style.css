@@ -18,10 +18,11 @@ body {
     margin-top:						4.5%;
     margin-bottom:					1.5%;
     padding:						2.5%;
+    border-radius:					8px;
     -webkit-border-radius:			8px;
-    -webkit-box-shadow:				inset 10px 10px 30px rgba(240, 240, 240, 0.99),
-        inset -10px -10px 30px rgba(150, 150, 150, 0.99),
-        rgba(240,240,240,0.4) 0px 0px 20px;
+    -webkit-box-shadow:				inset 5px 5px 20px rgba(240, 240, 240, 0.01),
+        inset 0px -5px 20px rgba(0, 0, 0, 0.99),
+        rgba(0,0,0,0.4) 0px 0px 20px;
 }
 
 :-webkit-any(button,
@@ -63,12 +64,12 @@ input[type='submit']):not(.custom-appearance):not(.link-button) {
 select {
     -webkit-appearance: 				none;
     -webkit-padding-end: 				20px;
-    -webkit-padding-start: 			6px;
+    -webkit-padding-start: 				6px;
     /* OVERRIDE */
-    background-image: 				url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAAICAQAAACxSAwfAAAAUklEQVQY02P4z0AMRGZGMaShwCisyhITmb8huMzfEhOxKvuvsGAh208Ik+3ngoX/FbBbClcIUcSAw21QhXxfIIrwKAMpfNsEUYRXGVCEFc6CQwBqq4CCCtU4VgAAAABJRU5ErkJggg=='),
-        -webkit-linear-gradient(#ededed, #ededed 38%, #dedede);
+    background-image: 					url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAAICAQAAACxSAwfAAAAUklEQVQY02P4z0AMRGZGMaShwCisyhITmb8huMzfEhOxKvuvsGAh208Ik+3ngoX/FbBbClcIUcSAw21QhXxfIIrwKAMpfNsEUYRXGVCEFc6CQwBqq4CCCtU4VgAAAABJRU5ErkJggg=='),
+	-webkit-linear-gradient(#ededed, #ededed 38%, #dedede);
     background-position: 				right center;
-    background-repeat: 				no-repeat;
+    background-repeat: 					no-repeat;
 }
 
 table {
@@ -105,10 +106,42 @@ td,th {
 	display:						block;
 	margin:							auto;
     text-align:						right;
+	border-radius:					6px
+    border-top-left-radius:			0px;
+    border-top-right-radius:		0px;
     -webkit-border-radius:			6px;
     -webkit-border-top-left-radius:	0px;
     -webkit-border-top-right-radius:0px;
-    -webkit-box-shadow:				inset 10px 10px 30px rgba(240, 240, 240, 0.99),
-        inset -10px -10px 30px rgba(150, 150, 150, 0.99),
-        rgba(240,240,240,0.4) 0px 0px 20px;
+    -webkit-box-shadow:				inset 5px 5px 20px rgba(240, 240, 240, 0.01),
+        inset 0px -5px 20px rgba(0, 0, 0, 0.99),
+        rgba(0,0,0,0.4) 0px 0px 20px;
+}
+
+#msgBoxContainer
+{
+	position:						absolute;
+	display:						block;
+	width:							20%;
+	height:							auto;
+	bottom:							5%;
+	left:							5%;
+	border:							1px solid #FF0000;
+}
+
+#msgBoxContainer .msgBox
+{
+	display:						block;
+	width:							auto;
+	height:							45px;
+	padding:						5px;
+	margin-bottom:					8px;
+	border-radius:					6px;
+    -webkit-border-radius:			6px;
+	color:							#FFFFFF;
+	border:							1px solid #FF0000;
+	font-size:						0.8em;
+	background:						#222222;
+    -webkit-box-shadow:				inset 5px 5px 20px rgba(240, 240, 240, 0.01),
+        inset 0px -5px 20px rgba(0, 0, 0, 0.99),
+        rgba(0,0,0,0.4) 0px 0px 20px;
 }
