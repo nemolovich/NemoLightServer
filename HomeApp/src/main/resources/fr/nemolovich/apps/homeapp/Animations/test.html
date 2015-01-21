@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<html>
+
+    <head>
+        <link id="favicon" rel="icon" type="image/png" sizes="16x16">
+		<link id="favicon2x" rel="icon" type="image/png" sizes="32x32">
+		<link type="text/css" rel="stylesheet" href="css/style.css"/>
+		<script src="js/jquery-1.11.1.min.js" type="text/javascript"></script>
+		<script src="js/messageBox.js" type="text/javascript"></script>
+
+		<script type="text/javascript" src="js/menu.js"></script>
+    <title>Login</title>
+</head>
+
+<body>
+	<div id="msgBoxContainer">
+	</div>
+	<div id="header">
+		User: Moi
+		<a href="/signup">Signup</a> <a href="/signup">Login</a>
+	</div>
+    <div id="content-div">
+		<div id="logo-div">
+		</div>
+		<div id="main-div">
+			<h2>Login</h2>
+			<form method="post" action="/login">
+				<table>
+					<tr>
+						<td class="label">Username</td>
+						<td><input type="text" name="name" value=""/>
+						</td>
+						<td class="error"></td>
+					</tr>
+
+					<tr>
+						<td class="label">Password</td>
+						<td><input type="password" name="password" value=""/></td>
+					</tr>
+
+				</table>
+
+				<input type="submit"/>
+			</form>
+		</div>
+    </div>
+	<div id="footer">
+		Created by Nemolovich | Github: <a class="logo-git" href="https://github.com/nemolovich" alt="Nemolovich's Github">Nemolovich's Github</a>
+	</div>
+</body>
+
+</html>
