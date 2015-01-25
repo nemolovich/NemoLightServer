@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package fr.nemolovich.apps.homeapp.reflection;
 
 /**
@@ -11,5 +10,6 @@ package fr.nemolovich.apps.homeapp.reflection;
  * @author Nemolovich
  */
 public abstract class SearchFilter {
+
 	public abstract boolean filterMatches(Class<?> clazz);
 }

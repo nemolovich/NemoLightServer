@@ -13,7 +13,7 @@ public class AnnotationTypeFilter extends SearchFilter {
 	@Override
 	public boolean filterMatches(Class<?> clazz) {
 		return clazz
-				.isAnnotationPresent((Class<? extends Annotation>) this.annotation);
+			.isAnnotationPresent((Class<? extends Annotation>) this.annotation);
 	}
 
 }

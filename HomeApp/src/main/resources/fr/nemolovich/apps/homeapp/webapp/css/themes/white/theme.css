@@ -1,0 +1,47 @@
+#content-div {
+    background:						rgba(250,250,250,0.6);
+}
+
+#header,
+#footer {
+	background:						rgba(210,210,210,0.4);
+}
+
+.ui-icon,
+.ui-button {
+	background:						#C2C2C2 url(img/button_white.png) 50% 50% repeat-x;
+}
+
+.ui-icon > span {
+	background-image:				url(img/ui-icons_222222_256x240.png);
+}
+
+.ui-icon:hover > span,
+.ui-icon:focus > span,
+.ui-icon.hover > span {
+	background-image:				url(img/ui-icons_8d8d8d_256x240.png);
+}
+
+.ui-icon:hover,
+.ui-icon:focus,
+.ui-icon.hover,
+.ui-button:hover,
+.ui-button:focus,
+.ui-button.hover {
+	background:						#C2C2C2 url(img/button_white_hover.png) 50% 50% repeat-x;
+}
+
+.ui-icon:active,
+.ui-button:active {
+	background:						#C2C2C2 url(img/button_white_active.png) 50% 50% repeat-x;
+}
+
+:-webkit-any(button,
+input[type='button'],
+input[type='submit']):not(.custom-appearance):not(.link-button),
+select,
+input[type='checkbox'],
+input[type='radio'] {
+	color:							#222222;
+    text-shadow: 					0 1px 0 #B8B8B8;
+}

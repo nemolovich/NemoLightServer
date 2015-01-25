@@ -6,7 +6,7 @@ function hideMessage(id) {
 }
 
 function hideMessage(id, time) {
-	var box=$('#'+id);
+	var box = $('#' + id);
 	box.mouseenter(function() {
 		showMessage(id, -1);
 	});
@@ -15,16 +15,28 @@ function hideMessage(id, time) {
 	});
     box.clearQueue();
     box.stop();
+	var duration = 3000;
 	box.delay(time).animate({
 		"opacity": "0"
-	}, 3000, function () {
+	}, duration, function () {
 		box.css('display', 'none');
 		box.remove();
 	});
 }
 
+function killMessage(id) {
+	var box = $('#' + id);
+	box.unbind('mouseenter mouseleave');
+    box.clearQueue();
+    box.stop();
+	box.css('min-height', '0px');
+	var close = box.find('.title');
+	close.css('display', 'none');
+	box.slideUp(500);
+}
+
 function showMessage(id, time) {
-	var box=$('#'+id);
+	var box = $('#' + id);
     box.clearQueue();
     box.stop();
     box.animate({
@@ -41,12 +53,25 @@ function showMessage(id, time) {
 	}
 }
 
-function addMessage(msg) {
-	var boxContainer=$('#msgBoxContainer');
-	var id='msgBox'+(MESSAGE_BOX_ID++);
-	var div=$('<div class="msgBox" id="'+id+'">'+msg+'</div>');
-	boxContainer.append(div);
-	showMessage(id, 10000);
+function addMessage(title, msg, style) {
+	var boxContainer = $('#msgBoxContainer');
+	var id = 'msgBox' + (MESSAGE_BOX_ID++);
+	var classType = "";
+	if(style !== undefined) {
+		classType = " " + style
+	}
+	var box = $('<div class="msgBox' + classType + '" id="' + id + '"></div>');
+	var div=$('<div class="icon-close""></div>');
+	div.click(function() {
+		killMessage(id);
+	});
+	box.append(div);
+	div=$('<div class="title">' + title + '</div>');
+	box.append(div);
+	div=$('<div>' + msg + '</div>');
+	box.append(div);
+	boxContainer.append(box);
+	showMessage(id, 20000);
 }
 
 $(document).ready(function() {

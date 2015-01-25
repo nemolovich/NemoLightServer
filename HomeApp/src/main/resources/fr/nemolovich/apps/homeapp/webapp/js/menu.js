@@ -1,5 +1,12 @@
 var menuActionMutex = false;
 var hideTimeout;
+var DEFAULT_HIDE_DELAY=200;
+var ELEMENTS_DELAY = new Map();
+ELEMENTS_DELAY.put('a', 275);
+ELEMENTS_DELAY.put('input[type!=submit]', 200);
+ELEMENTS_DELAY.put('input[type=submit]', 250);
+ELEMENTS_DELAY.put('.ui-icon', 100);
+ELEMENTS_DELAY.put('.icon-close', 350);
 
 function showMenu(menu) {
     clearTimeout(hideTimeout);
@@ -25,46 +32,65 @@ function hideMenu(menu) {
 }
 
 $(document).ready(function () {
-    $("#header").hover(function () {
+	resizeContent();
+    $('#header').mouseenter(function () {
         showMenu($(this));
-    }, function () {
-        hideMenu($(this));
     });
-    hideTimeout = setTimeout(function () {
-        hideMenu($("#header"));
-    }, 500);
-    resizeContent();
-	$('input').hover(function(){inputHover($(this));},
-	function(){inputLost($(this));});
+	
+	var keys = ELEMENTS_DELAY.keySet();
+	for (var i = 0; i<keys.length; i++) {
+		$(keys[i]).mouseenter(function(){
+			inputHover($(this));
+		});
+		$(keys[i]).focus(function(){
+			inputHover($(this));
+		});
+		$(keys[i]).mouseleave(function(){
+			inputLost($(this));
+		});
+		$(keys[i]).focusout(function(){
+			inputLost($(this));
+		});
+	}
 });
 
 function resizeContent() {
-    var height = $(window).height();
-    var outerHeight = $('#content-div').outerHeight(true) - $('#content-div').height();
-    var headerHeight = $('#header').outerHeight(true);
-    $('#content-div').css('height', (height - outerHeight - headerHeight) + 'px');
+	var marginBottom = 100;
+    var contentHeight = $('#content-div').outerHeight(true);
+    var logoHeight = $('#logo-div').outerHeight(true);
+    $('#main-div').css('height', (contentHeight - logoHeight - marginBottom) + 'px');
 }
 
 function inputHover(input) {
-    input.clearQueue();
-    input.stop();
-	input.css('outline','-webkit-focus-ring-color auto 5px');
-	input.css('outline-offset','-2px');
+	input.addClass('hover');
 }
 
 function inputLost(input) {
-
-	$({outline:100}).animate({outline:0}, {
-		duration: 1000,
-		step: function() {
-			input.css('outline-offset',-(this.outline/50)+'px');
+	var delay = DEFAULT_HIDE_DELAY;
+	var keys = ELEMENTS_DELAY.keySet();
+	for (var i = 0; i<keys.length; i++) {
+		if(input.is(keys[i])) {
+			delay = ELEMENTS_DELAY.get(keys[i]);
+			break;
 		}
-	});
-	// input.css('outline','');
-	// input.css('outline-offset','');
+	}
+	setTimeout(function() {
+		input.removeClass('hover');
+	}, delay);
 }
 
-onresize = (function ()
-{
+onresize = (function () {
     resizeContent();
 });
+
+if(!String.prototype.startsWith) {
+    String.prototype.startsWith = function (str) {
+        return !this.indexOf(str);
+    }
+}
+
+if(!String.prototype.contains) {
+    String.prototype.contains = function (str) {
+        return this.indexOf(str) > -1;
+    }
+}

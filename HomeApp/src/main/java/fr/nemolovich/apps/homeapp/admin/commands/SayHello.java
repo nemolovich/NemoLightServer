@@ -13,18 +13,18 @@ import fr.nemolovich.apps.homeapp.admin.Command;
  */
 public class SayHello extends Command {
 
-    public SayHello() {
-        super("hello", "Be polite! Say Hello!");
-    }
+	public SayHello() {
+		super("hello", "Be polite! Say Hello!");
+	}
 
-    @Override
-    public String getHelp() {
-        return String.format("\t%s%n", this.getDescription());
-    }
+	@Override
+	public String getHelp() {
+		return String.format("\t%s%n", this.getDescription());
+	}
 
-    @Override
-    public String doCommand(String... args) {
-        return "Hello guy!";
-    }
+	@Override
+	public String doCommand(String... args) {
+		return "Hello guy!";
+	}
 
 }

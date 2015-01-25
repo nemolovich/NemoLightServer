@@ -1,0 +1,23 @@
+<#macro master title="Nemolovich Web Site">
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></meta>
+		<#include "header.html">
+		<title>${title}</title>
+	</head>
+	<body>
+		<#include "menu.html">
+		<div id="content-div">
+			<div id="logo-div"></div>
+			<div id="main-div">
+				<#nested />
+			</div>
+			<#include "footer.html"/>
+		</div>
+		<div id="msgBoxContainer"></div>
+	</body>
+</html>
+</#macro>

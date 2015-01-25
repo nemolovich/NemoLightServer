@@ -5,15 +5,14 @@
  */
 package fr.nemolovich.apps.homeapp.route.pages;
 
-import java.io.IOException;
-
-import spark.Request;
-import spark.Response;
 import fr.nemolovich.apps.homeapp.config.route.RouteElement;
 import fr.nemolovich.apps.homeapp.route.WebRouteServlet;
 import freemarker.template.Configuration;
 import freemarker.template.SimpleHash;
 import freemarker.template.TemplateException;
+import java.io.IOException;
+import spark.Request;
+import spark.Response;
 
 /**
  *
@@ -22,29 +21,29 @@ import freemarker.template.TemplateException;
 @RouteElement(path = "/error/:code", page = "error.html")
 public class ErrorPage extends WebRouteServlet {
 
-    public ErrorPage(String routePath, String page, Configuration config)
-        throws IOException {
-        super(routePath, page, config);
-    }
+	public ErrorPage(String routePath, String page, Configuration config)
+		throws IOException {
+		super(routePath, page, config);
+	}
 
-    @Override
-    protected void doGet(Request request, Response response, SimpleHash root)
-        throws TemplateException, IOException {
+	@Override
+	protected void doGet(Request request, Response response, SimpleHash root)
+		throws TemplateException, IOException {
 
-        String error = request.params("code");
-        root.put("code", error);
-        String details = request.session().attribute("error_details");
-        if (details != null) {
-            root.put("error_details", details);
-            request.session().removeAttribute("error_details");
-        }
-        root.put("error", "System has encountered an error.");
-    }
+		String error = request.params("code");
+		root.put("code", error);
+		String details = request.session().attribute("error_details");
+		if (details != null) {
+			root.put("error_details", details);
+			request.session().removeAttribute("error_details");
+		}
+		root.put("error", "System has encountered an error.");
+	}
 
-    @Override
-    protected void doPost(Request request, Response response, SimpleHash root)
-        throws TemplateException, IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
+	@Override
+	protected void doPost(Request request, Response response, SimpleHash root)
+		throws TemplateException, IOException {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
 
 }

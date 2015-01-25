@@ -40,217 +40,218 @@ import spark.Spark;
  */
 public final class DeployResourceManager {
 
-    private static final Logger LOGGER = Logger
-        .getLogger(DeployResourceManager.class.getName());
+	private static final Logger LOGGER = Logger
+		.getLogger(DeployResourceManager.class.getName());
 
-    private static final List<WebRouteServlet> SERVLETS = new ArrayList<>();
-    private static final List<FileRoute> FILES = new ArrayList<>();
+	private static final List<WebRouteServlet> SERVLETS = new ArrayList<>();
+	private static final List<FileRoute> FILES = new ArrayList<>();
 
-    public static void initResources(String resourcesPath) {
-        URL url = DeployResourceManager.class.getClassLoader().getResource(
-            resourcesPath);
-        if (url == null) {
-            url = DeployResourceManager.class.getClassLoader().getResource(
-                String.format("%s/%s", HomeAppConstants.SRC_FOLDER,
-                    resourcesPath));
-        }
-        if (url != null) {
-            List<String> files = null;
-            String basePath = null;
-            String protocol = url.getProtocol();
-            try {
-                if (protocol.equalsIgnoreCase(HomeAppConstants.FILE_PROTOCOL)) {
-                    File path = new File(url.toURI());
-                    files = Utils.getAllFilesFrom("", path,
-                        HomeAppConstants.EXCLUDE_CLASS_FILES
-                        | HomeAppConstants.EXCLUDE_FOLDERS);
-                    basePath = url.toURI().getPath().substring(1);
+	public static void initResources(String resourcesPath) {
+		URL url = DeployResourceManager.class.getClassLoader().getResource(
+			resourcesPath);
+		if (url == null) {
+			url = DeployResourceManager.class.getClassLoader().getResource(
+				String.format("%s/%s", HomeAppConstants.SRC_FOLDER,
+					resourcesPath));
+		}
+		if (url != null) {
+			List<String> files = null;
+			String basePath = null;
+			String protocol = url.getProtocol();
+			try {
+				if (protocol.equalsIgnoreCase(HomeAppConstants.FILE_PROTOCOL)) {
+					File path = new File(url.toURI());
+					files = Utils.getAllFilesFrom("", path,
+						HomeAppConstants.EXCLUDE_CLASS_FILES
+						| HomeAppConstants.EXCLUDE_FOLDERS);
+					basePath = url.toURI().getPath().substring(1);
 
-                } else if (protocol
-                    .equalsIgnoreCase(HomeAppConstants.JAR_PROTOCOL)) {
-                    JarFile jar = Utils.extractJar(url);
-                    files = Utils.getAllFilesFrom(jar, resourcesPath,
-                        HomeAppConstants.EXCLUDE_CLASS_FILES
-                        | HomeAppConstants.EXCLUDE_FOLDERS);
+				} else if (protocol
+					.equalsIgnoreCase(HomeAppConstants.JAR_PROTOCOL)) {
+					JarFile jar = Utils.extractJar(url);
+					files = Utils.getAllFilesFrom(jar, resourcesPath,
+						HomeAppConstants.EXCLUDE_CLASS_FILES
+						| HomeAppConstants.EXCLUDE_FOLDERS);
 
-                    basePath = resourcesPath;
-                } else {
-                    LOGGER.error(String.format("Unknown protocol '%s'",
-                        protocol));
-                }
-            } catch (SearchFileOptionException | URISyntaxException ex) {
-                LOGGER.error("Error while searching files", ex);
-            }
-            if (files != null) {
-                extractFiles(files, basePath, protocol);
-            }
-        }
-    }
+					basePath = resourcesPath;
+				} else {
+					LOGGER.error(String.format("Unknown protocol '%s'",
+						protocol));
+				}
+			} catch (SearchFileOptionException | URISyntaxException ex) {
+				LOGGER.error("Error while searching files", ex);
+			}
+			if (files != null) {
+				extractFiles(files, basePath, protocol);
+			}
+		}
+	}
 
-    private static void extractFiles(List<String> files, String basePath,
-        String protocol) {
+	private static void extractFiles(List<String> files, String basePath,
+		String protocol) {
 
-        InputStream input = null;
-        for (String fileName : files) {
-            try {
-                if (protocol.equalsIgnoreCase(HomeAppConstants.FILE_PROTOCOL)) {
-                    File f = new File(String.format("%s%s", basePath, fileName));
-                    input = new FileInputStream(f);
-                } else if (protocol
-                    .equalsIgnoreCase(HomeAppConstants.JAR_PROTOCOL)) {
-                    URL res = DeployResourceManager.class.getClassLoader()
-                        .getResource(String.format("%s%s", basePath, fileName));
-                    if (res != null) {
-                        input = res.openStream();
-                    }
-                } else {
-                    LOGGER.error(String.format("Unknown protocol '%s'",
-                        protocol));
-                    return;
-                }
-                if (input == null) {
-                    throw new IOException("Can not read input file");
-                }
-                File target = new File(String.format("%s%s",
-                    HomeAppConstants.RESOURCES_FOLDER, fileName));
-                if (!target.exists()) {
-                    if (!target.getParentFile().mkdirs()
-                        && !target.createNewFile()) {
-                        throw new IOException("Can not create target file");
-                    }
-                }
-                Files.copy(input, target.toPath(),
-                    StandardCopyOption.REPLACE_EXISTING);
-                LOGGER.info(String.format("Resource '%s' extracted.",
-                    fileName));
-            } catch (IOException ex) {
-                LOGGER.error(String.format("Can not extract resources: '%s'",
-                    fileName), ex);
-            }
-        }
-    }
+		InputStream input = null;
+		for (String fileName : files) {
+			try {
+				if (protocol.equalsIgnoreCase(HomeAppConstants.FILE_PROTOCOL)) {
+					File f = new File(String.format("%s%s", basePath, fileName));
+					input = new FileInputStream(f);
+				} else if (protocol
+					.equalsIgnoreCase(HomeAppConstants.JAR_PROTOCOL)) {
+					URL res = DeployResourceManager.class.getClassLoader()
+						.getResource(String.format("%s%s", basePath, fileName));
+					if (res != null) {
+						input = res.openStream();
+					}
+				} else {
+					LOGGER.error(String.format("Unknown protocol '%s'",
+						protocol));
+					return;
+				}
+				if (input == null) {
+					throw new IOException("Can not read input file");
+				}
+				File target = new File(String.format("%s%s",
+					HomeAppConstants.RESOURCES_FOLDER, fileName));
+				if (!target.exists()) {
+					if (!target.getParentFile().mkdirs()
+						&& !target.createNewFile()) {
+						throw new IOException("Can not create target file");
+					}
+				}
+				Files.copy(input, target.toPath(),
+					StandardCopyOption.REPLACE_EXISTING);
+				LOGGER.info(String.format("Resource '%s' extracted.",
+					fileName));
+			} catch (IOException ex) {
+				LOGGER.error(String.format("Can not extract resources: '%s'",
+					fileName), ex);
+			}
+		}
+	}
 
-    public static final boolean deployWebPages(Configuration config) {
-        ClassPathScanner scanner = new ClassPathScanner();
-        scanner.addIncludeFilter(new AnnotationTypeFilter(RouteElement.class));
-        scanner.addIncludeFilter(new SuperClassFilter(WebRouteServlet.class));
+	public static final boolean deployWebPages(Configuration config) {
+		ClassPathScanner scanner = new ClassPathScanner();
+		scanner.addIncludeFilter(new AnnotationTypeFilter(RouteElement.class));
+		scanner.addIncludeFilter(new SuperClassFilter(WebRouteServlet.class));
 
-        WebRouteServlet servlet;
-        boolean loginPageDefined = false;
+		WebRouteServlet servlet;
+		boolean loginPageDefined = false;
 
-        for (Class<?> c : scanner
-            .findCandidateComponents("fr.nemolovich.apps.homeapp")) {
-            try {
-                RouteElement annotation = c.getAnnotation(RouteElement.class);
-                String path = annotation.path();
-                String page = annotation.page();
-                boolean isLoginPage = annotation.login();
-                Constructor<?> cst = c.getConstructor(String.class,
-                    String.class, Configuration.class);
-                Object o = cst.newInstance(path, page, config);
-                if (o instanceof WebRouteServlet) {
-                    servlet = (WebRouteServlet) o;
-                    SERVLETS.add(servlet);
-                    LOGGER.info(String.format(
-                        "Resource '%s' has been deployed! [%s]",
-                        c.getName(), path));
-                    if (!loginPageDefined && isLoginPage) {
-                        loginPageDefined = true;
-                        WebRoute.setLoginPage(servlet.getPostRoute());
-                        LOGGER.info(String.format(
-                            "Resource '%s' has been set to login page",
-                            c.getName()));
-                    } else if (isLoginPage) {
-                        LOGGER.warn("Login page is already set");
-                    }
-                }
+		for (Class<?> c : scanner
+			.findCandidateComponents("fr.nemolovich.apps.homeapp")) {
+			try {
+				RouteElement annotation = c.getAnnotation(RouteElement.class);
+				String path = annotation.path();
+				String page = annotation.page();
+				boolean isLoginPage = annotation.login();
+				boolean isSecured = annotation.secured();
+				Constructor<?> cst = c.getConstructor(String.class,
+					String.class, Configuration.class);
+				Object o = cst.newInstance(path, page, config);
+				if (o instanceof WebRouteServlet) {
+					servlet = (WebRouteServlet) o;
+					servlet.enableSecurity();
+					SERVLETS.add(servlet);
+					LOGGER.info(String.format(
+						"Resource '%s' has been deployed! [%s]",
+						c.getName(), path));
+					if (!loginPageDefined && isLoginPage) {
+						loginPageDefined = true;
+						WebRoute.setLoginPage(servlet.getPostRoute());
+						LOGGER.info(String.format(
+							"Resource '%s' has been set to login page",
+							c.getName()));
+					} else if (isLoginPage) {
+						LOGGER.warn("Login page is already set");
+					}
+				}
 
-            } catch (InstantiationException | IllegalAccessException |
-                IllegalArgumentException | InvocationTargetException |
-                NoSuchMethodException | SecurityException ex) {
-                LOGGER.error("Error while deploying resources", ex);
-            }
-        }
-        return false;
-    }
+			} catch (InstantiationException | IllegalAccessException |
+				IllegalArgumentException | InvocationTargetException |
+				NoSuchMethodException | SecurityException ex) {
+				LOGGER.error("Error while deploying resources", ex);
+			}
+		}
+		return false;
+	}
 
-    public static void deployWebApp(String deployFolderPath) {
-        File deployFolder = new File(deployFolderPath);
-        try {
-            if (!deployFolder.exists() || !deployFolder.isDirectory()) {
-                throw new FileNotFoundException(String.format(
-                    "The deploy folder '%s can not be located",
-                    deployFolderPath));
-            }
-            FileRoute route;
-            for (File f : getAllFiles(deployFolder,
-                HomeAppConstants.RECURSIVE_SEARCH)) {
-                String uriPath = f.toURI().toString();
-                String routePath = uriPath.substring(uriPath
-                    .lastIndexOf(deployFolderPath)
-                    + (deployFolderPath.length()));
-                route = new FileRoute(routePath, f);
-                route.disableSecurity();
-                FILES.add(route);
-                LOGGER.info(String.format(
-                    "Resource '%s' has been deployed! [%s]", f.getName(),
-                    routePath));
-            }
-        } catch (FileNotFoundException ex) {
-            LOGGER.error("Error while deploying webapp", ex);
-        }
-    }
+	public static void deployWebApp(String deployFolderPath) {
+		File deployFolder = new File(deployFolderPath);
+		try {
+			if (!deployFolder.exists() || !deployFolder.isDirectory()) {
+				throw new FileNotFoundException(String.format(
+					"The deploy folder '%s can not be located",
+					deployFolderPath));
+			}
+			FileRoute route;
+			for (File f : getAllFiles(deployFolder,
+				HomeAppConstants.RECURSIVE_SEARCH)) {
+				String uriPath = f.toURI().toString();
+				String routePath = uriPath.substring(uriPath
+					.lastIndexOf(deployFolderPath)
+					+ (deployFolderPath.length()));
+				route = new FileRoute(routePath, f);
+				FILES.add(route);
+				LOGGER.info(String.format(
+					"Resource '%s' has been deployed! [%s]", f.getName(),
+					routePath));
+			}
+		} catch (FileNotFoundException ex) {
+			LOGGER.error("Error while deploying webapp", ex);
+		}
+	}
 
-    private static List<File> getAllFiles(File root) {
-        return getAllFiles(root, HomeAppConstants.DEFAULT_SEARCH);
-    }
+	private static List<File> getAllFiles(File root) {
+		return getAllFiles(root, HomeAppConstants.DEFAULT_SEARCH);
+	}
 
-    private static List<File> getAllFiles(File root, int options) {
-        List<File> files = new ArrayList();
-        for (File f : root.listFiles()) {
-            if (f.isFile()) {
-                files.add(f);
-            } else if (f.isDirectory()
-                && options == HomeAppConstants.RECURSIVE_SEARCH) {
-                files.addAll(getAllFiles(f, options));
-            }
-        }
-        return files;
-    }
+	private static List<File> getAllFiles(File root, int options) {
+		List<File> files = new ArrayList();
+		for (File f : root.listFiles()) {
+			if (f.isFile()) {
+				files.add(f);
+			} else if (f.isDirectory()
+				&& options == HomeAppConstants.RECURSIVE_SEARCH) {
+				files.addAll(getAllFiles(f, options));
+			}
+		}
+		return files;
+	}
 
-    public static void startServer() {
-        startServer(8080);
-    }
+	public static void startServer() {
+		startServer(8080);
+	}
 
-    public static void startServer(int port) {
-        startServer(port, 8181);
-    }
+	public static void startServer(int port) {
+		startServer(port, 8181);
+	}
 
-    public static void startServer(int port, int adminPort) {
+	public static void startServer(int port, int adminPort) {
 
-        if (adminPort != port) {
-            AdminConnection ac = new AdminConnection(adminPort);
-            ac.start();
-        } else {
-            LOGGER.error("The admin port can not be the same as deployment port");
-        }
+		if (adminPort != port) {
+			AdminConnection ac = new AdminConnection(adminPort);
+			ac.start();
+		} else {
+			LOGGER.error("The admin port can not be the same as deployment port");
+		}
 
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                Thread.currentThread().setName("Shutdown-Hook");
-                LOGGER.info("Server stopped... I'll miss you ;)");
-            }
-        });
-        Spark.setPort(port);
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			@Override
+			public void run() {
+				Thread.currentThread().setName("Shutdown-Hook");
+				LOGGER.info("Server stopped... I'll miss you ;)");
+			}
+		});
+		Spark.setPort(port);
 
-        for (WebRouteServlet servlet : DeployResourceManager.SERVLETS) {
-            Spark.get(servlet.getGetRoute());
-            Spark.post(servlet.getPostRoute());
-        }
-        for (FileRoute route : FILES) {
-            Spark.get(route);
-        }
-    }
+		for (WebRouteServlet servlet : DeployResourceManager.SERVLETS) {
+			Spark.get(servlet.getGetRoute());
+			Spark.post(servlet.getPostRoute());
+		}
+		for (FileRoute route : FILES) {
+			Spark.get(route);
+		}
+	}
 
 }

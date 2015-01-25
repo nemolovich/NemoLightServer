@@ -25,122 +25,122 @@ import org.junit.runners.MethodSorters;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestMarshaling {
 
-    @Test
-    public void test1() throws JAXBException {
+	@Test
+	public void test1() throws JAXBException {
 
-        SecurityConfiguration.getInstance().addGroup("admin");
-        SecurityConfiguration.getInstance().addGroup("default");
+		SecurityConfiguration.getInstance().addGroup("admin");
+		SecurityConfiguration.getInstance().addGroup("default");
 
-        SecurityConfiguration.getInstance().addUser("admin", "root",
-            SecurityUtils.getEncryptedPassword("root"));
-        SecurityConfiguration.getInstance().addUser("default", "Nemolovich",
-            SecurityUtils.getEncryptedPassword(""));
+		SecurityConfiguration.getInstance().addUser("admin", "root",
+			SecurityUtils.getEncryptedPassword("root"));
+		SecurityConfiguration.getInstance().addUser("default", "Nemolovich",
+			SecurityUtils.getEncryptedPassword(""));
 
-        GlobalSecurity.saveConfig();
+		GlobalSecurity.saveConfig();
 
-        SecurityConfiguration sc = GlobalSecurity.loadConfig();
+		SecurityConfiguration sc = GlobalSecurity.loadConfig();
 
-        assertNotNull(sc);
+		assertNotNull(sc);
 
-        SecurityConfiguration.loadConfig(sc);
+		SecurityConfiguration.loadConfig(sc);
 
-        assertEquals(sc, SecurityConfiguration.getInstance());
+		assertEquals(sc, SecurityConfiguration.getInstance());
 
-    }
-
-//    @Test
-    public void test2() throws FileNotFoundException, IOException,
-        ClassNotFoundException {
-
-        Map<String, String> passwords;
-        try (ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(
-            new FileInputStream(HomeAppConstants.SECURITY_PASSWORDS_FILE)))) {
-            passwords = (Map<String, String>) ois.readObject();
-        }
-
-        System.out.println(passwords);
-    }
+	}
 
 //    @Test
-    public void test3() throws JAXBException {
-        SecurityConfiguration.getInstance().reset();
+	public void test2() throws FileNotFoundException, IOException,
+		ClassNotFoundException {
 
-        assertEquals(0, SecurityConfiguration.getInstance().getGroups().size());
+		Map<String, String> passwords;
+		try (ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(
+			new FileInputStream(HomeAppConstants.SECURITY_PASSWORDS_FILE)))) {
+			passwords = (Map<String, String>) ois.readObject();
+		}
 
-        AddGroup ag = new AddGroup();
-
-        assertEquals(CommandConstants.SUCCESS_CODE,
-            Integer.parseInt(ag.doCommand("default")));
-
-        assertEquals(CommandConstants.SUCCESS_CODE,
-            Integer.parseInt(ag.doCommand("admin")));
-
-        assertEquals(CommandConstants.EXECUTION_ERROR_CODE
-            + CommandConstants.GROUP_ALREADY_EXISTS_CODE,
-            Integer.parseInt(ag.doCommand("admin")));
-
-        assertEquals(2, SecurityConfiguration.getInstance().getGroups().size());
-
-        SecurityConfiguration.getInstance().reset();
-
-        assertEquals(0, SecurityConfiguration.getInstance().getGroups().size());
-
-        SecurityConfiguration sc = GlobalSecurity.loadConfig();
-
-        SecurityConfiguration.loadConfig(sc);
-
-        assertEquals(2, SecurityConfiguration.getInstance().getGroups().size());
-    }
+		System.out.println(passwords);
+	}
 
 //    @Test
-    public void test4() throws JAXBException {
+	public void test3() throws JAXBException {
+		SecurityConfiguration.getInstance().reset();
 
-        RemoveGroup rg = new RemoveGroup();
+		assertEquals(0, SecurityConfiguration.getInstance().getGroups().size());
 
-        int size = SecurityConfiguration.getInstance().getGroups().size();
+		AddGroup ag = new AddGroup();
 
-        assertTrue(SecurityConfiguration.getInstance()
-            .containsGroup("default"));
+		assertEquals(CommandConstants.SUCCESS_CODE,
+			Integer.parseInt(ag.doCommand("default")));
 
-        assertEquals(CommandConstants.SUCCESS_CODE,
-            Integer.parseInt(rg.doCommand("default")));
+		assertEquals(CommandConstants.SUCCESS_CODE,
+			Integer.parseInt(ag.doCommand("admin")));
 
-        assertEquals(size - 1,
-            SecurityConfiguration.getInstance().getGroups().size());
+		assertEquals(CommandConstants.EXECUTION_ERROR_CODE
+			+ CommandConstants.GROUP_ALREADY_EXISTS_CODE,
+			Integer.parseInt(ag.doCommand("admin")));
 
-        SecurityConfiguration.getInstance().reset();
+		assertEquals(2, SecurityConfiguration.getInstance().getGroups().size());
 
-        assertEquals(0, SecurityConfiguration.getInstance().getGroups().size());
+		SecurityConfiguration.getInstance().reset();
 
-        SecurityConfiguration sc = GlobalSecurity.loadConfig();
+		assertEquals(0, SecurityConfiguration.getInstance().getGroups().size());
 
-        SecurityConfiguration.loadConfig(sc);
+		SecurityConfiguration sc = GlobalSecurity.loadConfig();
 
-        assertEquals(size - 1,
-            SecurityConfiguration.getInstance().getGroups().size());
-    }
+		SecurityConfiguration.loadConfig(sc);
+
+		assertEquals(2, SecurityConfiguration.getInstance().getGroups().size());
+	}
 
 //    @Test
-    public void test5() throws JAXBException {
+	public void test4() throws JAXBException {
 
-        AddUser au = new AddUser();
+		RemoveGroup rg = new RemoveGroup();
 
-        int size = SecurityConfiguration.getInstance().getGroups().size();
+		int size = SecurityConfiguration.getInstance().getGroups().size();
 
-        assertTrue(size > 0);
+		assertTrue(SecurityConfiguration.getInstance()
+			.containsGroup("default"));
 
-        assertTrue(SecurityConfiguration.getInstance()
-            .containsGroup("admin"));
+		assertEquals(CommandConstants.SUCCESS_CODE,
+			Integer.parseInt(rg.doCommand("default")));
 
-        assertEquals(CommandConstants.SUCCESS_CODE,
-            Integer.parseInt(au.doCommand("admin", "root",
-                    SecurityUtils.getEncryptedPassword("root"))));
+		assertEquals(size - 1,
+			SecurityConfiguration.getInstance().getGroups().size());
 
-        assertEquals(CommandConstants.EXECUTION_ERROR_CODE
-            + CommandConstants.USER_ALREADY_EXISTS_CODE,
-            Integer.parseInt(au.doCommand("admin", "root",
-                    SecurityUtils.getEncryptedPassword(""))));
+		SecurityConfiguration.getInstance().reset();
 
-    }
+		assertEquals(0, SecurityConfiguration.getInstance().getGroups().size());
+
+		SecurityConfiguration sc = GlobalSecurity.loadConfig();
+
+		SecurityConfiguration.loadConfig(sc);
+
+		assertEquals(size - 1,
+			SecurityConfiguration.getInstance().getGroups().size());
+	}
+
+//    @Test
+	public void test5() throws JAXBException {
+
+		AddUser au = new AddUser();
+
+		int size = SecurityConfiguration.getInstance().getGroups().size();
+
+		assertTrue(size > 0);
+
+		assertTrue(SecurityConfiguration.getInstance()
+			.containsGroup("admin"));
+
+		assertEquals(CommandConstants.SUCCESS_CODE,
+			Integer.parseInt(au.doCommand("admin", "root",
+					SecurityUtils.getEncryptedPassword("root"))));
+
+		assertEquals(CommandConstants.EXECUTION_ERROR_CODE
+			+ CommandConstants.USER_ALREADY_EXISTS_CODE,
+			Integer.parseInt(au.doCommand("admin", "root",
+					SecurityUtils.getEncryptedPassword(""))));
+
+	}
 
 }

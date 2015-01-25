@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 @XmlRootElement(name = "user")
 public class User implements Serializable {
+
 	private String name;
 	private String password;
 
@@ -28,8 +29,7 @@ public class User implements Serializable {
 	}
 
 	/**
-	 * @param name
-	 *            the name to set
+	 * @param name the name to set
 	 */
 	public void setName(String name) {
 		this.name = name;
@@ -44,8 +44,7 @@ public class User implements Serializable {
 	}
 
 	/**
-	 * @param password
-	 *            the password to set
+	 * @param password the password to set
 	 */
 	public void setPassword(String password) {
 		this.password = password;

@@ -11,32 +11,33 @@ package fr.nemolovich.apps.homeapp.route.file.mimetype;
  */
 public abstract class ForcedMimeType {
 
-    private String extension;
-    private String mimeType;
+	private String extension;
+	private String mimeType;
 
-    public ForcedMimeType(String extension, String mimeType) {
-        this.extension = extension;
-        this.mimeType = mimeType;
-    }
+	public ForcedMimeType(String extension, String mimeType) {
+		this.extension = extension;
+		this.mimeType = mimeType;
+	}
 
-    public String getExtension() {
-        return extension;
-    }
+	public String getExtension() {
+		return extension;
+	}
 
-    public void setExtension(String extension) {
-        this.extension = extension;
-    }
+	public void setExtension(String extension) {
+		this.extension = extension;
+	}
 
-    public String getMimeType() {
-        return mimeType;
-    }
+	public String getMimeType() {
+		return mimeType;
+	}
 
-    public void setMimeType(String mimeType) {
-        this.mimeType = mimeType;
-    }
+	public void setMimeType(String mimeType) {
+		this.mimeType = mimeType;
+	}
 
-    public static ForcedMimeType newInstance(String extension,
-        String mimeType) {
-        return new ForcedMimeType(extension, mimeType) {};
-    }
+	public static ForcedMimeType newInstance(String extension,
+		String mimeType) {
+		return new ForcedMimeType(extension, mimeType) {
+		};
+	}
 }

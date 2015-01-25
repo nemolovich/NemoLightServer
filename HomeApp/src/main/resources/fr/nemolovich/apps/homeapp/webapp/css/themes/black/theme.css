@@ -1,0 +1,38 @@
+#content-div {
+    background:						rgba(1,1,1,0.6);
+}
+
+#header,
+#footer {
+    background:						rgba(0,0,0,0.4);
+}
+
+.ui-icon,
+.ui-button {
+	color:							#F0F0F0;
+	background:						#111111 url(img/button_black.png) 50% 50% repeat-x;
+}
+
+.ui-icon:hover,
+.ui-icon:focus,
+.ui-icon.hover,
+.ui-button:hover,
+.ui-button:focus,
+.ui-button.hover {
+	background:						#111111 url(img/button_black_hover.png) 50% 50% repeat-x;
+}
+
+.ui-icon:active,
+.ui-button:active {
+	background:						#C2C2C2 url(img/button_black_active.png) 50% 50% repeat-x;
+}
+
+:-webkit-any(button,
+input[type='button'],
+input[type='submit']):not(.custom-appearance):not(.link-button),
+select,
+input[type='checkbox'],
+input[type='radio'] {
+	color:							#B8B8B8;
+    text-shadow: 					0 1px 0 #222222;
+}

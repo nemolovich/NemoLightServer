@@ -15,18 +15,18 @@ import org.junit.Test;
  */
 public class TestArraysCopyOfRange {
 
-    private static final String[] arr1 = {"0", "1", "2"};
-    private static final String[] arr2 = {"1", "2"};
-    private static final String[] arr3 = {"2"};
-    private static final String[] arr4 = {};
+	private static final String[] arr1 = {"0", "1", "2"};
+	private static final String[] arr2 = {"1", "2"};
+	private static final String[] arr3 = {"2"};
+	private static final String[] arr4 = {};
 
-    @Test
-    public void test() {
-        String[] tmp = Arrays.copyOfRange(arr1, 1, arr1.length);
-        assertArrayEquals(arr2, tmp);
-        tmp = Arrays.copyOfRange(arr2, 1, arr2.length);
-        assertArrayEquals(arr3, tmp);
-        tmp = Arrays.copyOfRange(arr3, 1, arr3.length);
-        assertArrayEquals(arr4, tmp);
-    }
+	@Test
+	public void test() {
+		String[] tmp = Arrays.copyOfRange(arr1, 1, arr1.length);
+		assertArrayEquals(arr2, tmp);
+		tmp = Arrays.copyOfRange(arr2, 1, arr2.length);
+		assertArrayEquals(arr3, tmp);
+		tmp = Arrays.copyOfRange(arr3, 1, arr3.length);
+		assertArrayEquals(arr4, tmp);
+	}
 }
