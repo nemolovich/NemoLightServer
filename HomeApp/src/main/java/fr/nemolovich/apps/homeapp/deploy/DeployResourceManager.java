@@ -137,21 +137,28 @@ public final class DeployResourceManager {
 
 		WebRouteServlet servlet;
 		boolean loginPageDefined = false;
+		RouteElement annotation;
+		String path, page;
+		boolean isLoginPage, isSecured;
+		Constructor<?> cst;
+		Object newInstance;
 
 		for (Class<?> c : scanner
 			.findCandidateComponents("fr.nemolovich.apps.homeapp")) {
 			try {
-				RouteElement annotation = c.getAnnotation(RouteElement.class);
-				String path = annotation.path();
-				String page = annotation.page();
-				boolean isLoginPage = annotation.login();
-				boolean isSecured = annotation.secured();
-				Constructor<?> cst = c.getConstructor(String.class,
+				annotation = c.getAnnotation(RouteElement.class);
+				path = annotation.path();
+				page = annotation.page();
+				isLoginPage = annotation.login();
+				isSecured = annotation.secured();
+				cst = c.getConstructor(String.class,
 					String.class, Configuration.class);
-				Object o = cst.newInstance(path, page, config);
-				if (o instanceof WebRouteServlet) {
-					servlet = (WebRouteServlet) o;
-					servlet.enableSecurity();
+				newInstance = cst.newInstance(path, page, config);
+				if (newInstance instanceof WebRouteServlet) {
+					servlet = (WebRouteServlet) newInstance;
+					if (isSecured) {
+						servlet.enableSecurity();
+					}
 					SERVLETS.add(servlet);
 					LOGGER.info(String.format(
 						"Resource '%s' has been deployed! [%s]",

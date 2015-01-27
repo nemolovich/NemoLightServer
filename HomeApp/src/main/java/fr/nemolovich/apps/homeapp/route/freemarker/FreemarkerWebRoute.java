@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package fr.nemolovich.apps.homeapp.route.pages;
+package fr.nemolovich.apps.homeapp.route.freemarker;
 
 import fr.nemolovich.apps.homeapp.route.WebRoute;
 import freemarker.template.Configuration;
@@ -20,7 +20,8 @@ import spark.Response;
  *
  * @author Nemolovich
  */
-public abstract class FreemarkerWebRoute extends WebRoute {
+public abstract class FreemarkerWebRoute extends WebRoute
+	implements FreemarkerRoute {
 
 	private static final Logger LOGGER = Logger
 		.getLogger(FreemarkerWebRoute.class);
@@ -54,5 +55,10 @@ public abstract class FreemarkerWebRoute extends WebRoute {
 	protected abstract void doHandle(final Request request,
 		final Response response, Writer writer) throws IOException,
 		TemplateException;
+
+	@Override
+	public String toString() {
+		return "FreemarkerWebRoute: " + this.getPath();
+	}
 
 }

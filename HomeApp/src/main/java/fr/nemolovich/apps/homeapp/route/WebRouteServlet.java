@@ -6,7 +6,10 @@
 package fr.nemolovich.apps.homeapp.route;
 
 import fr.nemolovich.apps.homeapp.constants.HomeAppConstants;
-import fr.nemolovich.apps.homeapp.route.pages.FreemarkerWebRoute;
+import fr.nemolovich.apps.homeapp.route.filter.proxy.ServletHandler;
+import fr.nemolovich.apps.homeapp.route.filter.proxy.ServletProxy;
+import fr.nemolovich.apps.homeapp.route.freemarker.FreemarkerRoute;
+import fr.nemolovich.apps.homeapp.route.freemarker.FreemarkerWebRoute;
 import fr.nemolovich.apps.homeapp.security.User;
 import freemarker.template.Configuration;
 import freemarker.template.SimpleHash;
@@ -31,7 +34,7 @@ public abstract class WebRouteServlet {
 
 	public WebRouteServlet(String path, String templateName,
 		Configuration config) throws IOException {
-		this.getRoute = new FreemarkerWebRoute(path, config) {
+		FreemarkerRoute get = new FreemarkerWebRoute(path, config) {
 
 			@Override
 			protected void doHandle(Request request, Response response,
@@ -42,7 +45,20 @@ public abstract class WebRouteServlet {
 				template.process(root, writer);
 			}
 		};
-		this.postRoute = new FreemarkerWebRoute(path, config) {
+		FreemarkerWebRoute route = (FreemarkerWebRoute) get;
+		try {
+			ServletHandler handler = new ServletHandler(get);
+			Object proxy = ServletProxy.newProxyInstance(
+				FreemarkerRoute.class.getClassLoader(),
+				FreemarkerRoute.class.getInterfaces(),
+				handler);
+			Object o = FreemarkerRoute.class.cast(proxy);
+			System.out.println(o.toString());
+		} catch (ClassCastException ex) {
+			System.err.println("Can not instantiate get proxy: " + ex.getMessage());
+		}
+		this.getRoute = route;
+		FreemarkerRoute post = new FreemarkerWebRoute(path, config) {
 
 			@Override
 			protected void doHandle(Request request, Response response,
@@ -53,6 +69,7 @@ public abstract class WebRouteServlet {
 				template.process(root, writer);
 			}
 		};
+		this.postRoute = (FreemarkerWebRoute) post;
 		this.template = config.getTemplate(templateName);
 	}
 
@@ -69,17 +86,22 @@ public abstract class WebRouteServlet {
 	protected abstract void doPost(Request request, Response response,
 		SimpleHash root) throws TemplateException, IOException;
 
-	public final FreemarkerWebRoute getGetRoute() {
+	public final WebRoute getGetRoute() {
 		return this.getRoute;
 	}
 
-	public final FreemarkerWebRoute getPostRoute() {
-		return this.postRoute;
+	public final WebRoute getPostRoute() {
+		return (WebRoute) this.postRoute;
 	}
 
 	public void enableSecurity() {
 		this.getRoute.enableSecurity();
 		this.postRoute.enableSecurity();
+	}
+
+	@Override
+	public String toString() {
+		return "WebRouteServlet: " + this.template.getName();
 	}
 
 }
