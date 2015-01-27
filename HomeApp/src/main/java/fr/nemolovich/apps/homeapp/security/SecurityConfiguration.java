@@ -79,6 +79,20 @@ public class SecurityConfiguration {
 		return result;
 	}
 
+	public User getUserByUID(String userUID) {
+		User result = null;
+		grouploop:
+		for (Group group : this.groups) {
+			for (User user : group.getUsers()) {
+				if (user.getUID().equalsIgnoreCase(userUID)) {
+					result = user;
+					break grouploop;
+				}
+			}
+		}
+		return result;
+	}
+
 	public final boolean addUser(String groupName, String userName,
 		String password) {
 		boolean added = false;

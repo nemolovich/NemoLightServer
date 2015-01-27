@@ -1,6 +1,9 @@
 package fr.nemolovich.apps.homeapp.route;
 
 import fr.nemolovich.apps.homeapp.constants.HomeAppConstants;
+import fr.nemolovich.apps.homeapp.route.file.FileRoute;
+import fr.nemolovich.apps.homeapp.security.GlobalSecurity;
+import fr.nemolovich.apps.homeapp.security.SecurityConfiguration;
 import fr.nemolovich.apps.homeapp.security.User;
 import spark.Request;
 import spark.Response;
@@ -10,6 +13,7 @@ import spark.Session;
 public abstract class WebRoute extends Route {
 
 	private static WebRoute LOGIN_PAGE;
+	private static WebRoute HOME_PAGE;
 	private final String route;
 	private boolean secured;
 
@@ -20,6 +24,10 @@ public abstract class WebRoute extends Route {
 
 	public static final void setLoginPage(WebRoute loginPage) {
 		LOGIN_PAGE = loginPage;
+	}
+
+	public static final void setHomePage(WebRoute homePage) {
+		HOME_PAGE = homePage;
 	}
 
 	public final void disableSecurity() {
@@ -42,24 +50,44 @@ public abstract class WebRoute extends Route {
 
 		String loginPath = LOGIN_PAGE == null ? null
 			: LOGIN_PAGE.getPath();
+		String expectedPage = request.pathInfo();
+		if (!FileRoute.class.isAssignableFrom(this.getClass())) {
+			String UID = request.cookie(
+				HomeAppConstants.SESSION_COOKIE);
+//			LOGGER
+			if (UID != null) {
+				user = SecurityConfiguration.
+					getInstance().getUserByUID(UID);
+			}
+		}
 
 		Object result = null;
-//		if (GlobalSecurity.isEnabled() && this.secured
-//			&& ((loginPath != null
-//			&& !loginPath.equals(request.pathInfo()))
-//			&& user == null)) {
-//			String expectedPage = request.pathInfo();
-//			session.attribute(
-//				HomeAppConstants.EXPECTED_PAGE_ATTR,
-//				expectedPage);
-//			response.redirect(loginPath);
-//		} else {
-//			request.attribute(HomeAppConstants.SESSION_USER,
-//				user);
-		result = doHandle(request, response);
+		if (securityIsNeeded(loginPath, expectedPage,
+			user)) {
+			session.attribute(
+				HomeAppConstants.EXPECTED_PAGE_ATTR,
+				expectedPage);
+//			LOGGER
+			response.redirect(loginPath);
+		} else {
+			if (user != null) {
+				response.cookie("/",
+					HomeAppConstants.SESSION_COOKIE,
+					user.getUID(),
+					HomeAppConstants.COOKIE_TIME / 10, false);
+			}
+			result = doHandle(request, response);
 //			session.invalidate();
-//		}
+		}
 		return result;
+	}
+
+	private boolean securityIsNeeded(String loginPath,
+		String expectedPath, User user) {
+		return GlobalSecurity.isEnabled() && this.secured
+			&& ((loginPath != null
+			&& !loginPath.equals(expectedPath))
+			&& user == null);
 	}
 
 	public abstract Object doHandle(Request request, Response response);

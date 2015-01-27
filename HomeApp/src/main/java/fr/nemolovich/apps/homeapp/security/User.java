@@ -1,6 +1,7 @@
 package fr.nemolovich.apps.homeapp.security;
 
 import java.io.Serializable;
+import java.util.UUID;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
@@ -8,15 +9,23 @@ import javax.xml.bind.annotation.XmlTransient;
 @XmlRootElement(name = "user")
 public class User implements Serializable {
 
+	/**
+	 * UID
+	 */
+	private static final long serialVersionUID = -7593826775848734917L;
+
 	private String name;
 	private String password;
+	private String UID;
 
 	private User() {
+		this.name = "guest";
+		this.UID = null;
 	}
 
 	public User(String name, String password) {
-		this();
 		this.name = name;
+		this.UID = UUID.randomUUID().toString();
 		this.password = password;
 	}
 
@@ -25,7 +34,7 @@ public class User implements Serializable {
 	 */
 	@XmlElement(name = "name")
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	/**
@@ -40,7 +49,7 @@ public class User implements Serializable {
 	 */
 	@XmlTransient
 	public String getPassword() {
-		return password;
+		return this.password;
 	}
 
 	/**
@@ -48,6 +57,21 @@ public class User implements Serializable {
 	 */
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	/**
+	 * @return the UID
+	 */
+	@XmlElement(name = "UID")
+	public String getUID() {
+		return this.UID;
+	}
+
+	/**
+	 * @param UID the UID to set
+	 */
+	public void setUID(String UID) {
+		this.UID = UID;
 	}
 
 }

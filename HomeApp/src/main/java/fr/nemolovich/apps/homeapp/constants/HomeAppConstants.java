@@ -69,5 +69,7 @@ public interface HomeAppConstants {
 	 */
 	public static final String SESSION_USER = "session_user";
 	public static final String EXPECTED_PAGE_ATTR = "expected_page";
+	public static final String SESSION_COOKIE = "SESSION_COOKIE";
+	public static final int COOKIE_TIME = (int) (10 * 60);
 
 }
