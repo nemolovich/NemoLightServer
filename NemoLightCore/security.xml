@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<security>
+    <groups>
+        <groups>
+            <name>admin</name>
+            <users>
+                <user>
+                    <name>root</name>
+                    <UID>53d856cf-9fb2-4f12-b7ac-c0f3a484829a</UID>
+                </user>
+            </users>
+        </groups>
+        <groups>
+            <name>default</name>
+            <users>
+                <user>
+                    <name>Nemolovich</name>
+                    <UID>ba8ac78d-040d-45e1-ba13-546373146300</UID>
+                </user>
+            </users>
+        </groups>
+    </groups>
+</security>
