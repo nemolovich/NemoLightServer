@@ -20,6 +20,8 @@ public class WebConfig extends ClassConfig {
 		= "jquery.file";
 	public static final String DELPOYMENT_FOLDER
 		= "server.deploy.folder";
+	public static final String MAVEN_REPOSITORY
+		= "maven.repository.url";
 
 	private static final WebConfig INSTANCE;
 
@@ -37,6 +39,8 @@ public class WebConfig extends ClassConfig {
 		this.setConfig(DELPOYMENT_FOLDER,
 			String.format("%swebapp",
 				NemoLightConstants.RESOURCES_FOLDER));
+		this.setConfig(MAVEN_REPOSITORY,
+			"https://repo1.maven.org/maven2/");
 	}
 
 	@Override

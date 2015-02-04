@@ -20,7 +20,9 @@ public interface NemoLightConstants {
 	public static final String TEMPLATE_FOLDER = String.format("%s%s",
 		RESOURCES_FOLDER, "/freemarker/");
 
-	public static String LOGGER_FILE_PATH = "log4j/log4j.properties";
+	public static final String DEPENDENCIES_FOLDER = "dependencies";
+
+	public static final String LOGGER_FILE_PATH = "log4j/log4j.properties";
 
 	/* ***********************
 	 * Protocols to read file
@@ -29,6 +31,17 @@ public interface NemoLightConstants {
 	 */
 	public static final String FILE_PROTOCOL = "file";
 	public static final String JAR_PROTOCOL = "jar";
+
+	/* ***********************
+	 * JARs constants
+	 * 
+	 * ***********************
+	 */
+	public static String JAR_META_INF = "META-INF";
+	public static String JAR_MAVEN_FOLDER
+		= String.format("%s/maven", JAR_META_INF);
+	public static String JAR_DEPLOY_FILE
+		= String.format("%s/deploy.xml", JAR_META_INF);
 
 	/* ***********************
 	 * Folder search options
