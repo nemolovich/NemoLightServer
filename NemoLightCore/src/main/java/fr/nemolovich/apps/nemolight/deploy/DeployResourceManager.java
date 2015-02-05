@@ -370,7 +370,7 @@ public final class DeployResourceManager {
 			String outputPath = NemoLightConstants.DEPENDENCIES_FOLDER;
 
 			DependenciesDownloader.downloadDependencies(
-				model, mavenURL, outputPath);
+				model, outputPath, mavenURL);
 
 		} catch (IOException |
 			DependenciesException |
