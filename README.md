@@ -16,7 +16,7 @@ The project use the master module: **NemoLightMaster** (_fr.nemolivich.apps.nemo
 To deploy an application:
 * Go to **NemoLightCore** module;
 * Put **JAR file** in the "deploy" folder (default _./deploy_);
-[ * If the application depends of others libraries:
-		* Extern JARS: put it in the folder "dependencies" (default _./dependencies_);
-		* Maven dependencies: If the dependencies are embedded in the pom in JAR the deploy will download it;]
+* [ If the application depends of others libraries:
+	- **Extern JARS**: put it in the folder "dependencies" (default _./dependencies_);
+	- **Maven dependencies**: If the dependencies are embedded in the pom.xml in JAR the deploy will download it;]
 * Run Launcher in **NemoLightCore**.

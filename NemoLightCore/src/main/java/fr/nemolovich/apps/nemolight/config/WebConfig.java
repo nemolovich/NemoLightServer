@@ -5,7 +5,9 @@
  */
 package fr.nemolovich.apps.nemolight.config;
 
+import fr.nemolovich.apps.mavendependenciesdownloader.DependenciesDownloader;
 import fr.nemolovich.apps.nemolight.constants.NemoLightConstants;
+
 import java.util.Map;
 
 /**
@@ -40,7 +42,7 @@ public class WebConfig extends ClassConfig {
 			String.format("%swebapp",
 				NemoLightConstants.RESOURCES_FOLDER));
 		this.setConfig(MAVEN_REPOSITORY,
-			"https://repo1.maven.org/maven2/");
+			DependenciesDownloader.MAVEN_REPO);
 	}
 
 	@Override
