@@ -24,6 +24,8 @@ public interface NemoLightConstants {
 
 	public static final String LOGGER_FILE_PATH = "log4j/log4j.properties";
 
+	public static final String DEPLOY_FOLDER = "deploy";
+
 	/* ***********************
 	 * Protocols to read file
 	 * 

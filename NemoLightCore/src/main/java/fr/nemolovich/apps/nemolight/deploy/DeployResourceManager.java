@@ -176,13 +176,13 @@ public final class DeployResourceManager {
 					}
 					SERVLETS.add(servlet);
 					LOGGER.info(String.format(
-						"Resource '%s' has been deployed! [%s]",
+						"Resource page '%s' has been deployed! [%s]",
 						c.getName(), path));
 					if (!loginPageDefined && isLoginPage) {
 						loginPageDefined = true;
 						WebRoute.setLoginPage(servlet.getPostRoute());
 						LOGGER.info(String.format(
-							"Resource '%s' has been set to login page",
+							"Resource page '%s' has been set to login page",
 							c.getName()));
 					} else if (isLoginPage) {
 						LOGGER.warn("Login page is already set");
@@ -214,7 +214,7 @@ public final class DeployResourceManager {
 				route = new FileRoute(routePath, f);
 				FILES.add(route);
 				LOGGER.info(String.format(
-					"Resource '%s' has been deployed! [%s]", f.getName(),
+					"Resource file '%s' has been deployed! [%s]", f.getName(),
 					routePath));
 			}
 		} catch (FileNotFoundException ex) {
@@ -283,7 +283,11 @@ public final class DeployResourceManager {
 
 		List<InputStream> deployFiles = new ArrayList<>();
 
-		File deployFolder = new File("deploy");
+		/*
+		 * Load applications.
+		 */
+		File deployFolder = new File(
+			NemoLightConstants.DEPLOY_FOLDER);
 		if (deployFolder.listFiles().length > 0) {
 			for (File f : deployFolder.listFiles()) {
 				URL url;
@@ -291,8 +295,8 @@ public final class DeployResourceManager {
 					url = f.toURI().toURL();
 					urls.add(url);
 					classLoader = new URLClassLoader(
-						(URL[]) urls.toArray(new URL[0]), parentClassLoader);
-
+						(URL[]) urls.toArray(new URL[0]),
+						parentClassLoader);
 				} catch (MalformedURLException ex) {
 					System.err.printf(
 						"Can not load deployment file from jar '%s': %s\n",
@@ -309,9 +313,37 @@ public final class DeployResourceManager {
 			}
 		}
 
+		/*
+		 * Load dependencies.
+		 */
+		File dependenciesFolder = new File(
+			NemoLightConstants.DEPENDENCIES_FOLDER);
+		if (dependenciesFolder.listFiles().length > 0) {
+			for (File f : dependenciesFolder.listFiles()) {
+				URL url;
+				try {
+					url = f.toURI().toURL();
+					urls.add(url);
+					classLoader = new URLClassLoader(
+						(URL[]) urls.toArray(new URL[0]),
+						parentClassLoader);
+				} catch (MalformedURLException ex) {
+					System.err.printf(
+						"Can not load deployment file from jar '%s': %s\n",
+						f.getName(), ex.getMessage());
+				}
+			}
+		}
+
+		/*
+		 * Set Application Deployment ClassLoader.
+		 */
 		WebConfig.getInstance().setConfig(WebConfig.DEPLOYMENT_CLASSLOADER,
 			classLoader);
 
+		/*
+		 * Add the package name if specified.
+		 */
 		List<String> packagesName = new ArrayList<>();
 
 		try {
@@ -367,7 +399,8 @@ public final class DeployResourceManager {
 			String mavenURL = WebConfig.getInstance()
 				.getString(WebConfig.MAVEN_REPOSITORY);
 
-			String outputPath = NemoLightConstants.DEPENDENCIES_FOLDER;
+			String outputPath
+				= NemoLightConstants.DEPENDENCIES_FOLDER;
 
 			DependenciesDownloader.downloadDependencies(
 				model, mavenURL, outputPath);

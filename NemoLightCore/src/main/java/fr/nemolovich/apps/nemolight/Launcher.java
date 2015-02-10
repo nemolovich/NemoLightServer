@@ -130,10 +130,9 @@ public class Launcher {
 
 		log.info("Deploying resources...");
 
-
 		for (String packageName : packagesName) {
 			DeployResourceManager.deployWebPages(config,
-					packageName.replaceAll("/", "."));
+				packageName.replaceAll("/", "."));
 		}
 
 		DeployResourceManager.deployWebApp(WebConfig
