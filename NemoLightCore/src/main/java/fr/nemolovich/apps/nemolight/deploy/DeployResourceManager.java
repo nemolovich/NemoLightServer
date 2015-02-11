@@ -11,13 +11,13 @@ import fr.nemolovich.apps.nemolight.Launcher;
 import fr.nemolovich.apps.nemolight.admin.AdminConnection;
 import fr.nemolovich.apps.nemolight.config.DeployConfig;
 import fr.nemolovich.apps.nemolight.config.WebConfig;
-import fr.nemolovich.apps.nemolight.config.route.RouteElement;
 import fr.nemolovich.apps.nemolight.constants.NemoLightConstants;
 import fr.nemolovich.apps.nemolight.reflection.AnnotationTypeFilter;
 import fr.nemolovich.apps.nemolight.reflection.ClassPathScanner;
 import fr.nemolovich.apps.nemolight.reflection.SuperClassFilter;
 import fr.nemolovich.apps.nemolight.route.WebRoute;
 import fr.nemolovich.apps.nemolight.route.WebRouteServlet;
+import fr.nemolovich.apps.nemolight.route.annotations.RouteElement;
 import fr.nemolovich.apps.nemolight.route.file.FileRoute;
 import fr.nemolovich.apps.nemolight.utils.SearchFileOptionException;
 import fr.nemolovich.apps.nemolight.utils.Utils;
@@ -159,7 +159,13 @@ public final class DeployResourceManager {
 		Constructor<?> cst;
 		Object newInstance;
 
-		for (Class<?> c : scanner.findCandidateComponents(packageName)) {
+		List<Class<?>> classes
+			= scanner.findCandidateComponents(
+				"fr.nemolovich.apps.nemolight.provided.");
+		classes.addAll(scanner.findCandidateComponents(
+			packageName));
+
+		for (Class<?> c : classes) {
 			try {
 				annotation = c.getAnnotation(RouteElement.class);
 				path = annotation.path();
@@ -338,8 +344,8 @@ public final class DeployResourceManager {
 		/*
 		 * Set Application Deployment ClassLoader.
 		 */
-		WebConfig.getInstance().setConfig(WebConfig.DEPLOYMENT_CLASSLOADER,
-			classLoader);
+		WebConfig.getInstance().setConfig(
+			WebConfig.DEPLOYMENT_CLASSLOADER, classLoader);
 
 		/*
 		 * Add the package name if specified.
@@ -396,8 +402,8 @@ public final class DeployResourceManager {
 			Model model = reader.read(
 				new InputStreamReader(is));
 
-			String mavenURL = WebConfig.getInstance()
-				.getString(WebConfig.MAVEN_REPOSITORY);
+			String mavenURL = WebConfig.getStringValue(
+				WebConfig.MAVEN_REPOSITORY);
 
 			String outputPath
 				= NemoLightConstants.DEPENDENCIES_FOLDER;

@@ -2,6 +2,7 @@ package fr.nemolovich.apps.nemolight.reflection;
 
 import fr.nemolovich.apps.nemolight.config.WebConfig;
 import fr.nemolovich.apps.nemolight.constants.NemoLightConstants;
+import fr.nemolovich.apps.nemolight.provided.ajax.AjaxRequest;
 import fr.nemolovich.apps.nemolight.utils.SearchFileOptionException;
 import fr.nemolovich.apps.nemolight.utils.Utils;
 import java.io.File;
@@ -83,7 +84,8 @@ public class ClassPathScanner {
 
 	private static void forceLoadPackage(String packageName) {
 		try {
-			ClassLoader classLoader = (ClassLoader) WebConfig.getInstance().get(
+			ClassLoader classLoader
+				= (ClassLoader) WebConfig.getValue(
 					WebConfig.DEPLOYMENT_CLASSLOADER);
 			if (classLoader == null) {
 				throw new IOException("Can not get context ClassLoader");
@@ -135,11 +137,27 @@ public class ClassPathScanner {
 			if (classPath.endsWith(".class")) {
 				classPath = classPath.substring(0, classPath.lastIndexOf(".class"));
 			}
-			ClassLoader classLoader = (ClassLoader) WebConfig.getInstance()
-					.get(WebConfig.DEPLOYMENT_CLASSLOADER);
+			ClassLoader classLoader
+				= (ClassLoader) WebConfig.getValue(
+					WebConfig.DEPLOYMENT_CLASSLOADER);
 			classes.add(classLoader.loadClass(classPath));
 		}
 		return classes;
+	}
+
+	private void loadProvidedClasses() {
+		ClassLoader classLoader
+			= (ClassLoader) WebConfig.getValue(
+				WebConfig.DEPLOYMENT_CLASSLOADER);
+		String className = null;
+		try {
+			className = AjaxRequest.class.getName();
+			classLoader.loadClass(className);
+		} catch (ClassNotFoundException ex) {
+			LOGGER.error(String.format("Can not load classe '%s'",
+				className), ex);
+			return;
+		}
 	}
 
 	public void addIncludeFilter(SearchFilter filter) {
