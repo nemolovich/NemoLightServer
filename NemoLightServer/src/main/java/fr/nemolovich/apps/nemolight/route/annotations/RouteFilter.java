@@ -1,4 +1,4 @@
-package fr.nemolovich.apps.nemolight.config.route;
+package fr.nemolovich.apps.nemolight.route.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
