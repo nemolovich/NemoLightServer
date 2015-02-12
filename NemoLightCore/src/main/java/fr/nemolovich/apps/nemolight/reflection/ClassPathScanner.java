@@ -1,10 +1,5 @@
 package fr.nemolovich.apps.nemolight.reflection;
 
-import fr.nemolovich.apps.nemolight.config.WebConfig;
-import fr.nemolovich.apps.nemolight.constants.NemoLightConstants;
-import fr.nemolovich.apps.nemolight.provided.ajax.AjaxRequest;
-import fr.nemolovich.apps.nemolight.utils.SearchFileOptionException;
-import fr.nemolovich.apps.nemolight.utils.Utils;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -15,12 +10,18 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.jar.JarFile;
+
 import org.apache.log4j.Logger;
+
+import fr.nemolovich.apps.nemolight.config.WebConfig;
+import fr.nemolovich.apps.nemolight.constants.NemoLightConstants;
+import fr.nemolovich.apps.nemolight.utils.SearchFileOptionException;
+import fr.nemolovich.apps.nemolight.utils.Utils;
 
 public class ClassPathScanner {
 
 	private static final Logger LOGGER = Logger
-		.getLogger(ClassPathScanner.class.getName());
+			.getLogger(ClassPathScanner.class.getName());
 	private static final Field GET_CLASSES;
 
 	static {
@@ -44,15 +45,16 @@ public class ClassPathScanner {
 
 	private void loadClasses() {
 		try {
-			ClassLoader classLoader
-				= (ClassLoader) WebConfig.getValue(
-					WebConfig.DEPLOYMENT_CLASSLOADER);
+			ClassLoader classLoader = (ClassLoader) WebConfig
+					.getValue(WebConfig.DEPLOYMENT_CLASSLOADER);
 			GET_CLASSES.setAccessible(true);
 			this.classes = new ConcurrentLinkedQueue(
-				(List<Class<?>>) GET_CLASSES.get(
-					classLoader));
+					(List<Class<?>>) GET_CLASSES.get(classLoader));
+			this.classes.addAll(new ConcurrentLinkedQueue<Class<?>>(
+					(List<Class<?>>) GET_CLASSES.get(classLoader.getParent())));
 			GET_CLASSES.setAccessible(false);
-		} catch (IllegalArgumentException | IllegalAccessException | SecurityException ex) {
+		} catch (IllegalArgumentException | IllegalAccessException
+				| SecurityException ex) {
 			LOGGER.error("Can not retreive ClassLoader classes", ex);
 			System.exit(1);
 		}
@@ -65,7 +67,7 @@ public class ClassPathScanner {
 		List<Class<?>> result = new ArrayList();
 		for (Class<?> clazz : this.classes) {
 			if (!clazz.getName().startsWith(packageName)
-				|| clazz.getName().contains("$")) {
+					|| clazz.getName().contains("$")) {
 				continue;
 			}
 			boolean matches = true;
@@ -84,9 +86,8 @@ public class ClassPathScanner {
 
 	private static void forceLoadPackage(String packageName) {
 		try {
-			ClassLoader classLoader
-				= (ClassLoader) WebConfig.getValue(
-					WebConfig.DEPLOYMENT_CLASSLOADER);
+			ClassLoader classLoader = (ClassLoader) WebConfig
+					.getValue(WebConfig.DEPLOYMENT_CLASSLOADER);
 			if (classLoader == null) {
 				throw new IOException("Can not get context ClassLoader");
 			}
@@ -100,34 +101,36 @@ public class ClassPathScanner {
 				if (protocol.equalsIgnoreCase(NemoLightConstants.FILE_PROTOCOL)) {
 					File f = new File(resource.toURI());
 					files.addAll(Utils.getAllFilesFrom("", f,
-						NemoLightConstants.ONLY_CLASS_FILES));
+							NemoLightConstants.ONLY_CLASS_FILES));
 				} else if (protocol
-					.equalsIgnoreCase(NemoLightConstants.JAR_PROTOCOL)) {
+						.equalsIgnoreCase(NemoLightConstants.JAR_PROTOCOL)) {
 					JarFile jar = Utils.extractJar(resource);
 					files.addAll(Utils.getAllFilesFrom(jar, path,
-						NemoLightConstants.ONLY_CLASS_FILES));
+							NemoLightConstants.ONLY_CLASS_FILES));
 				} else {
-					throw new URISyntaxException(resource.toString(),
-						String.format("Can not use protocol '%s'", protocol));
+					throw new URISyntaxException(
+							resource.toString(),
+							String.format("Can not use protocol '%s'", protocol));
 				}
 			}
 			if (protocol != null) {
 				if (protocol.equalsIgnoreCase(NemoLightConstants.FILE_PROTOCOL)) {
 					loadClasses(files, packageName);
-				} else if (protocol.equalsIgnoreCase(NemoLightConstants.JAR_PROTOCOL)) {
+				} else if (protocol
+						.equalsIgnoreCase(NemoLightConstants.JAR_PROTOCOL)) {
 					loadClasses(files, packageName);
 				}
 			}
-		} catch (IOException | ClassNotFoundException | URISyntaxException |
-			SearchFileOptionException ex) {
+		} catch (IOException | ClassNotFoundException | URISyntaxException
+				| SearchFileOptionException ex) {
 			LOGGER.error(String.format(
-				"The classes could not be load from package '%s'",
-				packageName), ex);
+					"The classes could not be load from package '%s'",
+					packageName), ex);
 		}
 	}
 
-	private static List<Class> loadClasses(List<String> files, String packageName)
-		throws ClassNotFoundException {
+	private static List<Class> loadClasses(List<String> files,
+			String packageName) throws ClassNotFoundException {
 		List<Class> classes = new ArrayList();
 
 		for (String file : files) {
@@ -135,29 +138,14 @@ public class ClassPathScanner {
 			classPath = classPath.replaceAll("/", ".");
 			classPath = classPath.replaceAll("\\.{2}", ".");
 			if (classPath.endsWith(".class")) {
-				classPath = classPath.substring(0, classPath.lastIndexOf(".class"));
+				classPath = classPath.substring(0,
+						classPath.lastIndexOf(".class"));
 			}
-			ClassLoader classLoader
-				= (ClassLoader) WebConfig.getValue(
-					WebConfig.DEPLOYMENT_CLASSLOADER);
+			ClassLoader classLoader = (ClassLoader) WebConfig
+					.getValue(WebConfig.DEPLOYMENT_CLASSLOADER);
 			classes.add(classLoader.loadClass(classPath));
 		}
 		return classes;
-	}
-
-	private void loadProvidedClasses() {
-		ClassLoader classLoader
-			= (ClassLoader) WebConfig.getValue(
-				WebConfig.DEPLOYMENT_CLASSLOADER);
-		String className = null;
-		try {
-			className = AjaxRequest.class.getName();
-			classLoader.loadClass(className);
-		} catch (ClassNotFoundException ex) {
-			LOGGER.error(String.format("Can not load classe '%s'",
-				className), ex);
-			return;
-		}
 	}
 
 	public void addIncludeFilter(SearchFilter filter) {
