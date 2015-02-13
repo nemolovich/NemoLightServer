@@ -47,44 +47,39 @@ public abstract class WebRoute extends Route {
 		Session session = request.session(true);
 		User user = session.attribute(NemoLightConstants.USER_ATTR);
 
-		String loginPath = LOGIN_PAGE == null ? null
-			: LOGIN_PAGE.getPath();
+		String loginPath = LOGIN_PAGE == null ? null : LOGIN_PAGE.getPath();
 		String expectedPage = request.pathInfo();
 		if (!FileRoute.class.isAssignableFrom(this.getClass())) {
 			String UID = request.cookie(NemoLightConstants.SESSION_COOKIE);
-//			LOGGER
+			// LOGGER
 			if (UID != null) {
-				user = SecurityConfiguration.
-					getInstance().getUserByUID(UID);
+				user = SecurityConfiguration.getInstance().getUserByUID(UID);
 			}
 		}
 
 		Object result = null;
-		if (securityIsNeeded(loginPath, expectedPage,
-			user)) {
+		if (securityIsNeeded(loginPath, expectedPage, user)) {
 			session.attribute(NemoLightConstants.EXPECTED_PAGE_ATTR,
-				expectedPage);
-//			LOGGER
+					expectedPage);
+			// LOGGER
 			response.redirect(loginPath);
 		} else {
 			if (user != null) {
-				response.cookie("/",
-					NemoLightConstants.SESSION_COOKIE,
-					user.getUID(),
-					NemoLightConstants.COOKIE_TIME / 10, false);
+				response.cookie("/", NemoLightConstants.SESSION_COOKIE,
+						user.getUID(), NemoLightConstants.COOKIE_TIME / 10,
+						false);
 			}
 			result = doHandle(request, response);
-//			session.invalidate();
+			// session.invalidate();
 		}
 		return result;
 	}
 
-	private boolean securityIsNeeded(String loginPath,
-		String expectedPath, User user) {
-		return GlobalSecurity.isEnabled() && this.secured
-			&& ((loginPath != null
-			&& !loginPath.equals(expectedPath))
-			&& user == null);
+	private boolean securityIsNeeded(String loginPath, String expectedPath,
+			User user) {
+		return GlobalSecurity.isEnabled()
+				&& this.secured
+				&& ((loginPath != null && !loginPath.equals(expectedPath)) && user == null);
 	}
 
 	public abstract Object doHandle(Request request, Response response);

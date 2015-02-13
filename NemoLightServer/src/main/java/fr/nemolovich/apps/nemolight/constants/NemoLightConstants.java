@@ -87,4 +87,12 @@ public interface NemoLightConstants {
 	public static final String SESSION_COOKIE = "SESSION_COOKIE";
 	public static final int COOKIE_TIME = (int) (10 * 60);
 
+	/* ***********************
+	 * AJAX constants
+	 * 
+	 * ***********************
+	 */
+	public static final String AJAX_BEAN_KEY = "action";
+	public static final String AJAX_VALUE_KEY = "value";
+
 }

@@ -1,10 +1,11 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package fr.nemolovich.apps.nemolight.route;
 
+import java.io.IOException;
+import java.io.Writer;
+
+import spark.Request;
+import spark.Response;
+import spark.Session;
 import fr.nemolovich.apps.nemolight.constants.NemoLightConstants;
 import fr.nemolovich.apps.nemolight.route.freemarker.FreemarkerWebRoute;
 import fr.nemolovich.apps.nemolight.security.User;
@@ -12,11 +13,6 @@ import freemarker.template.Configuration;
 import freemarker.template.SimpleHash;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import java.io.IOException;
-import java.io.Writer;
-import spark.Request;
-import spark.Response;
-import spark.Session;
 
 /**
  *
@@ -30,12 +26,12 @@ public abstract class WebRouteServlet {
 	protected final Template template;
 
 	public WebRouteServlet(String path, String templateName,
-		Configuration config) throws IOException {
+			Configuration config) throws IOException {
 		this.getRoute = new FreemarkerWebRoute(path, config) {
 
 			@Override
 			protected void doHandle(Request request, Response response,
-				Writer writer) throws IOException, TemplateException {
+					Writer writer) throws IOException, TemplateException {
 				SimpleHash root = new SimpleHash();
 				setUser(root, request.session());
 				doGet(request, response, root);
@@ -46,7 +42,7 @@ public abstract class WebRouteServlet {
 
 			@Override
 			protected void doHandle(Request request, Response response,
-				Writer writer) throws IOException, TemplateException {
+					Writer writer) throws IOException, TemplateException {
 				SimpleHash root = new SimpleHash();
 				setUser(root, request.session());
 				doPost(request, response, root);
@@ -64,10 +60,10 @@ public abstract class WebRouteServlet {
 	}
 
 	protected abstract void doGet(Request request, Response response,
-		SimpleHash root) throws TemplateException, IOException;
+			SimpleHash root) throws TemplateException, IOException;
 
 	protected abstract void doPost(Request request, Response response,
-		SimpleHash root) throws TemplateException, IOException;
+			SimpleHash root) throws TemplateException, IOException;
 
 	public final WebRoute getGetRoute() {
 		return this.getRoute;
@@ -77,6 +73,13 @@ public abstract class WebRouteServlet {
 		return (WebRoute) this.postRoute;
 	}
 
+	public String getName() {
+		return this.getClass().getSimpleName();
+	}
+
+	public void getAjaxRequest(String request, SimpleHash root) {
+	}
+
 	public void enableSecurity() {
 		this.getRoute.enableSecurity();
 		this.postRoute.enableSecurity();
@@ -84,7 +87,7 @@ public abstract class WebRouteServlet {
 
 	@Override
 	public String toString() {
-		return "WebRouteServlet: " + this.template.getName();
+		return this.getClass().getSimpleName() + ": " + this.template.getName();
 	}
 
 }
