@@ -39,10 +39,10 @@ public interface NemoLightConstants {
 	 * 
 	 * ***********************
 	 */
-	public static String JAR_META_INF = "META-INF";
-	public static String JAR_MAVEN_FOLDER
+	public static final String JAR_META_INF = "META-INF";
+	public static final String JAR_MAVEN_FOLDER
 		= String.format("%s/maven", JAR_META_INF);
-	public static String JAR_DEPLOY_FILE
+	public static final String JAR_DEPLOY_FILE
 		= String.format("%s/deploy.xml", JAR_META_INF);
 
 	/* ***********************

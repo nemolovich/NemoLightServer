@@ -48,169 +48,170 @@ import javax.swing.SwingWorker;
  */
 public class MainFrame extends javax.swing.JFrame {
 
-    /**
-     * UID
-     */
-    private static final long serialVersionUID = 2901406508413961272L;
+	/**
+	 * UID
+	 */
+	private static final long serialVersionUID = 2901406508413961272L;
 
-    private static final Logger LOGGER = Logger.getLogger(MainFrame.class
-        .getName());
+	private static final Logger LOGGER = Logger.getLogger(MainFrame.class
+		.getName());
 
-    private static final String FRAME_ICON = "icon/icon.png";
-    private static final String NB_RESOURCES_PATH = "/fr/nemolovich/apps/homeapp/admin/gui/";
+	private static final String FRAME_ICON = "icon/icon.png";
+	private static final String NB_RESOURCES_PATH
+		= "/fr/nemolovich/apps/nemolight/admin/gui/";
 
-    private static final Pattern HOST_PATTERN = Pattern.compile("^(?<host>("
-        + "(\\d{1,3}\\.){3}\\d{1,3})|([A-Za-z0-9.-]+))"
-        + "\\:(?<port>\\d+)$");
+	private static final Pattern HOST_PATTERN = Pattern.compile("^(?<host>("
+		+ "(\\d{1,3}\\.){3}\\d{1,3})|([A-Za-z0-9.-]+))"
+		+ "\\:(?<port>\\d+)$");
 
-    private static final Pattern SERVER_COMMAND_PATTERN = Pattern
-        .compile(String.format("%s(?<cmd>\\w+)",
-                CommandConstants.COMMAND_START));
+	private static final Pattern SERVER_COMMAND_PATTERN = Pattern
+		.compile(String.format("%s(?<cmd>\\w+)",
+				CommandConstants.COMMAND_START));
 
-    private final ClientSocket socket;
-    private final List<String> commandHistory;
-    private int currentHistoryIndex;
-    private String currentLine;
+	private final ClientSocket socket;
+	private final List<String> commandHistory;
+	private int currentHistoryIndex;
+	private String currentLine;
 
-    /**
-     * Creates new form MainFrame
-     *
-     * @param socket
-     */
-    public MainFrame(ClientSocket socket) {
-        this.socket = socket;
+	/**
+	 * Creates new form MainFrame
+	 *
+	 * @param socket
+	 */
+	public MainFrame(ClientSocket socket) {
+		this.socket = socket;
 
-        this.commandHistory = Collections
-            .synchronizedList(new ArrayList<String>());
-        this.currentHistoryIndex = -1;
+		this.commandHistory = Collections
+			.synchronizedList(new ArrayList<String>());
+		this.currentHistoryIndex = -1;
 
-        CommandsUtils
-            .addCommand(new CommandAdapter("clear", "Clear the console") {
-                @Override
-                public String doCommand(String... args) {
-                    clearConsole();
-                    return null;
-                }
-            });
+		CommandsUtils
+			.addCommand(new CommandAdapter("clear", "Clear the console") {
+				@Override
+				public String doCommand(String... args) {
+					clearConsole();
+					return null;
+				}
+			});
 
-        setIconImage(Toolkit.getDefaultToolkit().getImage(
-            MainFrame.class.getResource(String.format("%s%s", NB_RESOURCES_PATH,
-                    FRAME_ICON))));
-        this.addWindowListener(new WindowAdapter() {
+		setIconImage(Toolkit.getDefaultToolkit().getImage(
+			MainFrame.class.getResource(String.format("%s%s",
+					NB_RESOURCES_PATH, FRAME_ICON))));
+		this.addWindowListener(new WindowAdapter() {
 
-            @Override
-            public void windowClosing(WindowEvent e) {
-                if (quitAskAction()) {
-                    exit();
-                }
-            }
-        });
+			@Override
+			public void windowClosing(WindowEvent e) {
+				if (quitAskAction()) {
+					exit();
+				}
+			}
+		});
 
-        initComponents();
+		initComponents();
 
-        setFocusTraversalPolicy(new FocusTraversalPolicy() {
+		setFocusTraversalPolicy(new FocusTraversalPolicy() {
 
-            @Override
-            public Component getComponentAfter(Container aContainer, Component aComponent) {
+			@Override
+			public Component getComponentAfter(Container aContainer, Component aComponent) {
 
-                Component result = null;
-                if (aComponent.equals(output)) {
-                    result = copyButton;
-                } else if (aComponent.equals(commandField)) {
-                    result = copyButton;
-                } else if (aComponent.equals(copyButton)) {
-                    result = clearButton;
-                } else if (aComponent.equals(clearButton)) {
-                    result = quitButton;
-                } else if (aComponent.equals(quitButton)) {
-                    result = output;
-                }
-                return result;
-            }
+				Component result = null;
+				if (aComponent.equals(output)) {
+					result = copyButton;
+				} else if (aComponent.equals(commandField)) {
+					result = copyButton;
+				} else if (aComponent.equals(copyButton)) {
+					result = clearButton;
+				} else if (aComponent.equals(clearButton)) {
+					result = quitButton;
+				} else if (aComponent.equals(quitButton)) {
+					result = output;
+				}
+				return result;
+			}
 
-            @Override
-            public Component getComponentBefore(Container aContainer, Component aComponent) {
-                Component result = null;
-                if (aComponent.equals(output)) {
-                    result = quitButton;
-                } else if (aComponent.equals(commandField)) {
-                    result = output;
-                } else if (aComponent.equals(copyButton)) {
-                    result = output;
-                } else if (aComponent.equals(clearButton)) {
-                    result = copyButton;
-                } else if (aComponent.equals(quitButton)) {
-                    result = clearButton;
-                }
-                return result;
-            }
+			@Override
+			public Component getComponentBefore(Container aContainer, Component aComponent) {
+				Component result = null;
+				if (aComponent.equals(output)) {
+					result = quitButton;
+				} else if (aComponent.equals(commandField)) {
+					result = output;
+				} else if (aComponent.equals(copyButton)) {
+					result = output;
+				} else if (aComponent.equals(clearButton)) {
+					result = copyButton;
+				} else if (aComponent.equals(quitButton)) {
+					result = clearButton;
+				}
+				return result;
+			}
 
-            @Override
-            public Component getFirstComponent(Container aContainer) {
-                return output;
-            }
+			@Override
+			public Component getFirstComponent(Container aContainer) {
+				return output;
+			}
 
-            @Override
-            public Component getLastComponent(Container aContainer) {
-                return quitButton;
-            }
+			@Override
+			public Component getLastComponent(Container aContainer) {
+				return quitButton;
+			}
 
-            @Override
-            public Component getDefaultComponent(Container aContainer) {
-                return commandField;
-            }
-        });
-        try {
-            this.socket.setLogger((ISocketLogger) this.output);
-            this.socket.connect();
-        } catch (Exception ex) {
-            ((ISocketLogger) this.output).error(String.format(
-                "Connection failed. %s%n", ex.getMessage()));
-            LOGGER.log(Level.SEVERE, "Can not connect to socket", ex);
-            exit();
-            return;
-        }
-        try {
-            ((ISocketLogger) this.output).info(String.format("%s%n",
-                this.socket.readResponse()));
-        } catch (IOException ex) {
-            ((ISocketLogger) this.output).warning(String.format(
-                "Can not read welcome message: %s%n", ex.getMessage()));
-            LOGGER.log(Level.SEVERE, "Can not read welcome message", ex);
-            exit();
-        }
-        try {
-            this.socket.sendRequest(String.format("%s%s",
-                CommandConstants.COMMAND_START,
-                CommandConstants.HELP_COMMAND));
-            String helpMsg = this.socket.readResponse();
-            List<String> serverCommands = parseServerCommands(helpMsg);;
-            CommandsUtils.addServerCommand(serverCommands);
-        } catch (IOException ex) {
-            ((ISocketLogger) this.output).warning(String.format(
-                "Can not retrive server commands: %s%n", ex.getMessage()));
-            LOGGER.log(Level.SEVERE, "Can not retrive server commands", ex);
-        }
+			@Override
+			public Component getDefaultComponent(Container aContainer) {
+				return commandField;
+			}
+		});
+		try {
+			this.socket.setLogger((ISocketLogger) this.output);
+			this.socket.connect();
+		} catch (Exception ex) {
+			((ISocketLogger) this.output).error(String.format(
+				"Connection failed. %s%n", ex.getMessage()));
+			LOGGER.log(Level.SEVERE, "Can not connect to socket", ex);
+			exit();
+			return;
+		}
+		try {
+			((ISocketLogger) this.output).info(String.format("%s%n",
+				this.socket.readResponse()));
+		} catch (IOException ex) {
+			((ISocketLogger) this.output).warning(String.format(
+				"Can not read welcome message: %s%n", ex.getMessage()));
+			LOGGER.log(Level.SEVERE, "Can not read welcome message", ex);
+			exit();
+		}
+		try {
+			this.socket.sendRequest(String.format("%s%s",
+				CommandConstants.COMMAND_START,
+				CommandConstants.HELP_COMMAND));
+			String helpMsg = this.socket.readResponse();
+			List<String> serverCommands = parseServerCommands(helpMsg);;
+			CommandsUtils.addServerCommand(serverCommands);
+		} catch (IOException ex) {
+			((ISocketLogger) this.output).warning(String.format(
+				"Can not retrive server commands: %s%n", ex.getMessage()));
+			LOGGER.log(Level.SEVERE, "Can not retrive server commands", ex);
+		}
 
-    }
+	}
 
-    private static List<String> parseServerCommands(String msg) {
-        List<String> commands = new ArrayList();
-        Matcher matcher = SERVER_COMMAND_PATTERN.matcher(msg);
+	private static List<String> parseServerCommands(String msg) {
+		List<String> commands = new ArrayList();
+		Matcher matcher = SERVER_COMMAND_PATTERN.matcher(msg);
 
-        while (matcher.find()) {
-            commands.add(matcher.group("cmd"));
-        }
-        return commands;
-    }
+		while (matcher.find()) {
+			commands.add(matcher.group("cmd"));
+		}
+		return commands;
+	}
 
-    /**
-     * This method is called from within the constructor to initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is always
-     * regenerated by the Form Editor.
-     */
-    @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed"
+	/**
+	 * This method is called from within the constructor to
+	 * initialize the form. WARNING: Do NOT modify this
+	 * code. The content of this method is always
+	 * regenerated by the Form Editor.
+	 */
+	@SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -318,273 +319,274 @@ public class MainFrame extends javax.swing.JFrame {
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    public final void exit() {
-        exit(false);
-    }
+	public final void exit() {
+		exit(false);
+	}
 
-    public final void exit(boolean forced) {
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setVisible(false);
-        this.dispose();
-        if (forced) {
-            System.exit(0);
-        }
-    }
+	public final void exit(boolean forced) {
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setVisible(false);
+		this.dispose();
+		if (forced) {
+			System.exit(0);
+		}
+	}
 
-    private void quitButtonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_quitButtonActionPerformed
-        if (this.quitAskAction()) {
-            try {
-                this.socket.sendRequest(ClientSocket.getQuitCommand());
-                ((ISocketLogger) this.output).info(String.format("%s%n",
-                    ClientSocket.getQuitCommand()));
-                ((ISocketLogger) this.output).info(String.format("%s%n",
-                    this.socket.readResponse()));
-            } catch (Exception ex) {
-                LOGGER.log(Level.SEVERE, "Error while sending quit command", ex);
-            }
-            exit(true);
-        }
-    }// GEN-LAST:event_quitButtonActionPerformed
+	private void quitButtonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_quitButtonActionPerformed
+		if (this.quitAskAction()) {
+			try {
+				this.socket.sendRequest(ClientSocket.getQuitCommand());
+				((ISocketLogger) this.output).info(String.format("%s%n",
+					ClientSocket.getQuitCommand()));
+				((ISocketLogger) this.output).info(String.format("%s%n",
+					this.socket.readResponse()));
+			} catch (Exception ex) {
+				LOGGER.log(Level.SEVERE, "Error while sending quit command", ex);
+			}
+			exit(true);
+		}
+	}// GEN-LAST:event_quitButtonActionPerformed
 
-    private void copyButtonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_copyButtonActionPerformed
-        String selection = this.output.getText();
-        if (selection != null && !selection.isEmpty()) {
-            Clipboard clipboard = Toolkit.getDefaultToolkit()
-                .getSystemClipboard();
-            clipboard.setContents(new StringSelection(selection), null);
-        }
-    }// GEN-LAST:event_copyButtonActionPerformed
+	private void copyButtonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_copyButtonActionPerformed
+		String selection = this.output.getText();
+		if (selection != null && !selection.isEmpty()) {
+			Clipboard clipboard = Toolkit.getDefaultToolkit()
+				.getSystemClipboard();
+			clipboard.setContents(new StringSelection(selection), null);
+		}
+	}// GEN-LAST:event_copyButtonActionPerformed
 
-    private void clearButtonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_clearButtonActionPerformed
-        this.clearConsole();
-    }// GEN-LAST:event_clearButtonActionPerformed
+	private void clearButtonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_clearButtonActionPerformed
+		this.clearConsole();
+	}// GEN-LAST:event_clearButtonActionPerformed
 
-    private void clearConsole() {
-        this.output.setText("");
-    }
+	private void clearConsole() {
+		this.output.setText("");
+	}
 
-    private void commandFieldActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_commandFieldActionPerformed
-        String command = this.commandField.getText();
-        String[] args = command.split(" ");
-        String commandName = args[0].substring(1);
-        args = Arrays.copyOfRange(args, 1, args.length);
-        ((ISocketLogger) this.output).info(String.format("%s%n",
-            command));
-        this.commandField.setText("");
-        if (!command.isEmpty()) {
-            if (CommandsUtils.getInternalCommands().contains(
-                commandName)) {
-                Command c = CommandsUtils.getInternalCommand(
-                    commandName);
-                c.doCommand(args);
-            } else if (commandName.equals(CommandConstants.HELP_COMMAND)
-                && args.length > 0
-                && CommandsUtils.getInternalCommands().contains(args[0])) {
-                ((ISocketLogger) this.output).info(String.format("%s%n",
-                    CommandsUtils.getInternalCommandHelp(args[0])));
-            } else {
-                try {
-                    this.socket.sendRequest(command);
-                    ((ISocketLogger) this.output).info(String.format("%s%n",
-                        this.socket.readResponse()));
-                    if (command.startsWith(ClientSocket.getQuitCommand())) {
-                        new SwingWorker() {
+	private void commandFieldActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_commandFieldActionPerformed
+		String command = this.commandField.getText();
+		String[] args = command.split(" ");
+		String commandName = args[0].substring(1);
+		args = Arrays.copyOfRange(args, 1, args.length);
+		((ISocketLogger) this.output).info(String.format("%s%n",
+			command));
+		this.commandField.setText("");
+		if (!command.isEmpty()) {
+			if (CommandsUtils.getInternalCommands().contains(
+				commandName)) {
+				Command c = CommandsUtils.getInternalCommand(
+					commandName);
+				c.doCommand(args);
+			} else if (commandName.equals(CommandConstants.HELP_COMMAND)
+				&& args.length > 0
+				&& CommandsUtils.getInternalCommands().contains(args[0])) {
+				((ISocketLogger) this.output).info(String.format("%s%n",
+					CommandsUtils.getInternalCommandHelp(args[0])));
+			} else {
+				try {
+					this.socket.sendRequest(command);
+					((ISocketLogger) this.output).info(String.format("%s%n",
+						this.socket.readResponse()));
+					if (command.startsWith(ClientSocket.getQuitCommand())) {
+						new SwingWorker() {
 
-                            @Override
-                            protected Object doInBackground() throws Exception {
-                                ((ISocketLogger) output)
-                                    .error(String
-                                        .format("Closing application in 3 secondes%n"));
-                                Thread.sleep(3000);
-                                return null;
-                            }
+							@Override
+							protected Object doInBackground() throws Exception {
+								((ISocketLogger) output)
+									.error(String
+										.format("Closing application in 3 secondes%n"));
+								Thread.sleep(3000);
+								return null;
+							}
 
-                            @Override
-                            protected void done() {
-                                exit(true);
-                            }
-                        }.execute();
-                    }
-                } catch (IOException ex) {
-                    ((ISocketLogger) this.output).error(String.format(
-                        "Communication error: %s%n", ex.getMessage()));
-                    LOGGER.log(Level.SEVERE, null, ex);
-                }
-            }
-            this.commandHistory.add(command);
-            this.currentHistoryIndex = this.commandHistory.size();
-        }
-    }// GEN-LAST:event_commandFieldActionPerformed
+							@Override
+							protected void done() {
+								exit(true);
+							}
+						}.execute();
+					}
+				} catch (IOException ex) {
+					((ISocketLogger) this.output).error(String.format(
+						"Communication error: %s%n", ex.getMessage()));
+					LOGGER.log(Level.SEVERE, null, ex);
+				}
+			}
+			this.commandHistory.add(command);
+			this.currentHistoryIndex = this.commandHistory.size();
+		}
+	}// GEN-LAST:event_commandFieldActionPerformed
 
-    private void commandFieldKeyReleased(java.awt.event.KeyEvent evt) {// GEN-FIRST:event_commandFieldKeyReleased
-        int code = evt.getKeyCode();
-        if (code == KeyEvent.VK_TAB) {
-            this.suggest();
-        } else if (code == KeyEvent.VK_DOWN) {
-            this.selectNextCommand();
-        } else if (code == KeyEvent.VK_UP) {
-            this.selectPreviousCommand();
-        } else {
-            if (this.currentHistoryIndex >= this.commandHistory.size()) {
-                this.currentLine = this.commandField.getText();
-            }
-        }
-    }// GEN-LAST:event_commandFieldKeyReleased
+	private void commandFieldKeyReleased(java.awt.event.KeyEvent evt) {// GEN-FIRST:event_commandFieldKeyReleased
+		int code = evt.getKeyCode();
+		if (code == KeyEvent.VK_TAB) {
+			this.suggest();
+		} else if (code == KeyEvent.VK_DOWN) {
+			this.selectNextCommand();
+		} else if (code == KeyEvent.VK_UP) {
+			this.selectPreviousCommand();
+		} else {
+			if (this.currentHistoryIndex >= this.commandHistory.size()) {
+				this.currentLine = this.commandField.getText();
+			}
+		}
+	}// GEN-LAST:event_commandFieldKeyReleased
 
-    private void selectPreviousCommand() {
-        if (this.currentHistoryIndex >= 1 && this.commandHistory.size() > 0) {
-            this.currentHistoryIndex--;
-            this.commandField.setText(this.commandHistory
-                .get(this.currentHistoryIndex));
-        }
-    }
+	private void selectPreviousCommand() {
+		if (this.currentHistoryIndex >= 1 && this.commandHistory.size() > 0) {
+			this.currentHistoryIndex--;
+			this.commandField.setText(this.commandHistory
+				.get(this.currentHistoryIndex));
+		}
+	}
 
-    private void selectNextCommand() {
-        if (this.currentHistoryIndex > -1
-            && this.currentHistoryIndex + 1 < this.commandHistory.size()) {
-            this.currentHistoryIndex++;
-            this.commandField.setText(this.commandHistory
-                .get(this.currentHistoryIndex));
-        } else {
-            this.commandField.setText(this.currentLine);
-            this.currentHistoryIndex = this.commandHistory.size();
-        }
-    }
+	private void selectNextCommand() {
+		if (this.currentHistoryIndex > -1
+			&& this.currentHistoryIndex + 1 < this.commandHistory.size()) {
+			this.currentHistoryIndex++;
+			this.commandField.setText(this.commandHistory
+				.get(this.currentHistoryIndex));
+		} else {
+			this.commandField.setText(this.currentLine);
+			this.currentHistoryIndex = this.commandHistory.size();
+		}
+	}
 
-    private void suggest() {
-        String line = this.commandField.getText();
-        if (line.length() > 0 && line.charAt(0) == CommandConstants.COMMAND_START) {
-            line = line.substring(1);
-            List<String> suggestions = new ArrayList();
-            for (String cmd : CommandsUtils.getAvailableCommands()) {
-                if (cmd.startsWith(line)) {
-                    suggestions.add(String.format("%s%s ",
-                        CommandConstants.COMMAND_START, cmd));
-                }
-            }
-            if (suggestions.size() == 1) {
-                this.commandField.setText(suggestions.get(0));
-            } else if (suggestions.size() > 1 && suggestions.size()
-                < CommandsUtils.getAvailableCommands().size()) {
-                StringBuilder display = new StringBuilder();
-                display.append(String.format("Available commmands:%n"));
-                for (String cmd : suggestions) {
-                    display.append(String.format("\t%s%n", cmd));
-                }
-                ((SocketLoggerArea) this.output).info(display.toString());
-            }
-        }
-    }
+	private void suggest() {
+		String line = this.commandField.getText();
+		if (line.length() > 0 && line.charAt(0) == CommandConstants.COMMAND_START) {
+			line = line.substring(1);
+			List<String> suggestions = new ArrayList();
+			for (String cmd : CommandsUtils.getAvailableCommands()) {
+				if (cmd.startsWith(line)) {
+					suggestions.add(String.format("%s%s ",
+						CommandConstants.COMMAND_START, cmd));
+				}
+			}
+			if (suggestions.size() == 1) {
+				this.commandField.setText(suggestions.get(0));
+			} else if (suggestions.size() > 1 && suggestions.size()
+				< CommandsUtils.getAvailableCommands().size()) {
+				StringBuilder display = new StringBuilder();
+				display.append(String.format("Available commmands:%n"));
+				for (String cmd : suggestions) {
+					display.append(String.format("\t%s%n", cmd));
+				}
+				((SocketLoggerArea) this.output).info(display.toString());
+			}
+		}
+	}
 
-    /**
-     * @param args the command line arguments
-     */
-    public static final void main(String args[]) {
-        /* Set the Nimbus look and feel */
+	/**
+	 * @param args the command line arguments
+	 */
+	public static final void main(String args[]) {
+		/* Set the Nimbus look and feel */
         // <editor-fold defaultstate="collapsed"
-        // desc=" Look and feel setting code (optional) ">
+		// desc=" Look and feel setting code (optional) ">
 		/*
-         * If Nimbus (introduced in Java SE 6) is not available, stay with the
-         * default look and feel. For details see
-         * http://download.oracle.com/javase
-         * /tutorial/uiswing/lookandfeel/plaf.html
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager
-                .getInstalledLookAndFeels()) {
-                if ("Windows".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
+		 * If Nimbus (introduced in Java SE 6) is not available, stay with the
+		 * default look and feel. For details see
+		 * http://download.oracle.com/javase
+		 * /tutorial/uiswing/lookandfeel/plaf.html
+		 */
+		try {
+			for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager
+				.getInstalledLookAndFeels()) {
+				if ("Windows".equals(info.getName())) {
+					javax.swing.UIManager.setLookAndFeel(info.getClassName());
+					break;
 
-                }
-            }
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(
-                java.util.logging.Level.SEVERE, null, ex);
-        }
+				}
+			}
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
+			java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(
+				java.util.logging.Level.SEVERE, null, ex);
+		}
 		// </editor-fold>
 
-        // </editor-fold>
-        JPanel panel = new JPanel(new BorderLayout(6, 6));
+		// </editor-fold>
+		JPanel panel = new JPanel(new BorderLayout(6, 6));
 
-        JPanel header = new JPanel(new GridLayout(1, 0, 2, 2));
-        final String defaultText = "Please enter connection informations";
+		JPanel header = new JPanel(new GridLayout(1, 0, 2, 2));
+		final String defaultText = "Please enter connection informations";
 
-        final JLabel headerLabel = new JLabel(defaultText,
-            SwingConstants.CENTER);
+		final JLabel headerLabel = new JLabel(defaultText,
+			SwingConstants.CENTER);
 
-        final Font defaultFont = headerLabel.getFont();
-        Font boldFont = new Font(defaultFont.getName(), Font.BOLD,
-            defaultFont.getSize());
-        final Color defaultColor = headerLabel.getForeground();
-        header.add(headerLabel);
-        panel.add(header, BorderLayout.NORTH);
+		final Font defaultFont = headerLabel.getFont();
+		Font boldFont = new Font(defaultFont.getName(), Font.BOLD,
+			defaultFont.getSize());
+		final Color defaultColor = headerLabel.getForeground();
+		header.add(headerLabel);
+		panel.add(header, BorderLayout.NORTH);
 
-        JPanel label = new JPanel(new GridLayout(0, 1, 2, 2));
-        label.add(new JLabel("Host", SwingConstants.RIGHT));
-        label.add(new JLabel("Password", SwingConstants.RIGHT));
-        panel.add(label, BorderLayout.WEST);
+		JPanel label = new JPanel(new GridLayout(0, 1, 2, 2));
+		label.add(new JLabel("Host", SwingConstants.RIGHT));
+		label.add(new JLabel("Password", SwingConstants.RIGHT));
+		panel.add(label, BorderLayout.WEST);
 
-        JPanel controls = new JPanel(new GridLayout(0, 1, 2, 2));
-        JTextField hostField = new JTextField("localhost:8181");
-        controls.add(hostField);
-        hostField.addKeyListener(new KeyAdapter() {
+		JPanel controls = new JPanel(new GridLayout(0, 1, 2, 2));
+		JTextField hostField = new JTextField("localhost:8181");
+		controls.add(hostField);
+		hostField.addKeyListener(new KeyAdapter() {
 
-            @Override
-            public void keyTyped(KeyEvent e) {
-                super.keyTyped(e);
-                headerLabel.setText(defaultText);
-                headerLabel.setFont(defaultFont);
-                headerLabel.setForeground(defaultColor);
-            }
-        });
-        JPasswordField passwordField = new JPasswordField();
-        controls.add(passwordField);
-        panel.add(controls, BorderLayout.CENTER);
+			@Override
+			public void keyTyped(KeyEvent e) {
+				super.keyTyped(e);
+				headerLabel.setText(defaultText);
+				headerLabel.setFont(defaultFont);
+				headerLabel.setForeground(defaultColor);
+			}
+		});
+		JPasswordField passwordField = new JPasswordField();
+		controls.add(passwordField);
+		panel.add(controls, BorderLayout.CENTER);
 
-        hostField.setText("localhost:8081");
-        passwordField.setText("serversslpass");
+		hostField.setText("localhost:8081");
+		passwordField.setText("serversslpass");
 
-        String host;
+		String host;
 
-        Matcher matcher = null;
+		Matcher matcher = null;
 
-        while (matcher == null || !matcher.matches()) {
-            if (JOptionPane.showConfirmDialog(null, panel, "Host informations",
-                JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-                host = hostField.getText();
-                matcher = HOST_PATTERN.matcher(host);
-                if (!matcher.matches()) {
-                    headerLabel.setForeground(Color.RED);
-                    headerLabel.setFont(boldFont);
-                    headerLabel.setText("Host format: <HOST>:<PORT>");
-                }
-            } else {
-                return;
-            }
-        }
+		while (matcher == null || !matcher.matches()) {
+			if (JOptionPane.showConfirmDialog(null, panel, "Host informations",
+				JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+				host = hostField.getText();
+				matcher = HOST_PATTERN.matcher(host);
+				if (!matcher.matches()) {
+					headerLabel.setForeground(Color.RED);
+					headerLabel.setFont(boldFont);
+					headerLabel.setText("Host format: <HOST>:<PORT>");
+				}
+			} else {
+				return;
+			}
+		}
 
-        final String hostName = matcher.group("host");
-        final int hostPort = Integer.parseInt(matcher.group("port"));
-        final String password = new String(passwordField.getPassword());
+		final String hostName = matcher.group("host");
+		final int hostPort = Integer.parseInt(matcher.group("port"));
+		final String password = new String(passwordField.getPassword());
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new MainFrame(new ClientSocket(hostName, hostPort, password))
-                    .setVisible(true);
-            }
-        });
-    }
+		/* Create and display the form */
+		java.awt.EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				new MainFrame(new ClientSocket(hostName, hostPort, password))
+					.setVisible(true);
+			}
+		});
+	}
 
-    private boolean quitAskAction() {
-        return JOptionPane.showConfirmDialog(this,
-            "Do you really want to leave?", "Leave client? oO?",
-            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION;
-    }
+	private boolean quitAskAction() {
+		return JOptionPane.showConfirmDialog(this,
+			"Do you really want to leave?", "Leave client? oO?",
+			JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION;
+	}
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton clearButton;

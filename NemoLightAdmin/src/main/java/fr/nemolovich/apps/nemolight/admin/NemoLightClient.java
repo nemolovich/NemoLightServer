@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  *
  * @author Nemolovich
  */
-public class HomeAppClient {
+public class NemoLightClient {
 
 	private static final ConcurrentLinkedQueue<Command> LOCAL_COMMANDS;
 	private static final String HELP = "Expected parameters: <HOST> <PORT>";
