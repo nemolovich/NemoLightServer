@@ -51,7 +51,7 @@ public abstract class WebRoute extends Route {
 		String expectedPage = request.pathInfo();
 		if (!FileRoute.class.isAssignableFrom(this.getClass())) {
 			String UID = request.cookie(NemoLightConstants.SESSION_COOKIE);
-			// LOGGER
+			// TODO: LOGGER
 			if (UID != null) {
 				user = SecurityConfiguration.getInstance().getUserByUID(UID);
 			}
@@ -61,12 +61,12 @@ public abstract class WebRoute extends Route {
 		if (securityIsNeeded(loginPath, expectedPage, user)) {
 			session.attribute(NemoLightConstants.EXPECTED_PAGE_ATTR,
 					expectedPage);
-			// LOGGER
+			// TODO: LOGGER
 			response.redirect(loginPath);
 		} else {
 			if (user != null) {
 				response.cookie("/", NemoLightConstants.SESSION_COOKIE,
-						user.getUID(), NemoLightConstants.COOKIE_TIME / 10,
+						user.getUID(), NemoLightConstants.COOKIE_TIME,
 						false);
 			}
 			result = doHandle(request, response);

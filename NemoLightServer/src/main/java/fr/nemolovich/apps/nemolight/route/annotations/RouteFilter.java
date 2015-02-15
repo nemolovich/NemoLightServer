@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface RouteFilter {
 
-	String beforeFilter();
+	String beforeFilter() default "";
 
 	int priority() default -1;
 

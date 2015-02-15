@@ -48,9 +48,9 @@ public class ClassPathScanner {
 			ClassLoader classLoader = (ClassLoader) WebConfig
 					.getValue(WebConfig.DEPLOYMENT_CLASSLOADER);
 			GET_CLASSES.setAccessible(true);
-			this.classes = new ConcurrentLinkedQueue(
+			this.classes = new ConcurrentLinkedQueue<>(
 					(List<Class<?>>) GET_CLASSES.get(classLoader));
-			this.classes.addAll(new ConcurrentLinkedQueue<Class<?>>(
+			this.classes.addAll(new ConcurrentLinkedQueue<>(
 					(List<Class<?>>) GET_CLASSES.get(classLoader.getParent())));
 			GET_CLASSES.setAccessible(false);
 		} catch (IllegalArgumentException | IllegalAccessException

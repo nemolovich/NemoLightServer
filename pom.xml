@@ -10,7 +10,7 @@
     
     <modules>
         <module>NemoLightAdminCommon</module>
-        <module>nemolightServer</module>
+        <module>NemoLightServer</module>
         <module>NemoLightCore</module>
         <module>NemoLightAdmin</module>
         <module>NemoLightAdminGUI</module>
