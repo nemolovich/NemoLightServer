@@ -25,16 +25,18 @@ public class AdminConnection extends Thread {
 	public AdminConnection(int port) {
 		this.port = port;
 	}
+	
+	public static void setSystemProperties() {
+		System.setProperty("javax.net.ssl.keyStore", String.format("%s%s",
+			NemoLightConstants.CONFIG_FOLDER, "certificates/server.ks"));
+		System.setProperty("javax.net.ssl.keyStorePassword", "serversslpass");
+	}
 
 	@Override
 	public void run() {
 
 		Thread.currentThread().setName("AdminSession");
 		Security.addProvider(new Provider());
-
-		System.setProperty("javax.net.ssl.keyStore", String.format("%s%s",
-			NemoLightConstants.CONFIG_FOLDER, "certificates/server.ks"));
-		System.setProperty("javax.net.ssl.keyStorePassword", "serversslpass");
 
 		SSLServerSocket sslServerSocket;
 		try {

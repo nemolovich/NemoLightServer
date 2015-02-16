@@ -5,6 +5,7 @@
  */
 package fr.nemolovich.apps.nemolight;
 
+import fr.nemolovich.apps.nemolight.admin.AdminConnection;
 import fr.nemolovich.apps.nemolight.config.WebConfig;
 import fr.nemolovich.apps.nemolight.constants.NemoLightConstants;
 import fr.nemolovich.apps.nemolight.deploy.DeployResourceManager;
@@ -69,6 +70,10 @@ public class Launcher {
 						String.format("Unknown parameter '%s'", arg));
 				}
 			}
+		}
+		
+		if(!securityDisabled) {
+			AdminConnection.setSystemProperties();
 		}
 
 		File templateFolder = new File(

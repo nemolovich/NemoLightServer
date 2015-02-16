@@ -5,36 +5,6 @@
  */
 package fr.nemolovich.apps.nemolight.deploy;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.jar.JarFile;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-
-import org.apache.log4j.Logger;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-
-import spark.Spark;
 import fr.nemolovich.apps.mavendependenciesdownloader.DependenciesDownloader;
 import fr.nemolovich.apps.mavendependenciesdownloader.DependenciesException;
 import fr.nemolovich.apps.nemolight.Launcher;
@@ -53,7 +23,34 @@ import fr.nemolovich.apps.nemolight.route.file.FileRoute;
 import fr.nemolovich.apps.nemolight.utils.SearchFileOptionException;
 import fr.nemolovich.apps.nemolight.utils.Utils;
 import freemarker.template.Configuration;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.jar.JarFile;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import org.apache.log4j.Logger;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import spark.Spark;
 
 /**
  *
@@ -321,7 +318,7 @@ public final class DeployResourceManager {
     }
 
     public static List<String> initializeClassLoader() {
-
+		
         List<URL> urls = new ArrayList<>();
         ClassLoader parentClassLoader = Launcher.class
             .getClassLoader();
