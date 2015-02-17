@@ -206,7 +206,7 @@ public final class DeployResourceManager {
                                 pageField.name());
                             pageFieldName = pageFieldName.isEmpty()
                                 ? field.getName() : pageFieldName;
-                            servlet.addPageField(field.getName(),
+                            servlet.addPageField(field,
                                 pageFieldName);
                         }
                     }
