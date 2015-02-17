@@ -15,10 +15,10 @@ public interface NemoLightConstants {
 	public static final String RESOURCES_FOLDER = "resources/";
 
 	public static final String CONFIG_FOLDER = String.format("%s%s",
-		RESOURCES_FOLDER, "/configs/");
+			RESOURCES_FOLDER, "/configs/");
 
 	public static final String TEMPLATE_FOLDER = String.format("%s%s",
-		RESOURCES_FOLDER, "/freemarker/");
+			RESOURCES_FOLDER, "/freemarker/");
 
 	public static final String DEPENDENCIES_FOLDER = "dependencies";
 
@@ -40,10 +40,10 @@ public interface NemoLightConstants {
 	 * ***********************
 	 */
 	public static final String JAR_META_INF = "META-INF";
-	public static final String JAR_MAVEN_FOLDER
-		= String.format("%s/maven", JAR_META_INF);
-	public static final String JAR_DEPLOY_FILE
-		= String.format("%s/deploy.xml", JAR_META_INF);
+	public static final String JAR_MAVEN_FOLDER = String.format("%s/maven",
+			JAR_META_INF);
+	public static final String JAR_DEPLOY_FILE = String.format("%s/deploy.xml",
+			JAR_META_INF);
 
 	/* ***********************
 	 * Folder search options
@@ -69,12 +69,12 @@ public interface NemoLightConstants {
 	 * 
 	 * ***********************
 	 */
-	public static final String SECURITY_PATH = String.format(
-		RESOURCES_FOLDER, "/security/");
+	public static final String SECURITY_PATH = String.format(RESOURCES_FOLDER,
+			"/security/");
 	public static final File SECURITY_CONFIG_FILE = new File(String.format(
-		"%s%s", SECURITY_PATH, "security.xml"));
+			"%s%s", SECURITY_PATH, "security.xml"));
 	public static final File SECURITY_PASSWORDS_FILE = new File(String.format(
-		"%s%s", SECURITY_PATH, "passwords"));
+			"%s%s", SECURITY_PATH, "passwords"));
 	public static final String USER_ATTR = "session_user_attr";
 
 	/* ***********************
@@ -94,5 +94,9 @@ public interface NemoLightConstants {
 	 */
 	public static final String AJAX_BEAN_KEY = "action";
 	public static final String AJAX_VALUE_KEY = "value";
-
+	public static final String AJAX_ERROR_KEY = "error";
+	public static final String AJAX_ERROR_DESC = "desc";
+	public static final String AJAX_ERROR_INVALID_REQUEST = "INVALID_REQUEST";
+	public static final String AJAX_ERROR_UNKNOWN_BEAN = "UNKNOWN_BEAN";
+	public static final String AJAX_ERROR_INVALID_SYNTAX = "INVALID_SYNTAX";
 }

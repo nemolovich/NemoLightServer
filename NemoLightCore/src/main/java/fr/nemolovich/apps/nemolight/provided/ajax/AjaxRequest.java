@@ -2,6 +2,7 @@ package fr.nemolovich.apps.nemolight.provided.ajax;
 
 import java.io.IOException;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import spark.Request;
@@ -43,8 +44,10 @@ public class AjaxRequest extends WebRouteServlet {
 		if (value == null || bean == null || uid == null || passedUid == null) {
 			JSONObject result = new JSONObject();
 
-			result.put("error", "INVALID_REQUEST");
-			result.put("desc", "Request parameters are incorrect");
+			result.put(NemoLightConstants.AJAX_ERROR_KEY,
+					NemoLightConstants.AJAX_ERROR_INVALID_REQUEST);
+			result.put(NemoLightConstants.AJAX_ERROR_DESC,
+					"Request parameters are incorrect");
 
 			root.put(NemoLightConstants.AJAX_BEAN_KEY, bean);
 			root.put(NemoLightConstants.AJAX_VALUE_KEY, result);
@@ -61,24 +64,44 @@ public class AjaxRequest extends WebRouteServlet {
 			if (beanRoute == null) {
 				JSONObject result = new JSONObject();
 
-				result.put("error", "UNKNOWN_BEAN");
-				result.put("desc",
+				result.put(NemoLightConstants.AJAX_ERROR_KEY,
+						NemoLightConstants.AJAX_ERROR_UNKNOWN_BEAN);
+				result.put(NemoLightConstants.AJAX_ERROR_DESC,
 						String.format("Can not find bean named '%s'", bean));
 
-				root.put(NemoLightConstants.AJAX_BEAN_KEY, bean);
+				root.put(NemoLightConstants.AJAX_BEAN_KEY,
+						NemoLightConstants.AJAX_ERROR_KEY);
 				root.put(NemoLightConstants.AJAX_VALUE_KEY, result);
 			} else {
-				beanRoute.getAjaxRequest(value, root);
+				JSONObject valueObject;
+				try {
+					valueObject = new JSONObject(value);
+					beanRoute.getAjaxRequest(valueObject, root);
+				} catch (JSONException je) {
+					valueObject = new JSONObject();
+
+					valueObject.put(NemoLightConstants.AJAX_ERROR_KEY,
+							NemoLightConstants.AJAX_ERROR_INVALID_SYNTAX);
+					valueObject.put(NemoLightConstants.AJAX_ERROR_DESC, String
+							.format("Value '%s' is not a valid JSON object",
+									value));
+
+					root.put(NemoLightConstants.AJAX_BEAN_KEY,
+							NemoLightConstants.AJAX_ERROR_KEY);
+					root.put(NemoLightConstants.AJAX_VALUE_KEY, valueObject);
+				}
 			}
 
 		} else {
 			JSONObject result = new JSONObject();
 
-			result.put("error", "INVALID_REQUEST");
-			result.put("desc",
+			result.put(NemoLightConstants.AJAX_ERROR_KEY,
+					NemoLightConstants.AJAX_ERROR_INVALID_REQUEST);
+			result.put(NemoLightConstants.AJAX_ERROR_DESC,
 					"Given request UUID is not the same as parameter");
 
-			root.put(NemoLightConstants.AJAX_BEAN_KEY, bean);
+			root.put(NemoLightConstants.AJAX_BEAN_KEY,
+					NemoLightConstants.AJAX_ERROR_KEY);
 			root.put(NemoLightConstants.AJAX_VALUE_KEY, result);
 		}
 	}

@@ -2,6 +2,10 @@ package fr.nemolovich.apps.nemolight.route;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+import org.json.JSONObject;
 
 import spark.Request;
 import spark.Response;
@@ -13,8 +17,6 @@ import freemarker.template.Configuration;
 import freemarker.template.SimpleHash;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  *
@@ -93,7 +95,12 @@ public abstract class WebRouteServlet {
         return this.getClass().getSimpleName();
     }
 
-    public void getAjaxRequest(String request, SimpleHash root) {
+    public void getAjaxRequest(JSONObject request, SimpleHash root) {
+    	for(String field:FIELDS_LIST.values()) {
+    		System.out.println("Field: "+field);
+    	}
+    	root.put(NemoLightConstants.AJAX_BEAN_KEY, this.getName());
+    	root.put(NemoLightConstants.AJAX_VALUE_KEY, request);
     }
 
     public void enableSecurity() {
