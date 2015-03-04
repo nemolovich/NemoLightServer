@@ -7,7 +7,7 @@ import fr.nemolovich.apps.nemolight.admin.commands.constants.CommandConstants;
 import fr.nemolovich.apps.nemolight.constants.NemoLightConstants;
 import fr.nemolovich.apps.nemolight.security.GlobalSecurity;
 import fr.nemolovich.apps.nemolight.security.SecurityConfiguration;
-import fr.nemolovich.apps.nemolight.security.SecurityUtils;
+import fr.nemolovich.apps.nemolight.security.CommonUtils;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -31,9 +31,9 @@ public class TestMarshaling {
 		SecurityConfiguration.getInstance().addGroup("default");
 
 		SecurityConfiguration.getInstance().addUser("admin", "root",
-			SecurityUtils.getEncryptedPassword("root"));
+			CommonUtils.getEncryptedPassword("root"));
 		SecurityConfiguration.getInstance().addUser("default", "Nemolovich",
-			SecurityUtils.getEncryptedPassword(""));
+			CommonUtils.getEncryptedPassword(""));
 
 		GlobalSecurity.saveConfig();
 
@@ -133,12 +133,12 @@ public class TestMarshaling {
 
 		assertEquals(CommandConstants.SUCCESS_CODE,
 			Integer.parseInt(au.doCommand("admin", "root",
-					SecurityUtils.getEncryptedPassword("root"))));
+					CommonUtils.getEncryptedPassword("root"))));
 
 		assertEquals(CommandConstants.EXECUTION_ERROR_CODE
 			+ CommandConstants.USER_ALREADY_EXISTS_CODE,
 			Integer.parseInt(au.doCommand("admin", "root",
-					SecurityUtils.getEncryptedPassword(""))));
+					CommonUtils.getEncryptedPassword(""))));
 
 	}
 

@@ -48,7 +48,7 @@ public class User implements Serializable {
 	 * @return the password
 	 */
 	@XmlTransient
-	public String getPassword() {
+	protected String getPassword() {
 		return this.password;
 	}
 

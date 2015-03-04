@@ -116,6 +116,29 @@ public class GlobalSecurity {
 		}
 	}
 
+	public static SecurityStatus submitAuthentication(
+		String userName, String encryptedPasswod) {
+		SecurityStatus result = SecurityStatus.UNKNOWN_USER;
+		if (userName != null) {
+			for (User u : GlobalSecurity.getUsers()) {
+				if (u.getName().equals(userName)) {
+					if (u.getPassword() == null) {
+						result = SecurityStatus.INVALID_PASSWORD;
+					} else {
+						if (u.getPassword().equals(
+							encryptedPasswod)) {
+							result = SecurityStatus.AUTH_SUCCESS;
+						} else {
+							result = SecurityStatus.AUTH_FAILED;
+						}
+					}
+					break;
+				}
+			}
+		}
+		return result;
+	}
+
 	public static List<User> getUsers() {
 		return SecurityConfiguration.getInstance().getUsers();
 	}

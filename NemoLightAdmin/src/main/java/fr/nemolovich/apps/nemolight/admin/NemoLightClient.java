@@ -8,7 +8,7 @@ package fr.nemolovich.apps.nemolight.admin;
 
 import fr.nemolovich.apps.nemolight.admin.commands.constants.CommandConstants;
 import fr.nemolovich.apps.nemolight.admin.socket.ClientSocket;
-import fr.nemolovich.apps.nemolight.security.SecurityUtils;
+import fr.nemolovich.apps.nemolight.security.CommonUtils;
 import java.io.Console;
 import java.io.IOException;
 import java.util.Scanner;
@@ -36,7 +36,7 @@ public class NemoLightClient {
 						result = "Please provide a password to encrypt";
 					} else {
 						String password = args[0];
-						result = SecurityUtils.getEncryptedPassword(password);
+						result = CommonUtils.getEncryptedPassword(password);
 					}
 					return result;
 				}
