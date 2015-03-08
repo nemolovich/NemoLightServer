@@ -71,8 +71,8 @@ public class Launcher {
 				}
 			}
 		}
-		
-		if(!securityDisabled) {
+
+		if (!securityDisabled) {
 			AdminConnection.setSystemProperties();
 		}
 

@@ -1,7 +1,9 @@
 package fr.nemolovich.apps.nemolight.session;
 
 import fr.nemolovich.apps.nemolight.security.User;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -9,17 +11,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  *
  * @author Nemolovich
  */
-public class Session extends HashMap<String, Object> {
+public class Session {
 
 	private static final long serialVersionUID
 		= -646424518559816081L;
-
-	public static final String ATTR_SESSION_USER = "User";
-	public static final String ATTR_SESSION_MSG = "Message";
-	public static final String ATTR_SESSION_EXPECTED_PAGE
-		= "ExpectedPage";
-	public static final String ATTR_SESSION_PROPERTIES
-		= "Properties";
 
 	private User user;
 	private final ConcurrentLinkedQueue<Message> messages;
@@ -30,28 +25,6 @@ public class Session extends HashMap<String, Object> {
 		super();
 		this.messages = new ConcurrentLinkedQueue<>();
 		this.properties = new HashMap<>();
-		super.put(ATTR_SESSION_USER, this.user);
-		super.put(ATTR_SESSION_MSG, this.messages);
-		super.put(ATTR_SESSION_PROPERTIES,
-			this.properties);
-		super.put(ATTR_SESSION_EXPECTED_PAGE,
-			this.exceptedPage);
-	}
-
-	/**
-	 * Use
-	 * {@link #addProperty(java.lang.String, java.lang.Object)}
-	 * instead of this method.
-	 *
-	 * @return Nothing because of throw.
-	 * @deprecated
-	 * @see #addProperty(java.lang.String, java.lang.Object)
-	 */
-	@Deprecated
-	@Override
-	public Object put(String key, Object value) {
-		throw new UnsupportedOperationException(
-			"This method can not be used for this object");
 	}
 
 	/**
@@ -75,16 +48,23 @@ public class Session extends HashMap<String, Object> {
 		return this.properties.get(name);
 	}
 
+	public Map<String, Object> getProperties() {
+		return this.properties;
+	}
+
 	public void submitMessage(Message message) {
 		this.messages.add(message);
 	}
 
-	public void consumeMessages() {
+	public List<Message> getConsumeMessages() {
+		List<Message> result
+			= new ArrayList<>(this.messages);
 		this.messages.clear();
+		return result;
 	}
 
 	public ConcurrentLinkedQueue<Message> getMessages() {
-		return this.messages;
+		return new ConcurrentLinkedQueue<>(this.messages);
 	}
 
 	public void setUser(User user) {
