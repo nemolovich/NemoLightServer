@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import spark.Response;
 
 /**
  *
@@ -19,7 +20,7 @@ public class Session {
 	private User user;
 	private final ConcurrentLinkedQueue<Message> messages;
 	private final Map<String, Object> properties;
-	private String exceptedPage;
+	private String expectedPage;
 
 	public Session() {
 		super();
@@ -75,12 +76,28 @@ public class Session {
 		return this.user;
 	}
 
-	public void setExceptedPage(String exceptedPage) {
-		this.exceptedPage = exceptedPage;
+	public void setExpectedPage(String exceptedPage) {
+		this.expectedPage = exceptedPage;
 	}
 
-	public String getExceptedPage() {
-		return this.exceptedPage;
+	public String getExpectedPage() {
+		return this.expectedPage;
+	}
+
+	public void redirect(Response response) {
+		String page = this.expectedPage;
+		this.expectedPage = null;
+		response.redirect(page);
+	}
+
+	@Override
+	public String toString() {
+		return String.format(
+			"%s[user=%s, expectedPage=%s, messages=%d]",
+			this.getClass().getName(),
+			this.user == null ? "null" : this.user.getName(),
+			this.expectedPage == null ? "null" : this.expectedPage,
+			this.messages.size());
 	}
 
 }

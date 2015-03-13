@@ -2,7 +2,8 @@ package fr.nemolovich.apps.nemolight.route;
 
 import fr.nemolovich.apps.nemolight.constants.NemoLightConstants;
 import fr.nemolovich.apps.nemolight.route.freemarker.FreemarkerWebRoute;
-import fr.nemolovich.apps.nemolight.security.User;
+import fr.nemolovich.apps.nemolight.session.Session;
+import fr.nemolovich.apps.nemolight.session.SessionUtils;
 import freemarker.template.Configuration;
 import freemarker.template.SimpleHash;
 import freemarker.template.Template;
@@ -18,7 +19,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import spark.Request;
 import spark.Response;
-import spark.Session;
 
 /**
  *
@@ -64,7 +64,10 @@ public abstract class WebRouteServlet {
 
 	private SimpleHash initRoute(Request request) {
 		SimpleHash root = new SimpleHash();
-		setUser(root, request.session());
+		Session userSession = SessionUtils.getSession(
+			request.session());
+		root.put(NemoLightConstants.SESSION_ATTR,
+			userSession);
 		root.put(NemoLightConstants.AJAX_BEAN_KEY,
 			this.getName());
 		JSONObject fields = new JSONObject();
@@ -80,13 +83,6 @@ public abstract class WebRouteServlet {
 
 	public void addPageField(Field field, String pageFieldName) {
 		fieldsList.put(field, pageFieldName);
-	}
-
-	protected void setUser(SimpleHash root, Session session) {
-		User user = session.attribute(NemoLightConstants.USER_ATTR);
-		if (user != null) {
-			root.put(NemoLightConstants.SESSION_USER, user);
-		}
 	}
 
 	protected abstract void doGet(Request request, Response response,

@@ -75,7 +75,7 @@ public interface NemoLightConstants {
 		"%s%s", SECURITY_PATH, "security.xml"));
 	public static final File SECURITY_PASSWORDS_FILE = new File(String.format(
 		"%s%s", SECURITY_PATH, "passwords"));
-	public static final String USER_ATTR = "session_user_attr";
+	public static final String SESSION_ATTR = "Session";
 
 	/* ***********************
 	 * Session attributes

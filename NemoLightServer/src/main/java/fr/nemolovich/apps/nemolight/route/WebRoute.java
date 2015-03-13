@@ -5,10 +5,11 @@ import fr.nemolovich.apps.nemolight.route.file.FileRoute;
 import fr.nemolovich.apps.nemolight.security.GlobalSecurity;
 import fr.nemolovich.apps.nemolight.security.SecurityConfiguration;
 import fr.nemolovich.apps.nemolight.security.User;
+import fr.nemolovich.apps.nemolight.session.Session;
+import fr.nemolovich.apps.nemolight.session.SessionUtils;
 import spark.Request;
 import spark.Response;
 import spark.Route;
-import spark.Session;
 
 public abstract class WebRoute extends Route {
 
@@ -44,8 +45,9 @@ public abstract class WebRoute extends Route {
 
 	@Override
 	public final Object handle(Request request, Response response) {
-		Session session = request.session(true);
-		User user = session.attribute(NemoLightConstants.USER_ATTR);
+		spark.Session session = request.session(true);
+		Session userSession = SessionUtils.getSession(session);
+		User user = userSession.getUser();
 
 		String loginPath = LOGIN_PAGE == null ? null : LOGIN_PAGE.getPath();
 		String expectedPage = request.pathInfo();
@@ -59,15 +61,14 @@ public abstract class WebRoute extends Route {
 
 		Object result = null;
 		if (securityIsNeeded(loginPath, expectedPage, user)) {
-			session.attribute(NemoLightConstants.EXPECTED_PAGE_ATTR,
-					expectedPage);
+			userSession.setExpectedPage(expectedPage);
 			// TODO: LOGGER
 			response.redirect(loginPath);
 		} else {
 			if (user != null) {
 				response.cookie("/", NemoLightConstants.SESSION_COOKIE,
-						user.getUID(), NemoLightConstants.COOKIE_TIME,
-						false);
+					user.getUID(), NemoLightConstants.COOKIE_TIME,
+					false);
 			}
 			result = doHandle(request, response);
 			// session.invalidate();
@@ -76,10 +77,10 @@ public abstract class WebRoute extends Route {
 	}
 
 	private boolean securityIsNeeded(String loginPath, String expectedPath,
-			User user) {
+		User user) {
 		return GlobalSecurity.isEnabled()
-				&& this.secured
-				&& ((loginPath != null && !loginPath.equals(expectedPath)) && user == null);
+			&& this.secured
+			&& ((loginPath != null && !loginPath.equals(expectedPath)) && user == null);
 	}
 
 	public abstract Object doHandle(Request request, Response response);
