@@ -43,9 +43,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarFile;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import org.apache.log4j.Logger;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
@@ -58,6 +56,8 @@ import spark.Spark;
  */
 public final class DeployResourceManager {
 
+    private static final boolean IS_WINDOWS_SYSTEM
+        = System.getProperty("os.name").startsWith("Windows");
     private static final Logger LOGGER = Logger
         .getLogger(DeployResourceManager.class.getName());
 
@@ -82,7 +82,13 @@ public final class DeployResourceManager {
                     files = Utils.getAllFilesFrom("", path,
                         NemoLightConstants.EXCLUDE_CLASS_FILES
                         | NemoLightConstants.EXCLUDE_FOLDERS);
-                    basePath = url.toURI().getPath().substring(1);
+                    basePath = url.toURI().getPath();
+                    if (IS_WINDOWS_SYSTEM) {
+                        /*
+                        * Remove drive letter for Windows.
+                        */
+                        basePath = basePath.substring(1);
+                    }
 
                 } else if (protocol
                     .equalsIgnoreCase(NemoLightConstants.JAR_PROTOCOL)) {
@@ -318,7 +324,7 @@ public final class DeployResourceManager {
     }
 
     public static List<String> initializeClassLoader() {
-		
+
         List<URL> urls = new ArrayList<>();
         ClassLoader parentClassLoader = Launcher.class
             .getClassLoader();
@@ -390,10 +396,8 @@ public final class DeployResourceManager {
         List<String> packagesName = new ArrayList<>();
 
         try {
-            JAXBContext context = JAXBContext.newInstance(DeployConfig.class);
-            Unmarshaller um = context.createUnmarshaller();
             for (InputStream is : deployFiles) {
-                DeployConfig deployConfig = (DeployConfig) um.unmarshal(is);
+                DeployConfig deployConfig = DeployConfig.loadConfig(is);
                 String packageName = deployConfig
                     .getString(DeployConfig.DEPLOY_PACKAGE);
                 if (packageName != null) {
