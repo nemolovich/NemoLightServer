@@ -24,6 +24,7 @@ public class CommandManager {
 		COMMANDS = new ArrayList<>();
 		COMMANDS.add(new HelpCommand());
 		COMMANDS.add(new ShutdownServer());
+		COMMANDS.add(new DeployServer());
 		COMMANDS.add(new SayHello());
 		COMMANDS.add(new AddGroup());
 		COMMANDS.add(new AddUser());

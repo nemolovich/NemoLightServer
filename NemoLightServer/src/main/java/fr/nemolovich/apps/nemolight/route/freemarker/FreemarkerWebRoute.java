@@ -47,7 +47,7 @@ public abstract class FreemarkerWebRoute extends WebRoute
 			}
 
 			request.session().attribute("error_details", details.toString());
-			response.redirect("error/500");
+			response.redirect("/error/500");
 		}
 		return writer;
 	}

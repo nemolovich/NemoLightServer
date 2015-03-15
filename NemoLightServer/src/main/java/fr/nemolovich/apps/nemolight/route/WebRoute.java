@@ -56,6 +56,7 @@ public abstract class WebRoute extends Route {
 			// TODO: LOGGER
 			if (UID != null) {
 				user = SecurityConfiguration.getInstance().getUserByUID(UID);
+				userSession.setUser(user);
 			}
 		}
 

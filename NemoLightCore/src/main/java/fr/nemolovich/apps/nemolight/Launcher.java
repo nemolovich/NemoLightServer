@@ -26,7 +26,8 @@ import org.apache.log4j.PropertyConfigurator;
  */
 public class Launcher {
 
-	private static final Configuration config = new Configuration();
+	public static final Configuration CONFIG
+		= new Configuration();
 
 	private static final Logger LOGGER = Logger.getLogger(Launcher.class
 		.getName());
@@ -75,9 +76,6 @@ public class Launcher {
 		if (!securityDisabled) {
 			AdminConnection.setSystemProperties();
 		}
-
-		File templateFolder = new File(
-			NemoLightConstants.TEMPLATE_FOLDER);
 
 		List<String> packagesName
 			= DeployResourceManager.initializeClassLoader();
@@ -128,15 +126,18 @@ public class Launcher {
 			NemoLightConstants.CONFIG_FOLDER,
 			NemoLightConstants.LOGGER_FILE_PATH));
 
+		File templateFolder = new File(
+			NemoLightConstants.TEMPLATE_FOLDER);
+
 		log.info(String.format("Setting freemarker templates folder to '%s'",
 			templateFolder.getAbsolutePath()));
 
-		config.setDirectoryForTemplateLoading(templateFolder);
+		CONFIG.setDirectoryForTemplateLoading(templateFolder);
 
 		log.info("Deploying resources...");
 
 		for (String packageName : packagesName) {
-			DeployResourceManager.deployWebPages(config,
+			DeployResourceManager.deployWebPages(CONFIG,
 				packageName.replaceAll("/", "."));
 		}
 
