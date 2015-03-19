@@ -13,7 +13,7 @@ The project use the master module: **NemoLightMaster** (_fr.nemolivich.apps.nemo
 * **NemoLightAdmin** (_fr.nemolivich.apps.nemolight.nemolight-admin_): admin client to connect to server administration (console);
 * **NemoLightAdminGUI** (_fr.nemolivich.apps.nemolight.nemolight-admin-gui_): admin client to connect to server administration (GUI).
 
-To create an application:
+#### To create an application:
 * Create a maven project;
 * add the following dependency:
 ```XML
@@ -25,7 +25,7 @@ To create an application:
 </dependency>
 ```
 
-To deploy an application:
+#### To deploy an application:
 * Go to **NemoLightCore** module;
 * Put **JAR file** in the "deploy" folder (default _./deploy_);
 * [ If the application depends of others libraries:
