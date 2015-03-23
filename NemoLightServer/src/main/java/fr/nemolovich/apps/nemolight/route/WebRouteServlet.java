@@ -2,6 +2,7 @@ package fr.nemolovich.apps.nemolight.route;
 
 import fr.nemolovich.apps.nemolight.constants.NemoLightConstants;
 import fr.nemolovich.apps.nemolight.route.freemarker.FreemarkerWebRoute;
+import fr.nemolovich.apps.nemolight.session.RequestParameters;
 import fr.nemolovich.apps.nemolight.session.Session;
 import fr.nemolovich.apps.nemolight.session.SessionUtils;
 import freemarker.template.Configuration;
@@ -35,6 +36,8 @@ public abstract class WebRouteServlet {
 	private final ConcurrentMap<Field, String> fieldsList
 		= new ConcurrentHashMap<>();
 
+	private boolean processTemplate = false;
+
 	protected final Template template;
 
 	public WebRouteServlet(String path, String templateName,
@@ -46,7 +49,9 @@ public abstract class WebRouteServlet {
 				Writer writer) throws IOException, TemplateException {
 				SimpleHash root = initRoute(request);
 				doGet(request, response, root);
-				template.process(root, writer);
+				if (processTemplate) {
+					template.process(root, writer);
+				}
 			}
 		};
 		this.postRoute = new FreemarkerWebRoute(path, config) {
@@ -56,18 +61,23 @@ public abstract class WebRouteServlet {
 				Writer writer) throws IOException, TemplateException {
 				SimpleHash root = initRoute(request);
 				doPost(request, response, root);
-				template.process(root, writer);
+				if (processTemplate) {
+					template.process(root, writer);
+				}
 			}
 		};
 		this.template = config.getTemplate(templateName);
 	}
 
 	private SimpleHash initRoute(Request request) {
+		this.processTemplate = true;
 		SimpleHash root = new SimpleHash();
 		Session userSession = SessionUtils.getSession(
 			request.session());
 		root.put(NemoLightConstants.SESSION_ATTR,
 			userSession);
+		root.put(NemoLightConstants.REQUEST_ATTR,
+			new RequestParameters(request));
 		root.put(NemoLightConstants.AJAX_BEAN_KEY,
 			this.getName());
 		JSONObject fields = new JSONObject();
@@ -112,6 +122,10 @@ public abstract class WebRouteServlet {
 		root.put(NemoLightConstants.AJAX_ACTION_KEY,
 			NemoLightConstants.AJAX_ACTION_UPDATE);
 		root.put(NemoLightConstants.AJAX_VALUE_KEY, request);
+	}
+
+	public void stopProcess() {
+		this.processTemplate = false;
 	}
 
 	public void enableSecurity() {

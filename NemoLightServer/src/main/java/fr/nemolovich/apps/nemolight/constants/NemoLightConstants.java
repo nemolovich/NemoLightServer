@@ -75,13 +75,14 @@ public interface NemoLightConstants {
 		"%s%s", SECURITY_PATH, "security.xml"));
 	public static final File SECURITY_PASSWORDS_FILE = new File(String.format(
 		"%s%s", SECURITY_PATH, "passwords"));
-	public static final String SESSION_ATTR = "Session";
 
 	/* ***********************
 	 * Session attributes
 	 * 
 	 * ***********************
 	 */
+	public static final String SESSION_ATTR = "Session";
+	public static final String REQUEST_ATTR = "RequestParameters";
 	public static final String SESSION_USER = "session_user";
 	public static final String EXPECTED_PAGE_ATTR = "expected_page";
 	public static final String SESSION_COOKIE = "SESSION_COOKIE";
