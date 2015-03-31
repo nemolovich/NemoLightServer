@@ -3,6 +3,7 @@ package fr.nemolovich.apps.nemolight.security;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
@@ -16,20 +17,44 @@ public class SecurityConfiguration {
 	@XmlTransient
 	private static SecurityConfiguration INSTANCE;
 
+	@XmlTransient
+	private final SecurityManager manager;
+
 	static {
 		INSTANCE = new SecurityConfiguration();
+
 	}
 
 	public static final SecurityConfiguration getInstance() {
 		return INSTANCE;
 	}
 
-	public static final void loadConfig(SecurityConfiguration config) {
-		INSTANCE = config;
+	private SecurityConfiguration(SecurityConfiguration config,
+			SecurityManager manager) {
+		this.groups = new ConcurrentLinkedQueue(config.groups);
+		this.manager = manager;
+	}
+
+	private SecurityConfiguration(SecurityManager manager) {
+		this.groups = new ConcurrentLinkedQueue();
+		this.manager = manager;
+	}
+
+	private SecurityConfiguration(SecurityConfiguration config) {
+		this(config, null);
 	}
 
 	private SecurityConfiguration() {
-		this.groups = new ConcurrentLinkedQueue();
+		this((SecurityManager) null);
+	}
+
+	public static final void loadConfig(SecurityConfiguration config) {
+		loadConfig(config, null);
+	}
+
+	public static final void loadConfig(SecurityConfiguration config,
+			SecurityManager manager) {
+		INSTANCE = new SecurityConfiguration(config, manager);
 	}
 
 	/**
@@ -40,10 +65,11 @@ public class SecurityConfiguration {
 	}
 
 	/**
-	 * @param groupName the name of the group to add
-	 * @return {@link Boolean boolean} - <code>true</code>
-	 * if the group has been added in the security
-	 * configuration, <code>false</code> otherwise.
+	 * @param groupName
+	 *            the name of the group to add
+	 * @return {@link Boolean boolean} - <code>true</code> if the group has been
+	 *         added in the security configuration, <code>false</code>
+	 *         otherwise.
 	 */
 	public final boolean addGroup(String groupName) {
 		boolean result = false;
@@ -67,8 +93,7 @@ public class SecurityConfiguration {
 
 	public User getUser(String userName) {
 		User result = null;
-		grouploop:
-		for (Group group : this.groups) {
+		grouploop: for (Group group : this.groups) {
 			for (User user : group.getUsers()) {
 				if (user.getName().equalsIgnoreCase(userName)) {
 					result = user;
@@ -81,8 +106,7 @@ public class SecurityConfiguration {
 
 	public User getUserByUID(String userUID) {
 		User result = null;
-		grouploop:
-		for (Group group : this.groups) {
+		grouploop: for (Group group : this.groups) {
 			for (User user : group.getUsers()) {
 				if (user.getUID().equalsIgnoreCase(userUID)) {
 					result = user;
@@ -94,7 +118,7 @@ public class SecurityConfiguration {
 	}
 
 	public final boolean addUser(String groupName, String userName,
-		String password) {
+			String password) {
 		boolean added = false;
 		Group group = getGroup(groupName);
 		if (group != null) {
@@ -106,7 +130,7 @@ public class SecurityConfiguration {
 	}
 
 	public final boolean moveUser(String srcGroup, String userName,
-		String dstGroup) {
+			String dstGroup) {
 		boolean moved = false;
 		Group fromGroup = getGroup(srcGroup);
 		Group toGroup = getGroup(dstGroup);
@@ -133,8 +157,7 @@ public class SecurityConfiguration {
 	public final boolean removeUser(String groupName, String userName) {
 		boolean result = false;
 
-		grouploop:
-		for (Group group : this.groups) {
+		grouploop: for (Group group : this.groups) {
 			if (group.getName().equalsIgnoreCase(groupName)) {
 				for (User user : group.getUsers()) {
 					if (user.getName().equalsIgnoreCase(userName)) {
@@ -167,6 +190,18 @@ public class SecurityConfiguration {
 	public boolean containsUser(String groupName, String userName) {
 		Group group = this.getGroup(groupName);
 		return group != null && group.containsUser(userName);
+	}
+
+	public static SecurityStatus submitAuthentication(String name,
+			String encryptedPassword) {
+		SecurityStatus result;
+		if (INSTANCE.manager == null) {
+			result = SecurityStatus.NO_MANAGER;
+		} else {
+			result = INSTANCE.manager.submitAuthentication(name,
+					encryptedPassword);
+		}
+		return result;
 	}
 
 }

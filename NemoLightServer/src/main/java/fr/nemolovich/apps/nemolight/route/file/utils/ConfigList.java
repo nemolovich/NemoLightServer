@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.XmlType;
  * @author Nemolovich
  */
 @XmlType
-public class ConfigList extends ArrayList<String> {
+class ConfigList extends ArrayList<String> {
 
 	private static final long serialVersionUID = -1739796273906584252L;
 

@@ -7,9 +7,7 @@ import javax.xml.bind.annotation.XmlElements;
  *
  * @author Nemolovich
  */
-public class ConfigMapEntry {
-
-	private static final long serialVersionUID = 3638984549337881253L;
+class ConfigMapEntry {
 
 	private String key;
 	private Object value;

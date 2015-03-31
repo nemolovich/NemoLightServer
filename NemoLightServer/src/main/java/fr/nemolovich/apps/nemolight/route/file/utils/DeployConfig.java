@@ -3,9 +3,8 @@ package fr.nemolovich.apps.nemolight.route.file.utils;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -13,39 +12,36 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+
 import org.apache.log4j.Logger;
-import org.w3c.dom.Node;
 
 /**
  *
  * @author Nemolovich
  */
 @XmlRootElement(name = "deployment")
-public class Config {
+public class DeployConfig {
 
-	public static final String DEPLOY_FILES_PATH
-		= "server.deploy.filesPath";
+	public static final String DEPLOY_FILES_PATH = "server.deploy.filesPath";
+	public static final String DEPLOY_PACKAGE = "server.deploy.packageName";
 
-	private final Map<String, Object> configs;
 	private final List<ConfigMapEntry> entries;
 	private static final JAXBContext CONTEXT;
 
-	public static final Logger LOGGER = Logger.getLogger(
-		Config.class);
+	public static final Logger LOGGER = Logger.getLogger(DeployConfig.class);
 
 	static {
 		JAXBContext ctx = null;
 		try {
-			ctx = JAXBContext.newInstance(Config.class,
-				ConfigList.class, ConfigMapEntry.class);
+			ctx = JAXBContext.newInstance(DeployConfig.class, ConfigList.class,
+					ConfigMapEntry.class);
 		} catch (JAXBException ex) {
 			LOGGER.error("Can not initialize JAXB context", ex);
 		}
 		CONTEXT = ctx;
 	}
 
-	public Config() {
-		this.configs = new HashMap<>();
+	public DeployConfig() {
 		this.entries = new ArrayList<>();
 	}
 
@@ -58,9 +54,7 @@ public class Config {
 	}
 
 	public Object put(String key, Object value) {
-		Object result;
-
-		result = this.configs.put(key, value);
+		Object result = null;
 
 		for (ConfigMapEntry entry : this.entries) {
 			if (entry.getKey().equals(key)) {
@@ -74,19 +68,20 @@ public class Config {
 	}
 
 	public void setConfig(String name, Object value) {
-		this.configs.put(name, value);
+		this.entries.add(new ConfigMapEntry(name, value));
 	}
-	
-    public String getString(String key) {
-        Object node = this.get(key);
-        Node elm = (Node) node;
 
-        return elm.getFirstChild().getNodeValue();
-    }
+	public String getString(String key) {
+		return (String) this.get(key);
+	}
 
-	public static Config loadConfig(InputStream is) throws JAXBException {
+	public List<String> getList(String key) {
+		return new ArrayList<>((ConfigList) this.get(key));
+	}
+
+	public static DeployConfig loadConfig(InputStream is) throws JAXBException {
 		Unmarshaller um = CONTEXT.createUnmarshaller();
-		Config config = (Config) um.unmarshal(is);
+		DeployConfig config = (DeployConfig) um.unmarshal(is);
 		return config;
 	}
 
@@ -105,6 +100,10 @@ public class Config {
 			}
 		}
 		return result;
+	}
+
+	public int size() {
+		return this.entries.size();
 	}
 
 	@XmlElementWrapper(name = "configs")

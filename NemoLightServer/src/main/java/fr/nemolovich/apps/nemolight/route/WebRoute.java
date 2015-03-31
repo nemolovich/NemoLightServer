@@ -1,15 +1,15 @@
 package fr.nemolovich.apps.nemolight.route;
 
-import fr.nemolovich.apps.nemolight.constants.NemoLightConstants;
-import fr.nemolovich.apps.nemolight.route.file.FileRoute;
-import fr.nemolovich.apps.nemolight.security.GlobalSecurity;
-import fr.nemolovich.apps.nemolight.security.SecurityConfiguration;
-import fr.nemolovich.apps.nemolight.security.User;
-import fr.nemolovich.apps.nemolight.session.Session;
-import fr.nemolovich.apps.nemolight.session.SessionUtils;
 import spark.Request;
 import spark.Response;
 import spark.Route;
+import fr.nemolovich.apps.nemolight.constants.NemoLightConstants;
+import fr.nemolovich.apps.nemolight.route.file.FileRoute;
+import fr.nemolovich.apps.nemolight.security.SecurityConfiguration;
+import fr.nemolovich.apps.nemolight.security.SecurityUtils;
+import fr.nemolovich.apps.nemolight.security.User;
+import fr.nemolovich.apps.nemolight.session.Session;
+import fr.nemolovich.apps.nemolight.session.SessionUtils;
 
 public abstract class WebRoute extends Route {
 
@@ -79,7 +79,7 @@ public abstract class WebRoute extends Route {
 
 	private boolean securityIsNeeded(String loginPath, String expectedPath,
 		User user) {
-		return GlobalSecurity.isEnabled()
+		return SecurityUtils.isSecured()
 			&& this.secured
 			&& ((loginPath != null && !loginPath.equals(expectedPath)) && user == null);
 	}

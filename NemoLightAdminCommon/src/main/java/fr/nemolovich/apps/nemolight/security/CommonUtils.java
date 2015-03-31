@@ -5,11 +5,9 @@
  */
 package fr.nemolovich.apps.nemolight.security;
 
-import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import org.apache.log4j.Logger;
+
+import fr.nemolovich.apps.nemolight.security.exceptions.EncryptingException;
 
 /**
  *
@@ -19,17 +17,15 @@ public class CommonUtils {
 
 	private static final Logger LOGGER = Logger.getLogger(CommonUtils.class);
 
-	public static final String getEncryptedPassword(String password) {
-		String sha1 = null;
-		try {
-			MessageDigest crypt = MessageDigest.getInstance("SHA-1");
-			crypt.reset();
-			crypt.update(password.getBytes("UTF-8"));
-			sha1 = new BigInteger(1, crypt.digest()).toString(16);
+	private static Encryptor ENCRYPTOR = DefaultEncryptor.getInstance();
 
-		} catch (NoSuchAlgorithmException | UnsupportedEncodingException ex) {
-			LOGGER.error("Can not encrypt password", ex);
+	public static final String getEncryptedPassword(String password) {
+		String result = null;
+		try {
+			result = ENCRYPTOR.getEncryptedPassword(password);
+		} catch (EncryptingException e) {
+			LOGGER.error("Encrypting failed: ", e);
 		}
-		return sha1;
+		return result;
 	}
 }

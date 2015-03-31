@@ -5,24 +5,6 @@
  */
 package fr.nemolovich.apps.nemolight.deploy;
 
-import fr.nemolovich.apps.mavendependenciesdownloader.DependenciesDownloader;
-import fr.nemolovich.apps.mavendependenciesdownloader.DependenciesException;
-import fr.nemolovich.apps.nemolight.Launcher;
-import fr.nemolovich.apps.nemolight.admin.AdminConnection;
-import fr.nemolovich.apps.nemolight.config.DeployConfig;
-import fr.nemolovich.apps.nemolight.config.WebConfig;
-import fr.nemolovich.apps.nemolight.constants.NemoLightConstants;
-import fr.nemolovich.apps.nemolight.reflection.AnnotationTypeFilter;
-import fr.nemolovich.apps.nemolight.reflection.ClassPathScanner;
-import fr.nemolovich.apps.nemolight.reflection.SuperClassFilter;
-import fr.nemolovich.apps.nemolight.route.WebRoute;
-import fr.nemolovich.apps.nemolight.route.WebRouteServlet;
-import fr.nemolovich.apps.nemolight.route.annotations.PageField;
-import fr.nemolovich.apps.nemolight.route.annotations.RouteElement;
-import fr.nemolovich.apps.nemolight.route.file.FileRoute;
-import fr.nemolovich.apps.nemolight.utils.SearchFileOptionException;
-import fr.nemolovich.apps.nemolight.utils.Utils;
-import freemarker.template.Configuration;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -43,12 +25,33 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarFile;
+
 import javax.xml.bind.JAXBException;
+
 import org.apache.log4j.Logger;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
 import spark.Spark;
+import fr.nemolovich.apps.mavendependenciesdownloader.DependenciesDownloader;
+import fr.nemolovich.apps.mavendependenciesdownloader.DependenciesException;
+import fr.nemolovich.apps.nemolight.Launcher;
+import fr.nemolovich.apps.nemolight.admin.AdminConnection;
+import fr.nemolovich.apps.nemolight.config.WebConfig;
+import fr.nemolovich.apps.nemolight.constants.NemoLightConstants;
+import fr.nemolovich.apps.nemolight.reflection.AnnotationTypeFilter;
+import fr.nemolovich.apps.nemolight.reflection.ClassPathScanner;
+import fr.nemolovich.apps.nemolight.reflection.SuperClassFilter;
+import fr.nemolovich.apps.nemolight.route.WebRoute;
+import fr.nemolovich.apps.nemolight.route.WebRouteServlet;
+import fr.nemolovich.apps.nemolight.route.annotations.PageField;
+import fr.nemolovich.apps.nemolight.route.annotations.RouteElement;
+import fr.nemolovich.apps.nemolight.route.file.FileRoute;
+import fr.nemolovich.apps.nemolight.route.file.utils.DeployConfig;
+import fr.nemolovich.apps.nemolight.utils.SearchFileOptionException;
+import fr.nemolovich.apps.nemolight.utils.Utils;
+import freemarker.template.Configuration;
 
 /**
  *
@@ -283,7 +286,7 @@ public final class DeployResourceManager {
 	}
 
 	private static List<File> getAllFiles(File root, int options) {
-		List<File> files = new ArrayList();
+		List<File> files = new ArrayList<>();
 		for (File f : root.listFiles()) {
 			if (f.isFile()) {
 				files.add(f);
@@ -466,7 +469,7 @@ public final class DeployResourceManager {
 	}
 
 	public static List<String> getBeans() {
-		return new ArrayList(
+		return new ArrayList<>(
 			DeployResourceManager.SERVLETS.keySet());
 	}
 
