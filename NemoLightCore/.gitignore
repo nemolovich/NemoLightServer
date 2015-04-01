@@ -1,6 +1,8 @@
 /target/
 /resources/
 /log/
-/.settings/
 /deploy/
 /dependencies/
+/.settings/
+/.classpath
+/.project

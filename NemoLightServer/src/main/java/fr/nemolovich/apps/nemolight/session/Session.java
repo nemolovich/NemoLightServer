@@ -1,12 +1,12 @@
 package fr.nemolovich.apps.nemolight.session;
 
-import fr.nemolovich.apps.nemolight.security.User;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import spark.Response;
+
+import fr.nemolovich.apps.nemolight.security.User;
 
 /**
  *
@@ -14,8 +14,7 @@ import spark.Response;
  */
 public class Session {
 
-	private static final long serialVersionUID
-		= -646424518559816081L;
+	private static final long serialVersionUID = -646424518559816081L;
 
 	private User user;
 	private final ConcurrentLinkedQueue<Message> messages;
@@ -29,17 +28,18 @@ public class Session {
 	}
 
 	/**
-	 * Associates the specified value with the specified key
-	 * in this session. If the session already contains an
-	 * object for the key, the old value is replaced and
-	 * returned.
+	 * Associates the specified value with the specified key in this session. If
+	 * the session already contains an object for the key, the old value is
+	 * replaced and returned.
 	 *
-	 * @param key {@link String} - The key with which the
-	 * specified value is to be associated value.
-	 * @param value {@link Object} - The value to be
-	 * associated with the specified key.
-	 * @return {@link Object} - The previous value if there
-	 * was, <code>null</code> otherwise.
+	 * @param key
+	 *            {@link String} - The key with which the specified value is to
+	 *            be associated value.
+	 * @param value
+	 *            {@link Object} - The value to be associated with the specified
+	 *            key.
+	 * @return {@link Object} - The previous value if there was,
+	 *         <code>null</code> otherwise.
 	 */
 	public Object addProperty(String key, Object value) {
 		return this.properties.put(key, value);
@@ -58,8 +58,7 @@ public class Session {
 	}
 
 	public List<Message> getConsumeMessages() {
-		List<Message> result
-			= new ArrayList<>(this.messages);
+		List<Message> result = new ArrayList<>(this.messages);
 		this.messages.clear();
 		return result;
 	}
@@ -84,20 +83,13 @@ public class Session {
 		return this.expectedPage;
 	}
 
-	public void redirect(Response response) {
-		String page = this.expectedPage;
-		this.expectedPage = null;
-		response.redirect(page);
-	}
-
 	@Override
 	public String toString() {
-		return String.format(
-			"%s[user=%s, expectedPage=%s, messages=%d]",
-			this.getClass().getName(),
-			this.user == null ? "null" : this.user.getName(),
-			this.expectedPage == null ? "null" : this.expectedPage,
-			this.messages.size());
+		return String.format("%s[user=%s, expectedPage=%s, messages=%d]", this
+				.getClass().getName(),
+				this.user == null ? "null" : this.user.getName(),
+				this.expectedPage == null ? "null" : this.expectedPage,
+				this.messages.size());
 	}
 
 }

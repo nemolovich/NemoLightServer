@@ -41,7 +41,7 @@ public class SecurityConfiguration {
 	}
 
 	private SecurityConfiguration(SecurityConfiguration config) {
-		this(config, null);
+		this(config, config.manager);
 	}
 
 	private SecurityConfiguration() {
@@ -49,7 +49,7 @@ public class SecurityConfiguration {
 	}
 
 	public static final void loadConfig(SecurityConfiguration config) {
-		loadConfig(config, null);
+		loadConfig(config, config.manager);
 	}
 
 	public static final void loadConfig(SecurityConfiguration config,
@@ -202,6 +202,10 @@ public class SecurityConfiguration {
 					encryptedPassword);
 		}
 		return result;
+	}
+
+	public boolean isEmpty() {
+		return this.groups.isEmpty() && this.manager == null;
 	}
 
 }

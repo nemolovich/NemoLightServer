@@ -2,3 +2,5 @@
 /resources/
 /log/
 /.settings/
+/.classpath
+/.project
