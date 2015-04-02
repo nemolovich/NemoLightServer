@@ -1,13 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package fr.nemolovich.apps.nemolight.route.freemarker;
 
 import fr.nemolovich.apps.nemolight.route.WebRoute;
+import fr.nemolovich.apps.nemolight.route.exceptions.ServerException;
 import freemarker.template.Configuration;
-import freemarker.template.TemplateException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -36,7 +31,7 @@ public abstract class FreemarkerWebRoute extends WebRoute
 		StringWriter writer = new StringWriter();
 		try {
 			doHandle(request, response, writer);
-		} catch (TemplateException | IOException ex) {
+		} catch (ServerException ex) {
 			LOGGER.log(Level.ERROR, "Error while processing with route", ex);
 			StringBuilder details = new StringBuilder(String.format("%s<br/>\n",
 				ex.getMessage()));
@@ -53,8 +48,7 @@ public abstract class FreemarkerWebRoute extends WebRoute
 	}
 
 	protected abstract void doHandle(final Request request,
-		final Response response, Writer writer) throws IOException,
-		TemplateException;
+		final Response response, Writer writer) throws ServerException;
 
 	@Override
 	public String toString() {

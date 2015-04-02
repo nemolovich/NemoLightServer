@@ -1,8 +1,5 @@
 package fr.nemolovich.apps.nemolight.route;
 
-import spark.Request;
-import spark.Response;
-import spark.Route;
 import fr.nemolovich.apps.nemolight.constants.NemoLightConstants;
 import fr.nemolovich.apps.nemolight.route.file.FileRoute;
 import fr.nemolovich.apps.nemolight.security.SecurityConfiguration;
@@ -10,6 +7,9 @@ import fr.nemolovich.apps.nemolight.security.SecurityUtils;
 import fr.nemolovich.apps.nemolight.security.User;
 import fr.nemolovich.apps.nemolight.session.Session;
 import fr.nemolovich.apps.nemolight.session.SessionUtils;
+import spark.Request;
+import spark.Response;
+import spark.Route;
 
 public abstract class WebRoute extends Route {
 
@@ -72,7 +72,6 @@ public abstract class WebRoute extends Route {
 					false);
 			}
 			result = doHandle(request, response);
-			// session.invalidate();
 		}
 		return result;
 	}

@@ -4,9 +4,9 @@ import fr.nemolovich.apps.nemolight.constants.NemoLightConstants;
 import fr.nemolovich.apps.nemolight.deploy.DeployResourceManager;
 import fr.nemolovich.apps.nemolight.route.WebRouteServlet;
 import fr.nemolovich.apps.nemolight.route.annotations.RouteElement;
+import fr.nemolovich.apps.nemolight.route.exceptions.ServerException;
 import freemarker.template.Configuration;
 import freemarker.template.SimpleHash;
-import freemarker.template.TemplateException;
 import java.io.IOException;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,12 +27,12 @@ public class AjaxRequest extends WebRouteServlet {
 
 	@Override
 	protected void doGet(Request request, Response response, SimpleHash root)
-		throws TemplateException, IOException {
+		throws ServerException {
 	}
 
 	@Override
 	protected void doPost(Request request, Response response, SimpleHash root)
-		throws TemplateException, IOException {
+		throws ServerException {
 
 		String passedUid = request.params("uid");
 		String value = request.raw().getParameter("value");
