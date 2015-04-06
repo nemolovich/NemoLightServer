@@ -4,7 +4,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -12,7 +11,6 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
-
 import org.apache.log4j.Logger;
 
 /**
@@ -24,6 +22,7 @@ public class DeployConfig {
 
 	public static final String DEPLOY_FILES_PATH = "server.deploy.filesPath";
 	public static final String DEPLOY_PACKAGE = "server.deploy.packageName";
+	public static final String DEPLOY_APP_NAME = "server.deploy.appName";
 
 	private final List<ConfigMapEntry> entries;
 	private static final JAXBContext CONTEXT;

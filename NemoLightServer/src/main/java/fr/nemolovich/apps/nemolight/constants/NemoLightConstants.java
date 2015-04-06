@@ -3,14 +3,23 @@ package fr.nemolovich.apps.nemolight.constants;
 import java.io.File;
 
 public interface NemoLightConstants {
+	
+	
+	/* ***********************
+	 * Deployment constants
+	 * 
+	 * ***********************
+	 */
+	public static final String PACKAGE_NAME = "fr/nemolovich/apps/nemolight/";
+	public static final String APP_IDENTIFIER = "APP_IDENTIFIER";
+	public static final String APP_NAME = "APP_NAME";
+	public static final String APP_PACKAGE = "APP_PACKAGE";
 
 	/* ***********************
 	 * Web folders
 	 * 
 	 * ***********************
 	 */
-	public static final String PACKAGE_NAME = "fr/nemolovich/apps/nemolight/";
-
 	public static final String SRC_FOLDER = "src/main/resources";
 	public static final String RESOURCES_FOLDER = "resources/";
 

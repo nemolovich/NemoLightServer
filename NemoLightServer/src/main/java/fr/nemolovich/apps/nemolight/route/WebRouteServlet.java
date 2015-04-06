@@ -26,7 +26,8 @@ import spark.Response;
  *
  * @author Nemolovich
  */
-public abstract class WebRouteServlet {
+abstract class WebRouteServlet implements
+	WebRouteServletInterface {
 
 	private static final Logger LOGGER = Logger
 		.getLogger(WebRouteServlet.class);
@@ -95,6 +96,7 @@ public abstract class WebRouteServlet {
 		return root;
 	}
 
+	@Override
 	public final void addPageField(Field field, String pageFieldName) {
 		fieldsList.put(field, pageFieldName);
 	}
@@ -105,18 +107,22 @@ public abstract class WebRouteServlet {
 	protected abstract void doPost(Request request, Response response,
 		SimpleHash root) throws ServerException;
 
+	@Override
 	public final WebRoute getGetRoute() {
 		return this.getRoute;
 	}
 
+	@Override
 	public final WebRoute getPostRoute() {
 		return (WebRoute) this.postRoute;
 	}
 
+	@Override
 	public String getName() {
 		return this.getClass().getSimpleName();
 	}
 
+	@Override
 	public void getAjaxRequest(JSONObject request, SimpleHash root) {
 		for (Entry<Field, String> entry : fieldsList.entrySet()) {
 			String value = request.getString(entry.getValue());
@@ -127,6 +133,7 @@ public abstract class WebRouteServlet {
 		root.put(NemoLightConstants.AJAX_VALUE_KEY, request);
 	}
 
+	@Override
 	public final void redirect(Request request, Response response) {
 
 		spark.Session session = request.session(true);
@@ -139,10 +146,12 @@ public abstract class WebRouteServlet {
 
 	}
 
+	@Override
 	public final void stopProcess() {
 		this.processTemplate = false;
 	}
 
+	@Override
 	public final void enableSecurity() {
 		this.getRoute.enableSecurity();
 		this.postRoute.enableSecurity();

@@ -1,7 +1,5 @@
 package fr.nemolovich.apps.nemolight.deploy;
 
-import fr.nemolovich.apps.mavendependenciesdownloader.DependenciesDownloader;
-import fr.nemolovich.apps.mavendependenciesdownloader.DependenciesException;
 import fr.nemolovich.apps.nemolight.Launcher;
 import fr.nemolovich.apps.nemolight.admin.AdminConnection;
 import fr.nemolovich.apps.nemolight.config.WebConfig;
@@ -10,7 +8,7 @@ import fr.nemolovich.apps.nemolight.reflection.AnnotationTypeFilter;
 import fr.nemolovich.apps.nemolight.reflection.ClassPathScanner;
 import fr.nemolovich.apps.nemolight.reflection.SuperClassFilter;
 import fr.nemolovich.apps.nemolight.route.WebRoute;
-import fr.nemolovich.apps.nemolight.route.WebRouteServlet;
+import fr.nemolovich.apps.nemolight.route.WebRouteServletInterface;
 import fr.nemolovich.apps.nemolight.route.annotations.PageField;
 import fr.nemolovich.apps.nemolight.route.annotations.RouteElement;
 import fr.nemolovich.apps.nemolight.route.file.FileRoute;
@@ -19,11 +17,8 @@ import fr.nemolovich.apps.nemolight.utils.SearchFileOptionException;
 import fr.nemolovich.apps.nemolight.utils.Utils;
 import freemarker.template.Configuration;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -31,18 +26,14 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarFile;
 import javax.xml.bind.JAXBException;
 import org.apache.log4j.Logger;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import spark.Spark;
 
 /**
@@ -53,15 +44,19 @@ public final class DeployResourceManager {
 
 	private static final boolean IS_WINDOWS_SYSTEM
 		= System.getProperty("os.name").startsWith("Windows");
-	
-	private static final Logger LOGGER = Logger
+
+	protected static final Logger LOGGER = Logger
 		.getLogger(DeployResourceManager.class.getName());
 
-	private static final Map<String, WebRouteServlet> SERVLETS
+	private static final Map<String, WebRouteServletInterface> SERVLETS
 		= new ConcurrentHashMap<>();
 	private static final List<FileRoute> FILES = new ArrayList<>();
 
-	public static void initResources(String resourcesPath) {
+	private static int APPLICATION_NUMBER = 0;
+	private static final List<Map<String, Object>> ALLICATIONS_PROPERTIES
+		= new ArrayList<>();
+
+	public static void initFromPackage(String resourcesPath) {
 		ClassLoader classLoader = (ClassLoader) WebConfig
 			.getValue(WebConfig.DEPLOYMENT_CLASSLOADER);
 		URL url = classLoader.getResource(resourcesPath);
@@ -74,7 +69,8 @@ public final class DeployResourceManager {
 			String basePath = null;
 			String protocol = url.getProtocol();
 			try {
-				if (protocol.equalsIgnoreCase(NemoLightConstants.FILE_PROTOCOL)) {
+				if (protocol.equalsIgnoreCase(
+					NemoLightConstants.FILE_PROTOCOL)) {
 					File path = new File(url.toURI());
 					files = Utils.getAllFilesFrom("", path,
 						NemoLightConstants.EXCLUDE_CLASS_FILES
@@ -103,62 +99,21 @@ public final class DeployResourceManager {
 				LOGGER.error("Error while searching files", ex);
 			}
 			if (files != null) {
-				extractFiles(files, basePath, protocol);
-			}
-		}
-	}
-
-	private static void extractFiles(List<String> files, String basePath,
-		String protocol) {
-
-		InputStream input = null;
-		for (String fileName : files) {
-			try {
-				if (protocol.equalsIgnoreCase(NemoLightConstants.FILE_PROTOCOL)) {
-					File f = new File(String.format("%s%s", basePath, fileName));
-					input = new FileInputStream(f);
-				} else if (protocol
-					.equalsIgnoreCase(NemoLightConstants.JAR_PROTOCOL)) {
-					ClassLoader classLoader = (ClassLoader) WebConfig
-						.getValue(WebConfig.DEPLOYMENT_CLASSLOADER);
-					URL res = classLoader.getResource(String.format("%s%s",
-						basePath, fileName));
-					if (res != null) {
-						input = res.openStream();
-					}
-				} else {
-					LOGGER.error(String.format("Unknown protocol '%s'",
-						protocol));
-					return;
-				}
-				if (input == null) {
-					throw new IOException("Can not read input file");
-				}
-				File target = new File(String.format("%s%s",
-					NemoLightConstants.RESOURCES_FOLDER, fileName));
-				if (!target.exists()) {
-					if (!target.getParentFile().mkdirs()
-						&& !target.createNewFile()) {
-						throw new IOException("Can not create target file");
-					}
-				}
-				Files.copy(input, target.toPath(),
-					StandardCopyOption.REPLACE_EXISTING);
-				LOGGER.info(String.format("Resource '%s' extracted.", fileName));
-			} catch (IOException ex) {
-				LOGGER.error(String.format("Can not extract resources: '%s'",
-					fileName), ex);
+				DeployUtils.extractFiles(files, basePath,
+					protocol);
 			}
 		}
 	}
 
 	public static final boolean deployWebPages(Configuration config,
-		String packageName) {
+		String packageName, int appIdentifier) {
 		ClassPathScanner scanner = new ClassPathScanner();
-		scanner.addIncludeFilter(new AnnotationTypeFilter(RouteElement.class));
-		scanner.addIncludeFilter(new SuperClassFilter(WebRouteServlet.class));
+		scanner.addIncludeFilter(new AnnotationTypeFilter(
+			RouteElement.class));
+		scanner.addIncludeFilter(new SuperClassFilter(
+			WebRouteServletInterface.class));
 
-		WebRouteServlet servlet;
+		WebRouteServletInterface servlet;
 		boolean loginPageDefined = false;
 		RouteElement annotation;
 		String path, page;
@@ -171,12 +126,16 @@ public final class DeployResourceManager {
 		String pageFieldName;
 
 		List<Class<?>> classes = scanner
-			.findCandidateComponents("fr.nemolovich.apps.nemolight.provided.");
-		classes.addAll(scanner.findCandidateComponents(packageName));
+			.findCandidateComponents(
+				NemoLightConstants.PACKAGE_NAME.replaceAll(
+					"/", "."));
+		classes.addAll(scanner.findCandidateComponents(
+			packageName));
 
 		config.clearTemplateCache();
 		DeployResourceManager.SERVLETS.clear();
 		DeployResourceManager.FILES.clear();
+		DeployResourceManager.ALLICATIONS_PROPERTIES.clear();
 
 		for (Class<?> c : classes) {
 			try {
@@ -195,8 +154,8 @@ public final class DeployResourceManager {
 				 */
 				newInstance = cst.newInstance(path, page, config);
 
-				if (newInstance instanceof WebRouteServlet) {
-					servlet = (WebRouteServlet) newInstance;
+				if (newInstance instanceof WebRouteServletInterface) {
+					servlet = (WebRouteServletInterface) newInstance;
 					if (isSecured) {
 						servlet.enableSecurity();
 					}
@@ -256,10 +215,12 @@ public final class DeployResourceManager {
 					deployFolderPath));
 			}
 			FileRoute route;
-			for (File f : getAllFiles(deployFolder,
+			String uriPath;
+			String routePath;
+			for (File f : DeployUtils.getAllFiles(deployFolder,
 				NemoLightConstants.RECURSIVE_SEARCH)) {
-				String uriPath = f.toURI().toString();
-				String routePath = uriPath.substring(uriPath
+				uriPath = f.toURI().toString();
+				routePath = uriPath.substring(uriPath
 					.lastIndexOf(deployFolderPath)
 					+ (deployFolderPath.length()));
 				route = new FileRoute(routePath, f);
@@ -271,23 +232,6 @@ public final class DeployResourceManager {
 		} catch (FileNotFoundException ex) {
 			LOGGER.error("Error while deploying webapp", ex);
 		}
-	}
-
-	private static List<File> getAllFiles(File root) {
-		return getAllFiles(root, NemoLightConstants.DEFAULT_SEARCH);
-	}
-
-	private static List<File> getAllFiles(File root, int options) {
-		List<File> files = new ArrayList<>();
-		for (File f : root.listFiles()) {
-			if (f.isFile()) {
-				files.add(f);
-			} else if (f.isDirectory()
-				&& options == NemoLightConstants.RECURSIVE_SEARCH) {
-				files.addAll(getAllFiles(f, options));
-			}
-		}
-		return files;
 	}
 
 	public static void startServer() {
@@ -320,7 +264,7 @@ public final class DeployResourceManager {
 	}
 
 	public static void startListening() {
-		for (WebRouteServlet servlet
+		for (WebRouteServletInterface servlet
 			: DeployResourceManager.SERVLETS.values()) {
 			Spark.get(servlet.getGetRoute());
 			Spark.post(servlet.getPostRoute());
@@ -330,7 +274,7 @@ public final class DeployResourceManager {
 		}
 	}
 
-	public static List<String> initializeClassLoader() {
+	public static List<Map<String, Object>> initializeClassLoader() {
 
 		List<URL> urls = new ArrayList<>();
 		ClassLoader parentClassLoader = Launcher.class
@@ -346,8 +290,9 @@ public final class DeployResourceManager {
 		File deployFolder = new File(NemoLightConstants.DEPLOY_FOLDER);
 
 		if (deployFolder.listFiles().length > 0) {
+			InputStream is;
+			URL url;
 			for (File f : deployFolder.listFiles()) {
-				URL url;
 				try {
 					url = f.toURI().toURL();
 					urls.add(url);
@@ -360,10 +305,10 @@ public final class DeployResourceManager {
 						f.getName(), ex.getMessage());
 					continue;
 				}
-				InputStream is = classLoader
+				is = classLoader
 					.getResourceAsStream(
 						NemoLightConstants.JAR_DEPLOY_FILE);
-				addMavenDependencies(url, classLoader);
+				DeployUtils.addMavenDependencies(url, classLoader);
 				if (is != null) {
 					deployFiles.add(is);
 				}
@@ -377,8 +322,8 @@ public final class DeployResourceManager {
 			NemoLightConstants.DEPENDENCIES_FOLDER);
 
 		if (dependenciesFolder.listFiles().length > 0) {
+			URL url;
 			for (File f : dependenciesFolder.listFiles()) {
-				URL url;
 				try {
 					url = f.toURI().toURL();
 					urls.add(url);
@@ -406,58 +351,38 @@ public final class DeployResourceManager {
 		List<String> packagesName = new ArrayList<>();
 
 		try {
+			DeployConfig deployConfig;
+			String packageName;
+			String appName;
+			Map<String, Object> infos;
 			for (InputStream is : deployFiles) {
-				DeployConfig deployConfig = DeployConfig.loadConfig(is);
-				String packageName = deployConfig
+
+				deployConfig = DeployConfig.loadConfig(is);
+				packageName = deployConfig
 					.getString(DeployConfig.DEPLOY_PACKAGE);
+				appName = deployConfig
+					.getString(DeployConfig.DEPLOY_APP_NAME);
+				appName = appName == null ? String.format(
+					"Application%02d", (APPLICATION_NUMBER + 1))
+					: appName;
+
 				if (packageName != null) {
-					packagesName.add(packageName);
+					infos = new HashMap<>();
+					infos.put(NemoLightConstants.APP_IDENTIFIER,
+						APPLICATION_NUMBER++);
+					infos.put(NemoLightConstants.APP_NAME,
+						appName);
+					infos.put(NemoLightConstants.APP_PACKAGE,
+						packageName);
+
+					ALLICATIONS_PROPERTIES.add(infos);
 				}
 			}
 		} catch (JAXBException ex) {
 			LOGGER.error("Can not load config", ex);
 		}
 
-		return packagesName;
-	}
-
-	private static void addMavenDependencies(URL url, URLClassLoader classLoader) {
-		MavenXpp3Reader reader = new MavenXpp3Reader();
-
-		try {
-			JarFile jarFile = new JarFile(new File(url.toURI()));
-
-			List<String> files = Utils.getAllFilesFrom(jarFile,
-				NemoLightConstants.JAR_MAVEN_FOLDER,
-				NemoLightConstants.EXCLUDE_CLASS_FILES
-				| NemoLightConstants.EXCLUDE_FOLDERS);
-
-			String pomPath = null;
-			for (String file : files) {
-				if (file.endsWith("pom.xml")) {
-					pomPath = file;
-					break;
-				}
-			}
-			if (pomPath == null) {
-				throw new IOException("Can not locate pom file in JAR file");
-			}
-
-			InputStream is = classLoader.getResourceAsStream(String.format(
-				"%s%s", NemoLightConstants.JAR_MAVEN_FOLDER, pomPath));
-			Model model = reader.read(new InputStreamReader(is));
-
-			String mavenURL = WebConfig
-				.getStringValue(WebConfig.MAVEN_REPOSITORY);
-
-			String outputPath = NemoLightConstants.DEPENDENCIES_FOLDER;
-
-			DependenciesDownloader.downloadDependencies(model, outputPath,
-				mavenURL);
-
-		} catch (IOException | DependenciesException | XmlPullParserException | SearchFileOptionException | URISyntaxException ex) {
-			System.err.printf("Can not read pom file: %s\n", ex.getMessage());
-		}
+		return ALLICATIONS_PROPERTIES;
 	}
 
 	public static List<String> getBeans() {
@@ -465,7 +390,7 @@ public final class DeployResourceManager {
 			DeployResourceManager.SERVLETS.keySet());
 	}
 
-	public static WebRouteServlet getBean(String beanName) {
+	public static WebRouteServletInterface getBean(String beanName) {
 		return DeployResourceManager.SERVLETS.get(beanName);
 	}
 

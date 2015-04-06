@@ -10,18 +10,15 @@ import fr.nemolovich.apps.nemolight.config.WebConfig;
 import fr.nemolovich.apps.nemolight.constants.NemoLightConstants;
 import fr.nemolovich.apps.nemolight.deploy.DeployResourceManager;
 import fr.nemolovich.apps.nemolight.security.GlobalSecurity;
-import fr.nemolovich.apps.nemolight.security.SecurityConfiguration;
 import fr.nemolovich.apps.nemolight.security.SecurityUtils;
 import freemarker.template.Configuration;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.xml.bind.JAXBException;
-
 import org.apache.log4j.PropertyConfigurator;
 
 /**
@@ -33,7 +30,7 @@ public class Launcher {
 	public static final Configuration CONFIG = new Configuration();
 
 	private static final Logger LOGGER = Logger.getLogger(Launcher.class
-			.getName());
+		.getName());
 
 	public static void main(String[] args) throws IOException {
 
@@ -66,12 +63,12 @@ public class Launcher {
 						adminport = Integer.parseInt(arg);
 					} catch (NumberFormatException e) {
 						LOGGER.log(Level.SEVERE,
-								"Incorrect admin port parameter", e);
+							"Incorrect admin port parameter", e);
 					}
 					needAdminPort = false;
 				} else {
 					LOGGER.log(Level.SEVERE,
-							String.format("Unknown parameter '%s'", arg));
+						String.format("Unknown parameter '%s'", arg));
 				}
 			}
 		}
@@ -80,17 +77,29 @@ public class Launcher {
 			AdminConnection.setSystemProperties();
 		}
 
-		List<String> packagesName = DeployResourceManager
-				.initializeClassLoader();
+		List<Map<String, Object>> apps = DeployResourceManager
+			.initializeClassLoader();
+		String packageName;
+		int identifier;
 
 		if (extract) {
 
 			LOGGER.info("Extracting files from archive...");
 
 			DeployResourceManager
-					.initResources(NemoLightConstants.PACKAGE_NAME);
-			for (String packageName : packagesName) {
-				DeployResourceManager.initResources(packageName);
+				.initFromPackage(NemoLightConstants.PACKAGE_NAME);
+
+			for (Map<String, Object> app : apps) {
+				packageName
+					= (String) app.get(NemoLightConstants.APP_PACKAGE);
+				if (packageName == null) {
+					LOGGER.warning(String.format(
+						"There is no package for application '[%02d] %s'",
+						app.get(NemoLightConstants.APP_IDENTIFIER),
+						app.get(NemoLightConstants.APP_NAME)));
+				} else {
+					DeployResourceManager.initFromPackage(packageName);
+				}
 			}
 
 			LOGGER.info("Extraction completed!");
@@ -100,10 +109,10 @@ public class Launcher {
 		LOGGER.info("Configuring log file...");
 
 		PropertyConfigurator.configure(String.format("%s%s",
-				NemoLightConstants.CONFIG_FOLDER,
-				NemoLightConstants.LOGGER_FILE_PATH));
+			NemoLightConstants.CONFIG_FOLDER,
+			NemoLightConstants.LOGGER_FILE_PATH));
 		org.apache.log4j.Logger log = org.apache.log4j.Logger
-				.getLogger(Launcher.class);
+			.getLogger(Launcher.class);
 
 		log.info("Log4j appender configuration successfully loaded");
 
@@ -124,34 +133,46 @@ public class Launcher {
 		}
 
 		log.info(String.format("Log file settings set from '%s%s'",
-				NemoLightConstants.CONFIG_FOLDER,
-				NemoLightConstants.LOGGER_FILE_PATH));
+			NemoLightConstants.CONFIG_FOLDER,
+			NemoLightConstants.LOGGER_FILE_PATH));
 
 		File templateFolder = new File(NemoLightConstants.TEMPLATE_FOLDER);
 
 		log.info(String.format("Setting freemarker templates folder to '%s'",
-				templateFolder.getAbsolutePath()));
+			templateFolder.getAbsolutePath()));
 
 		CONFIG.setDirectoryForTemplateLoading(templateFolder);
 
 		log.info("Deploying resources...");
 
-		for (String packageName : packagesName) {
-			DeployResourceManager.deployWebPages(CONFIG,
-					packageName.replaceAll("/", "."));
+		for (Map<String, Object> app : apps) {
+			packageName
+				= (String) app.get(NemoLightConstants.APP_PACKAGE);
+			identifier = (int) app.get(NemoLightConstants.APP_IDENTIFIER);
+			if (packageName == null) {
+				LOGGER.warning(String.format(
+					"There is no package for application '[%02d] %s'",
+					identifier,
+					app.get(NemoLightConstants.APP_NAME))
+				);
+			} else {
+				DeployResourceManager.deployWebPages(CONFIG,
+					packageName.replaceAll("/", "."),
+					identifier);
+			}
 		}
 
 		DeployResourceManager.deployWebApp(WebConfig
-				.getStringValue(WebConfig.DELPOYMENT_FOLDER));
+			.getStringValue(WebConfig.DELPOYMENT_FOLDER));
 
 		log.info("Resources deployed!");
 
 		log.info(String.format("Starting server on port [%s]...",
-				String.valueOf(port)));
+			String.valueOf(port)));
 		DeployResourceManager.startServer(port, adminport);
 
 		log.info(String.format("Server started on port [%s]!",
-				String.valueOf(port)));
+			String.valueOf(port)));
 
 	}
 }

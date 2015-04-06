@@ -7,7 +7,6 @@ package fr.nemolovich.apps.nemolight.config;
 
 import fr.nemolovich.apps.mavendependenciesdownloader.DependenciesDownloader;
 import fr.nemolovich.apps.nemolight.constants.NemoLightConstants;
-
 import java.util.Map;
 
 /**

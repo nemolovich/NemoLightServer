@@ -18,10 +18,10 @@ import spark.Response;
  *
  * @author Nemolovich
  */
-@RouteElement(path = "/ajax/:uid", page = "ajax.tpl")
-public class AjaxRequest extends WebRouteServletAdapter {
+@RouteElement(path = "/ajax/function/:method/:uid", page = "ajax_functions.tpl")
+public class AjaxFunction extends WebRouteServletAdapter {
 
-	public AjaxRequest(String routePath, String page, Configuration config)
+	public AjaxFunction(String routePath, String page, Configuration config)
 		throws IOException {
 		super(routePath, page, config);
 	}
@@ -31,6 +31,7 @@ public class AjaxRequest extends WebRouteServletAdapter {
 		throws ServerException {
 
 		String passedUid = request.params("uid");
+		String passedMethod = request.params("method");
 		String value = request.raw().getParameter("value");
 		String uid = request.raw().getParameter("uid");
 		String bean = request.raw().getParameter("bean");

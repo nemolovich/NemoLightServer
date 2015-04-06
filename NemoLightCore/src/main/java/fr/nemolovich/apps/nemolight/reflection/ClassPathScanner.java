@@ -1,5 +1,9 @@
 package fr.nemolovich.apps.nemolight.reflection;
 
+import fr.nemolovich.apps.nemolight.config.WebConfig;
+import fr.nemolovich.apps.nemolight.constants.NemoLightConstants;
+import fr.nemolovich.apps.nemolight.utils.SearchFileOptionException;
+import fr.nemolovich.apps.nemolight.utils.Utils;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -10,13 +14,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.jar.JarFile;
-
 import org.apache.log4j.Logger;
-
-import fr.nemolovich.apps.nemolight.config.WebConfig;
-import fr.nemolovich.apps.nemolight.constants.NemoLightConstants;
-import fr.nemolovich.apps.nemolight.utils.SearchFileOptionException;
-import fr.nemolovich.apps.nemolight.utils.Utils;
 
 public class ClassPathScanner {
 
