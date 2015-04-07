@@ -10,7 +10,7 @@ import spark.Response;
  *
  * @author Nemolovich
  */
-public interface WebRouteServletInterface {
+public interface IWebRouteServlet {
 
 	void addPageField(Field field, String pageFieldName);
 

@@ -7,8 +7,8 @@ import fr.nemolovich.apps.nemolight.constants.NemoLightConstants;
 import fr.nemolovich.apps.nemolight.reflection.AnnotationTypeFilter;
 import fr.nemolovich.apps.nemolight.reflection.ClassPathScanner;
 import fr.nemolovich.apps.nemolight.reflection.SuperClassFilter;
+import fr.nemolovich.apps.nemolight.route.IWebRouteServlet;
 import fr.nemolovich.apps.nemolight.route.WebRoute;
-import fr.nemolovich.apps.nemolight.route.WebRouteServletInterface;
 import fr.nemolovich.apps.nemolight.route.annotations.PageField;
 import fr.nemolovich.apps.nemolight.route.annotations.RouteElement;
 import fr.nemolovich.apps.nemolight.route.file.FileRoute;
@@ -27,10 +27,10 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.jar.JarFile;
 import javax.xml.bind.JAXBException;
 import org.apache.log4j.Logger;
@@ -48,13 +48,13 @@ public final class DeployResourceManager {
 	protected static final Logger LOGGER = Logger
 		.getLogger(DeployResourceManager.class.getName());
 
-	private static final Map<String, WebRouteServletInterface> SERVLETS
+	private static final Map<String, IWebRouteServlet> SERVLETS
 		= new ConcurrentHashMap<>();
 	private static final List<FileRoute> FILES = new ArrayList<>();
 
 	private static int APPLICATION_NUMBER = 0;
-	private static final List<Map<String, Object>> ALLICATIONS_PROPERTIES
-		= new ArrayList<>();
+	private static final ConcurrentLinkedQueue<ConcurrentHashMap<String, Object>> ALLICATIONS_PROPERTIES
+		= new ConcurrentLinkedQueue<>();
 
 	public static void initFromPackage(String resourcesPath) {
 		ClassLoader classLoader = (ClassLoader) WebConfig
@@ -111,9 +111,9 @@ public final class DeployResourceManager {
 		scanner.addIncludeFilter(new AnnotationTypeFilter(
 			RouteElement.class));
 		scanner.addIncludeFilter(new SuperClassFilter(
-			WebRouteServletInterface.class));
+			IWebRouteServlet.class));
 
-		WebRouteServletInterface servlet;
+		IWebRouteServlet servlet;
 		boolean loginPageDefined = false;
 		RouteElement annotation;
 		String path, page;
@@ -154,8 +154,8 @@ public final class DeployResourceManager {
 				 */
 				newInstance = cst.newInstance(path, page, config);
 
-				if (newInstance instanceof WebRouteServletInterface) {
-					servlet = (WebRouteServletInterface) newInstance;
+				if (newInstance instanceof IWebRouteServlet) {
+					servlet = (IWebRouteServlet) newInstance;
 					if (isSecured) {
 						servlet.enableSecurity();
 					}
@@ -264,7 +264,7 @@ public final class DeployResourceManager {
 	}
 
 	public static void startListening() {
-		for (WebRouteServletInterface servlet
+		for (IWebRouteServlet servlet
 			: DeployResourceManager.SERVLETS.values()) {
 			Spark.get(servlet.getGetRoute());
 			Spark.post(servlet.getPostRoute());
@@ -354,7 +354,7 @@ public final class DeployResourceManager {
 			DeployConfig deployConfig;
 			String packageName;
 			String appName;
-			Map<String, Object> infos;
+			ConcurrentHashMap<String, Object> infos;
 			for (InputStream is : deployFiles) {
 
 				deployConfig = DeployConfig.loadConfig(is);
@@ -367,7 +367,7 @@ public final class DeployResourceManager {
 					: appName;
 
 				if (packageName != null) {
-					infos = new HashMap<>();
+					infos = new ConcurrentHashMap<>();
 					infos.put(NemoLightConstants.APP_IDENTIFIER,
 						APPLICATION_NUMBER++);
 					infos.put(NemoLightConstants.APP_NAME,
@@ -382,7 +382,7 @@ public final class DeployResourceManager {
 			LOGGER.error("Can not load config", ex);
 		}
 
-		return ALLICATIONS_PROPERTIES;
+		return new ArrayList<Map<String, Object>>(ALLICATIONS_PROPERTIES);
 	}
 
 	public static List<String> getBeans() {
@@ -390,7 +390,7 @@ public final class DeployResourceManager {
 			DeployResourceManager.SERVLETS.keySet());
 	}
 
-	public static WebRouteServletInterface getBean(String beanName) {
+	public static IWebRouteServlet getBean(String beanName) {
 		return DeployResourceManager.SERVLETS.get(beanName);
 	}
 

@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
@@ -146,14 +147,16 @@ public class Launcher {
 		log.info("Deploying resources...");
 
 		for (Map<String, Object> app : apps) {
+			ConcurrentHashMap<String, Object> appMap=
+				new ConcurrentHashMap<>(app);
 			packageName
-				= (String) app.get(NemoLightConstants.APP_PACKAGE);
-			identifier = (int) app.get(NemoLightConstants.APP_IDENTIFIER);
+				= (String) appMap.get(NemoLightConstants.APP_PACKAGE);
+			identifier = (int) appMap.get(NemoLightConstants.APP_IDENTIFIER);
 			if (packageName == null) {
 				LOGGER.warning(String.format(
 					"There is no package for application '[%02d] %s'",
 					identifier,
-					app.get(NemoLightConstants.APP_NAME))
+					appMap.get(NemoLightConstants.APP_NAME))
 				);
 			} else {
 				DeployResourceManager.deployWebPages(CONFIG,

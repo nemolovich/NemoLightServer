@@ -5,7 +5,6 @@ import fr.nemolovich.apps.nemolight.admin.Command;
 import fr.nemolovich.apps.nemolight.config.WebConfig;
 import fr.nemolovich.apps.nemolight.constants.NemoLightConstants;
 import fr.nemolovich.apps.nemolight.deploy.DeployResourceManager;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
@@ -31,9 +30,6 @@ public class DeployServer extends Command {
 	@Override
 	public String doCommand(String... args) {
 		LOGGER.info("Deploying resources...");
-
-		List<String> packagesName
-			= new ArrayList<>();
 
 		List<Map<String, Object>> apps = DeployResourceManager
 			.initializeClassLoader();

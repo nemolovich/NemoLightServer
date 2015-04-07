@@ -40,6 +40,39 @@ function request(bean, fields, callback) {
 	return false;
 }
 
+function ajaxFunction(funcName, param, callback) {
+	var res = "error";
+	var uuid = generateUUID();
+	var url = "/ajax/functions/" + uuid;
+	$.ajax({
+		type: 'POST',
+		url: url,
+		data: {
+			method: funcName,
+			uid: uuid,
+			param: JSON.stringify(param)
+		},
+		success: function (response) {
+			try {
+				var r = response.replace(/\n/g, '').replace(/\r/g, '')
+						.replace(/\/\*{2}.*\*\//, '');
+				res = JSON.parse(r);
+				if (callback !== undefined) {
+					callback(res);
+				}
+			} catch (e) {
+				console.error("Can not parse result: " + e);
+			}
+		},
+		error: function (xhr, ajaxOptions, thrownError) {
+			console.error(xhr.status); // 0
+			console.error(ajaxOptions);
+			console.error(thrownError);
+		}
+	});
+	return false;
+}
+
 function getAjaxValues(fields) {
 	var result = new Object();
 	for (i = 0; i < fields.length; i++) {

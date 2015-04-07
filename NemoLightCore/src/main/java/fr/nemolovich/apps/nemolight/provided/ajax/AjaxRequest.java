@@ -3,7 +3,7 @@ package fr.nemolovich.apps.nemolight.provided.ajax;
 import fr.nemolovich.apps.nemolight.constants.NemoLightConstants;
 import fr.nemolovich.apps.nemolight.deploy.DeployResourceManager;
 import fr.nemolovich.apps.nemolight.route.WebRouteServletAdapter;
-import fr.nemolovich.apps.nemolight.route.WebRouteServletInterface;
+import fr.nemolovich.apps.nemolight.route.IWebRouteServlet;
 import fr.nemolovich.apps.nemolight.route.annotations.RouteElement;
 import fr.nemolovich.apps.nemolight.route.exceptions.ServerException;
 import freemarker.template.Configuration;
@@ -35,9 +35,10 @@ public class AjaxRequest extends WebRouteServletAdapter {
 		String uid = request.raw().getParameter("uid");
 		String bean = request.raw().getParameter("bean");
 
+		JSONObject result;
 		if (value == null || bean == null || uid == null
 			|| passedUid == null) {
-			JSONObject result = new JSONObject();
+			result = new JSONObject();
 
 			result.put(NemoLightConstants.AJAX_ERROR_KEY,
 				NemoLightConstants.AJAX_ERROR_INVALID_REQUEST);
@@ -47,7 +48,7 @@ public class AjaxRequest extends WebRouteServletAdapter {
 			root.put(NemoLightConstants.AJAX_ACTION_KEY, bean);
 			root.put(NemoLightConstants.AJAX_VALUE_KEY, result);
 		} else if (uid.equals(passedUid)) {
-			WebRouteServletInterface beanRoute = null;
+			IWebRouteServlet beanRoute = null;
 			for (String beanName : DeployResourceManager.getBeans()) {
 				if (beanName.equalsIgnoreCase(bean)) {
 					beanRoute = DeployResourceManager.getBean(beanName);
@@ -55,8 +56,7 @@ public class AjaxRequest extends WebRouteServletAdapter {
 				}
 			}
 			if (beanRoute == null) {
-				JSONObject result = new JSONObject();
-
+				result = new JSONObject();
 				result.put(NemoLightConstants.AJAX_ERROR_KEY,
 					NemoLightConstants.AJAX_ERROR_UNKNOWN_BEAN);
 				result.put(NemoLightConstants.AJAX_ERROR_DESC,
@@ -66,27 +66,26 @@ public class AjaxRequest extends WebRouteServletAdapter {
 					NemoLightConstants.AJAX_ERROR_KEY);
 				root.put(NemoLightConstants.AJAX_VALUE_KEY, result);
 			} else {
-				JSONObject valueObject;
 				try {
-					valueObject = new JSONObject(value);
-					beanRoute.getAjaxRequest(valueObject, root);
+					result = new JSONObject(value);
+					beanRoute.getAjaxRequest(result, root);
 				} catch (JSONException je) {
-					valueObject = new JSONObject();
+					result = new JSONObject();
 
-					valueObject.put(NemoLightConstants.AJAX_ERROR_KEY,
+					result.put(NemoLightConstants.AJAX_ERROR_KEY,
 						NemoLightConstants.AJAX_ERROR_INVALID_SYNTAX);
-					valueObject.put(NemoLightConstants.AJAX_ERROR_DESC, String
+					result.put(NemoLightConstants.AJAX_ERROR_DESC, String
 						.format("Value '%s' is not a valid JSON object: %s",
 							value, je.getMessage()));
 
 					root.put(NemoLightConstants.AJAX_ACTION_KEY,
 						NemoLightConstants.AJAX_ERROR_KEY);
-					root.put(NemoLightConstants.AJAX_VALUE_KEY, valueObject);
+					root.put(NemoLightConstants.AJAX_VALUE_KEY, result);
 				}
 			}
 
 		} else {
-			JSONObject result = new JSONObject();
+			result = new JSONObject();
 
 			result.put(NemoLightConstants.AJAX_ERROR_KEY,
 				NemoLightConstants.AJAX_ERROR_INVALID_REQUEST);

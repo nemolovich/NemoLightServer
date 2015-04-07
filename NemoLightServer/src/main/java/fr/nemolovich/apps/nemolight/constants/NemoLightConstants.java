@@ -3,8 +3,7 @@ package fr.nemolovich.apps.nemolight.constants;
 import java.io.File;
 
 public interface NemoLightConstants {
-	
-	
+
 	/* ***********************
 	 * Deployment constants
 	 * 
@@ -105,11 +104,14 @@ public interface NemoLightConstants {
 	public static final String AJAX_BEAN_KEY = "bean";
 	public static final String AJAX_FIELDS_KEY = "fields";
 	public static final String AJAX_ACTION_KEY = "action";
+	public static final String AJAX_FUNC_NAME_KEY = "funcName";
+	public static final String AJAX_RESULT_KEY = "result";
 	public static final String AJAX_VALUE_KEY = "value";
 	public static final String AJAX_ERROR_KEY = "error";
 	public static final String AJAX_ERROR_DESC = "desc";
 	public static final String AJAX_ERROR_INVALID_REQUEST = "INVALID_REQUEST";
 	public static final String AJAX_ERROR_UNKNOWN_BEAN = "UNKNOWN_BEAN";
+	public static final String AJAX_ERROR_UNKNOWN_FUNCTION = "UNKNOWN_FUNCTION";
 	public static final String AJAX_ERROR_INVALID_SYNTAX = "INVALID_SYNTAX";
 	public static final String AJAX_ACTION_UPDATE = "update";
 }

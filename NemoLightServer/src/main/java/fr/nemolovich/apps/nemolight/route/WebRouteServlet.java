@@ -27,7 +27,7 @@ import spark.Response;
  * @author Nemolovich
  */
 abstract class WebRouteServlet implements
-	WebRouteServletInterface {
+	IWebRouteServlet {
 
 	private static final Logger LOGGER = Logger
 		.getLogger(WebRouteServlet.class);
