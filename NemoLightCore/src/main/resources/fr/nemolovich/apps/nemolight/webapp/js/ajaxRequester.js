@@ -1,4 +1,4 @@
-AJAX_FIELD_SUFFIX="_ajax_input";
+AJAX_FIELD_SUFFIX = "_ajax_input";
 
 function request(bean, fields, callback) {
 	if (!beanExists(bean)) {
@@ -9,17 +9,17 @@ function request(bean, fields, callback) {
 	var uuid = generateUUID();
 	var url = "/ajax/" + uuid;
 	$.ajax({
-		type: 'POST',
-		url: url,
-		data: {
-			bean: bean,
-			uid: uuid,
-			value: JSON.stringify(value)
+		type : 'POST',
+		url : url,
+		data : {
+			bean : bean,
+			uid : uuid,
+			value : JSON.stringify(value)
 		},
-		success: function (response) {
+		success : function(response) {
 			try {
-				var r = response.replace(/\n/g, '').replace(/\r/g, '')
-						.replace(/\/\*{2}.*\*\//, '');
+				var r = response.replace(/\n/g, '').replace(/\r/g, '').replace(
+						/\/\*{2}.*\*\//, '');
 				var resp = JSON.parse(r);
 				if (resp.action === 'update') {
 					updateFields(resp.value);
@@ -31,7 +31,7 @@ function request(bean, fields, callback) {
 				console.error("Can not parse result: " + e);
 			}
 		},
-		error: function (xhr, ajaxOptions, thrownError) {
+		error : function(xhr, ajaxOptions, thrownError) {
 			console.error(xhr.status); // 0
 			console.error(ajaxOptions);
 			console.error(thrownError);
@@ -40,44 +40,60 @@ function request(bean, fields, callback) {
 	return false;
 }
 
+var AJAX_RESPONSE = null;
+
 function ajaxFunction(funcName, param, callback) {
+	var x = callAjaxFunction(funcName, param, function(data) {
+		AJAX_RESPONSE = data;
+	});
+//	 while(AJAX_RESPONSE == null){}
+	if (callback !== undefined) {
+		callback(AJAX_RESPONSE);
+	}
+	var res = AJAX_RESPONSE;
+	AJAX_RESPONSE = null;
+	return res;
+}
+
+function callAjaxFunction(funcName, param, callback) {
 	var res = "error";
 	var uuid = generateUUID();
 	var url = "/ajax/functions/" + uuid;
-	$.ajax({
-		type: 'POST',
-		url: url,
-		data: {
-			method: funcName,
-			uid: uuid,
-			param: JSON.stringify(param)
-		},
-		success: function (response) {
-			try {
-				var r = response.replace(/\n/g, '').replace(/\r/g, '')
-						.replace(/\/\*{2}.*\*\//, '');
-				res = JSON.parse(r);
-				if (callback !== undefined) {
-					callback(res);
+	$.ajax(
+			{
+				type : 'POST',
+				url : url,
+				data : {
+					method : funcName,
+					uid : uuid,
+					param : JSON.stringify(param == null ? {} : param)
+				},
+				success : function(response) {
+					try {
+						var r = response.replace(/\n/g, '').replace(/\r/g, '')
+								.replace(/\/\*{2}.*\*\//, '');
+						res = JSON.parse(r);
+						if (callback !== undefined) {
+							callback(res);
+						}
+					} catch (e) {
+						console.error("Can not parse result: " + e);
+					}
+				},
+				error : function(xhr, ajaxOptions, thrownError) {
+					console.error(xhr.status); // 0
+					console.error(ajaxOptions);
+					console.error(thrownError);
 				}
-			} catch (e) {
-				console.error("Can not parse result: " + e);
-			}
-		},
-		error: function (xhr, ajaxOptions, thrownError) {
-			console.error(xhr.status); // 0
-			console.error(ajaxOptions);
-			console.error(thrownError);
-		}
-	});
+			});
 	return false;
+
 }
 
 function getAjaxValues(fields) {
 	var result = new Object();
 	for (i = 0; i < fields.length; i++) {
-		var value = document.getElementById(fields[i] +
-				AJAX_FIELD_SUFFIX);
+		var value = document.getElementById(fields[i] + AJAX_FIELD_SUFFIX);
 		if (value !== null) {
 			result[fields[i]] = value.value;
 		}
@@ -87,16 +103,17 @@ function getAjaxValues(fields) {
 
 function generateUUID() {
 	var d = new Date().getTime();
-	var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-		var r = (d + Math.random() * 16) % 16 | 0;
-		d = Math.floor(d / 16);
-		return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-	});
+	var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
+			function(c) {
+				var r = (d + Math.random() * 16) % 16 | 0;
+				d = Math.floor(d / 16);
+				return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+			});
 	return uuid;
 }
 
 function updateFields(value) {
-	for (var key in value) {
+	for ( var key in value) {
 		if (value.hasOwnProperty(key)) {
 			var elm = document.getElementById(key);
 			if (elm !== null && elm !== undefined) {
