@@ -10,9 +10,6 @@ public interface NemoLightConstants {
 	 * ***********************
 	 */
 	public static final String PACKAGE_NAME = "fr/nemolovich/apps/nemolight/";
-	public static final String APP_IDENTIFIER = "APP_IDENTIFIER";
-	public static final String APP_NAME = "APP_NAME";
-	public static final String APP_PACKAGE = "APP_PACKAGE";
 
 	/* ***********************
 	 * Web folders

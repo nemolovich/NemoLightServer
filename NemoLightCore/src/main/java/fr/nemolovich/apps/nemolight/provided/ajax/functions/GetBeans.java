@@ -1,6 +1,8 @@
 package fr.nemolovich.apps.nemolight.provided.ajax.functions;
 
+import fr.nemolovich.apps.nemolight.deploy.DeployResourceManager;
 import fr.nemolovich.apps.nemolight.provided.ajax.IAjaxFunction;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -13,8 +15,11 @@ public class GetBeans implements IAjaxFunction {
 
 	@Override
 	public JSONObject call(JSONObject param) {
-		System.out.println("param: " + param);
-		return param;
+		JSONObject result = new JSONObject();
+		JSONArray array = new JSONArray(
+			DeployResourceManager.getBeans());
+		result.put("list", array);
+		return result;
 	}
 
 	@Override

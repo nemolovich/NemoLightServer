@@ -27,10 +27,10 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.jar.JarFile;
 import javax.xml.bind.JAXBException;
 import org.apache.log4j.Logger;
@@ -51,10 +51,6 @@ public final class DeployResourceManager {
 	private static final Map<String, IWebRouteServlet> SERVLETS
 		= new ConcurrentHashMap<>();
 	private static final List<FileRoute> FILES = new ArrayList<>();
-
-	private static int APPLICATION_NUMBER = 0;
-	private static final ConcurrentLinkedQueue<ConcurrentHashMap<String, Object>> ALLICATIONS_PROPERTIES
-		= new ConcurrentLinkedQueue<>();
 
 	public static void initFromPackage(String resourcesPath) {
 		ClassLoader classLoader = (ClassLoader) WebConfig
@@ -106,7 +102,7 @@ public final class DeployResourceManager {
 	}
 
 	public static final boolean deployWebPages(Configuration config,
-		String packageName, int appIdentifier) {
+		String packageName, String appName) {
 		ClassPathScanner scanner = new ClassPathScanner();
 		scanner.addIncludeFilter(new AnnotationTypeFilter(
 			RouteElement.class));
@@ -135,7 +131,6 @@ public final class DeployResourceManager {
 		config.clearTemplateCache();
 		DeployResourceManager.SERVLETS.clear();
 		DeployResourceManager.FILES.clear();
-		DeployResourceManager.ALLICATIONS_PROPERTIES.clear();
 
 		for (Class<?> c : classes) {
 			try {
@@ -143,7 +138,7 @@ public final class DeployResourceManager {
 				 * Get annoation informations.
 				 */
 				annotation = c.getAnnotation(RouteElement.class);
-				path = annotation.path();
+				path = String.format("/%s%s", appName, annotation.path());
 				page = annotation.page();
 				isLoginPage = annotation.login();
 				isSecured = annotation.secured();
@@ -206,7 +201,8 @@ public final class DeployResourceManager {
 		return false;
 	}
 
-	public static void deployWebApp(String deployFolderPath) {
+	public static void deployWebApp(String deployFolderPath,
+		String appname) {
 		File deployFolder = new File(deployFolderPath);
 		try {
 			if (!deployFolder.exists() || !deployFolder.isDirectory()) {
@@ -223,7 +219,8 @@ public final class DeployResourceManager {
 				routePath = uriPath.substring(uriPath
 					.lastIndexOf(deployFolderPath)
 					+ (deployFolderPath.length()));
-				route = new FileRoute(routePath, f);
+				route = new FileRoute(String.format(
+					"/%s%s", appname, routePath), f);
 				DeployResourceManager.FILES.add(route);
 				LOGGER.info(String.format(
 					"Resource file '%s' has been deployed! [%s]",
@@ -274,7 +271,7 @@ public final class DeployResourceManager {
 		}
 	}
 
-	public static List<Map<String, Object>> initializeClassLoader() {
+	public static Map<String, String> initializeClassLoader() {
 
 		List<URL> urls = new ArrayList<>();
 		ClassLoader parentClassLoader = Launcher.class
@@ -348,7 +345,7 @@ public final class DeployResourceManager {
 		/*
 		 * Add the package name if specified.
 		 */
-		List<String> packagesName = new ArrayList<>();
+		Map<String, String> packagesName = new HashMap<>();
 
 		try {
 			DeployConfig deployConfig;
@@ -362,27 +359,16 @@ public final class DeployResourceManager {
 					.getString(DeployConfig.DEPLOY_PACKAGE);
 				appName = deployConfig
 					.getString(DeployConfig.DEPLOY_APP_NAME);
-				appName = appName == null ? String.format(
-					"Application%02d", (APPLICATION_NUMBER + 1))
-					: appName;
 
 				if (packageName != null) {
-					infos = new ConcurrentHashMap<>();
-					infos.put(NemoLightConstants.APP_IDENTIFIER,
-						APPLICATION_NUMBER++);
-					infos.put(NemoLightConstants.APP_NAME,
-						appName);
-					infos.put(NemoLightConstants.APP_PACKAGE,
-						packageName);
-
-					ALLICATIONS_PROPERTIES.add(infos);
+					packagesName.put(appName, packageName);
 				}
 			}
 		} catch (JAXBException ex) {
 			LOGGER.error("Can not load config", ex);
 		}
 
-		return new ArrayList<Map<String, Object>>(ALLICATIONS_PROPERTIES);
+		return packagesName;
 	}
 
 	public static List<String> getBeans() {

@@ -14,9 +14,8 @@ import fr.nemolovich.apps.nemolight.security.SecurityUtils;
 import freemarker.template.Configuration;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
@@ -78,9 +77,10 @@ public class Launcher {
 			AdminConnection.setSystemProperties();
 		}
 
-		List<Map<String, Object>> apps = DeployResourceManager
-			.initializeClassLoader();
+		Map<String, String> packagesName
+			= DeployResourceManager.initializeClassLoader();
 		String packageName;
+		String appName;
 		int identifier;
 
 		if (extract) {
@@ -90,14 +90,14 @@ public class Launcher {
 			DeployResourceManager
 				.initFromPackage(NemoLightConstants.PACKAGE_NAME);
 
-			for (Map<String, Object> app : apps) {
-				packageName
-					= (String) app.get(NemoLightConstants.APP_PACKAGE);
+			for (Entry<String, String> entryPackage
+				: packagesName.entrySet()) {
+				packageName = entryPackage.getValue();
+				appName = entryPackage.getKey();
 				if (packageName == null) {
 					LOGGER.warning(String.format(
-						"There is no package for application '[%02d] %s'",
-						app.get(NemoLightConstants.APP_IDENTIFIER),
-						app.get(NemoLightConstants.APP_NAME)));
+						"There is no package for application '%s'",
+						appName));
 				} else {
 					DeployResourceManager.initFromPackage(packageName);
 				}
@@ -146,27 +146,25 @@ public class Launcher {
 
 		log.info("Deploying resources...");
 
-		for (Map<String, Object> app : apps) {
-			ConcurrentHashMap<String, Object> appMap=
-				new ConcurrentHashMap<>(app);
-			packageName
-				= (String) appMap.get(NemoLightConstants.APP_PACKAGE);
-			identifier = (int) appMap.get(NemoLightConstants.APP_IDENTIFIER);
+		for (Entry<String, String> entryPackage : packagesName.entrySet()) {
+			packageName = entryPackage.getValue();
+			appName = entryPackage.getKey();
 			if (packageName == null) {
 				LOGGER.warning(String.format(
-					"There is no package for application '[%02d] %s'",
-					identifier,
-					appMap.get(NemoLightConstants.APP_NAME))
+					"There is no package for application '%s'",
+					entryPackage.getKey())
 				);
 			} else {
 				DeployResourceManager.deployWebPages(CONFIG,
 					packageName.replaceAll("/", "."),
-					identifier);
+					appName
+				);
+
+				DeployResourceManager.deployWebApp(WebConfig
+					.getStringValue(WebConfig.DELPOYMENT_FOLDER),
+					appName);
 			}
 		}
-
-		DeployResourceManager.deployWebApp(WebConfig
-			.getStringValue(WebConfig.DELPOYMENT_FOLDER));
 
 		log.info("Resources deployed!");
 

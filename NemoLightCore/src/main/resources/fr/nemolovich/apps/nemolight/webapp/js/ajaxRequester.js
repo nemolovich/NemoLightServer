@@ -40,19 +40,15 @@ function request(bean, fields, callback) {
 	return false;
 }
 
-var AJAX_RESPONSE = null;
-
 function ajaxFunction(funcName, param, callback) {
-	var x = callAjaxFunction(funcName, param, function(data) {
+	var AJAX_RESPONSE;
+	var tmp = callAjaxFunction(funcName, param, function(data) {
 		AJAX_RESPONSE = data;
 	});
-//	 while(AJAX_RESPONSE == null){}
 	if (callback !== undefined) {
-		callback(AJAX_RESPONSE);
+		tmp = callback(AJAX_RESPONSE);
 	}
-	var res = AJAX_RESPONSE;
-	AJAX_RESPONSE = null;
-	return res;
+	return AJAX_RESPONSE;
 }
 
 function callAjaxFunction(funcName, param, callback) {
@@ -61,6 +57,7 @@ function callAjaxFunction(funcName, param, callback) {
 	var url = "/ajax/functions/" + uuid;
 	$.ajax(
 			{
+				async: false,
 				type : 'POST',
 				url : url,
 				data : {
