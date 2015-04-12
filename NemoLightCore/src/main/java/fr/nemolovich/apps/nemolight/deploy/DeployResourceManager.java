@@ -42,342 +42,341 @@ import spark.Spark;
  */
 public final class DeployResourceManager {
 
-	private static final boolean IS_WINDOWS_SYSTEM
-		= System.getProperty("os.name").startsWith("Windows");
+    private static final boolean IS_WINDOWS_SYSTEM
+        = System.getProperty("os.name").startsWith("Windows");
 
-	protected static final Logger LOGGER = Logger
-		.getLogger(DeployResourceManager.class.getName());
+    protected static final Logger LOGGER = Logger
+        .getLogger(DeployResourceManager.class.getName());
 
-	private static final Map<String, IWebRouteServlet> SERVLETS
-		= new ConcurrentHashMap<>();
-	private static final List<FileRoute> FILES = new ArrayList<>();
+    private static final Map<String, IWebRouteServlet> SERVLETS
+        = new ConcurrentHashMap<>();
+    private static final List<FileRoute> FILES = new ArrayList<>();
 
-	public static void initFromPackage(String resourcesPath) {
-		ClassLoader classLoader = (ClassLoader) WebConfig
-			.getValue(WebConfig.DEPLOYMENT_CLASSLOADER);
-		URL url = classLoader.getResource(resourcesPath);
-		if (url == null) {
-			url = classLoader.getResource(String.format("%s/%s",
-				NemoLightConstants.SRC_FOLDER, resourcesPath));
-		}
-		if (url != null) {
-			List<String> files = null;
-			String basePath = null;
-			String protocol = url.getProtocol();
-			try {
-				if (protocol.equalsIgnoreCase(
-					NemoLightConstants.FILE_PROTOCOL)) {
-					File path = new File(url.toURI());
-					files = Utils.getAllFilesFrom("", path,
-						NemoLightConstants.EXCLUDE_CLASS_FILES
-						| NemoLightConstants.EXCLUDE_FOLDERS);
-					basePath = url.toURI().getPath();
-					if (IS_WINDOWS_SYSTEM) {
-						/*
-						 * Remove drive letter for Windows.
-						 */
-						basePath = basePath.substring(1);
-					}
+    public static void initFromPackage(String resourcesPath) {
+        ClassLoader classLoader = (ClassLoader) WebConfig
+            .getValue(WebConfig.DEPLOYMENT_CLASSLOADER);
+        URL url = classLoader.getResource(resourcesPath);
+        if (url == null) {
+            url = classLoader.getResource(String.format("%s/%s",
+                NemoLightConstants.SRC_FOLDER, resourcesPath));
+        }
+        if (url != null) {
+            List<String> files = null;
+            String basePath = null;
+            String protocol = url.getProtocol();
+            try {
+                if (protocol.equalsIgnoreCase(
+                    NemoLightConstants.FILE_PROTOCOL)) {
+                    File path = new File(url.toURI());
+                    files = Utils.getAllFilesFrom("", path,
+                        NemoLightConstants.EXCLUDE_CLASS_FILES
+                        | NemoLightConstants.EXCLUDE_FOLDERS);
+                    basePath = url.toURI().getPath();
+                    if (IS_WINDOWS_SYSTEM) {
+                        /*
+                         * Remove drive letter for Windows.
+                         */
+                        basePath = basePath.substring(1);
+                    }
 
-				} else if (protocol
-					.equalsIgnoreCase(NemoLightConstants.JAR_PROTOCOL)) {
-					JarFile jar = Utils.extractJar(url);
-					files = Utils.getAllFilesFrom(jar, resourcesPath,
-						NemoLightConstants.EXCLUDE_CLASS_FILES
-						| NemoLightConstants.EXCLUDE_FOLDERS);
+                } else if (protocol
+                    .equalsIgnoreCase(NemoLightConstants.JAR_PROTOCOL)) {
+                    JarFile jar = Utils.extractJar(url);
+                    files = Utils.getAllFilesFrom(jar, resourcesPath,
+                        NemoLightConstants.EXCLUDE_CLASS_FILES
+                        | NemoLightConstants.EXCLUDE_FOLDERS);
 
-					basePath = resourcesPath;
-				} else {
-					LOGGER.error(String.format("Unknown protocol '%s'",
-						protocol));
-				}
-			} catch (SearchFileOptionException | URISyntaxException ex) {
-				LOGGER.error("Error while searching files", ex);
-			}
-			if (files != null) {
-				DeployUtils.extractFiles(files, basePath,
-					protocol);
-			}
-		}
-	}
+                    basePath = resourcesPath;
+                } else {
+                    LOGGER.error(String.format("Unknown protocol '%s'",
+                        protocol));
+                }
+            } catch (SearchFileOptionException | URISyntaxException ex) {
+                LOGGER.error("Error while searching files", ex);
+            }
+            if (files != null) {
+                DeployUtils.extractFiles(files, basePath,
+                    protocol);
+            }
+        }
+    }
 
-	public static final boolean deployWebPages(Configuration config,
-		String packageName, String appName) {
-		ClassPathScanner scanner = new ClassPathScanner();
-		scanner.addIncludeFilter(new AnnotationTypeFilter(
-			RouteElement.class));
-		scanner.addIncludeFilter(new SuperClassFilter(
-			IWebRouteServlet.class));
+    public static final boolean deployWebPages(Configuration config,
+        String packageName, String appName) {
+        ClassPathScanner scanner = new ClassPathScanner();
+        scanner.addIncludeFilter(new AnnotationTypeFilter(
+            RouteElement.class));
+        scanner.addIncludeFilter(new SuperClassFilter(
+            IWebRouteServlet.class));
 
-		IWebRouteServlet servlet;
-		boolean loginPageDefined = false;
-		RouteElement annotation;
-		String path, page;
-		boolean isLoginPage, isSecured;
-		Constructor<?> cst;
-		Object newInstance;
+        IWebRouteServlet servlet;
+        boolean loginPageDefined = false;
+        RouteElement annotation;
+        String path, page;
+        boolean isLoginPage, isSecured;
+        Constructor<?> cst;
+        Object newInstance;
 
-		Field[] declaredFields;
-		PageField pageField;
-		String pageFieldName;
+        Field[] declaredFields;
+        PageField pageField;
+        String pageFieldName;
 
-		List<Class<?>> classes = scanner
-			.findCandidateComponents(
-				NemoLightConstants.PACKAGE_NAME.replaceAll(
-					"/", "."));
-		classes.addAll(scanner.findCandidateComponents(
-			packageName));
+        List<Class<?>> classes = scanner
+            .findCandidateComponents(
+                NemoLightConstants.PACKAGE_NAME.replaceAll(
+                    "/", "."));
+        classes.addAll(scanner.findCandidateComponents(
+            packageName));
 
-		config.clearTemplateCache();
-		DeployResourceManager.SERVLETS.clear();
-		DeployResourceManager.FILES.clear();
+        config.clearTemplateCache();
+        DeployResourceManager.SERVLETS.clear();
+        DeployResourceManager.FILES.clear();
 
-		for (Class<?> c : classes) {
-			try {
-				/*
-				 * Get annoation informations.
-				 */
-				annotation = c.getAnnotation(RouteElement.class);
-				path = String.format("/%s%s", appName, annotation.path());
-				page = annotation.page();
-				isLoginPage = annotation.login();
-				isSecured = annotation.secured();
-				cst = c.getConstructor(String.class, String.class,
-					Configuration.class);
-				/*
-				 * Construct.
-				 */
-				newInstance = cst.newInstance(path, page, config);
+        for (Class<?> c : classes) {
+            try {
+                /*
+                 * Get annoation informations.
+                 */
+                annotation = c.getAnnotation(RouteElement.class);
+                path = annotation.path();
+                page = annotation.page();
+                isLoginPage = annotation.login();
+                isSecured = annotation.secured();
+                cst = c.getConstructor(String.class, String.class, String.class,
+                    Configuration.class);
+                /*
+                 * Construct.
+                 */
+                newInstance = cst.newInstance(path, appName, page, config);
 
-				if (newInstance instanceof IWebRouteServlet) {
-					servlet = (IWebRouteServlet) newInstance;
-					if (isSecured) {
-						servlet.enableSecurity();
-					}
+                if (newInstance instanceof IWebRouteServlet) {
+                    servlet = (IWebRouteServlet) newInstance;
+                    if (isSecured) {
+                        servlet.enableSecurity();
+                    }
 
-					/*
-					 * Set page fields for servlet.
-					 */
-					declaredFields = c.getDeclaredFields();
-					for (Field field : declaredFields) {
-						if (field.getType() == String.class
-							&& field.isAnnotationPresent(PageField.class)) {
-							pageField = field.getAnnotation(PageField.class);
-							pageFieldName = Utils.getFieldName(
-								pageField.name());
-							pageFieldName = pageFieldName.isEmpty()
-								? field.getName() : pageFieldName;
-							servlet.addPageField(field,
-								pageFieldName);
-						}
-					}
+                    /*
+                     * Set page fields for servlet.
+                     */
+                    declaredFields = c.getDeclaredFields();
+                    for (Field field : declaredFields) {
+                        if (field.getType() == String.class
+                            && field.isAnnotationPresent(PageField.class)) {
+                            pageField = field.getAnnotation(PageField.class);
+                            pageFieldName = Utils.getFieldName(
+                                pageField.name());
+                            pageFieldName = pageFieldName.isEmpty()
+                                ? field.getName() : pageFieldName;
+                            servlet.addPageField(field,
+                                pageFieldName);
+                        }
+                    }
 
-					/*
-					 * Add to deployer.
-					 */
-					DeployResourceManager.SERVLETS.put(
-						servlet.getName(), servlet);
-					LOGGER.info(String.format(
-						"Resource page '%s' has been deployed! [%s]",
-						c.getName(), path));
-					if (!loginPageDefined && isLoginPage) {
-						loginPageDefined = true;
-						WebRoute.setLoginPage(servlet.getPostRoute());
-						LOGGER.info(String
-							.format("Resource page '%s' has been set to login page",
-								c.getName()));
-					} else if (isLoginPage) {
-						LOGGER.warn("Login page is already set");
-					}
-				}
+                    /*
+                     * Add to deployer.
+                     */
+                    DeployResourceManager.SERVLETS.put(
+                        servlet.getName(), servlet);
+                    LOGGER.info(String.format(
+                        "Resource page '%s' has been deployed! [/%s%s]",
+                        c.getName(), appName, path));
+                    if (!loginPageDefined && isLoginPage) {
+                        loginPageDefined = true;
+                        WebRoute.setLoginPage(servlet.getPostRoute());
+                        LOGGER.info(String
+                            .format("Resource page '%s' has been set to login page",
+                                c.getName()));
+                    } else if (isLoginPage) {
+                        LOGGER.warn("Login page is already set");
+                    }
+                }
 
-			} catch (InstantiationException | IllegalAccessException |
-				IllegalArgumentException | InvocationTargetException |
-				NoSuchMethodException | SecurityException ex) {
-				LOGGER.error("Error while deploying resources", ex);
-			}
-		}
+            } catch (InstantiationException | IllegalAccessException |
+                IllegalArgumentException | InvocationTargetException |
+                NoSuchMethodException | SecurityException ex) {
+                LOGGER.error("Error while deploying resources", ex);
+            }
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	public static void deployWebApp(String deployFolderPath,
-		String appname) {
-		File deployFolder = new File(deployFolderPath);
-		try {
-			if (!deployFolder.exists() || !deployFolder.isDirectory()) {
-				throw new FileNotFoundException(String.format(
-					"The deploy folder '%s can not be located",
-					deployFolderPath));
-			}
-			FileRoute route;
-			String uriPath;
-			String routePath;
-			for (File f : DeployUtils.getAllFiles(deployFolder,
-				NemoLightConstants.RECURSIVE_SEARCH)) {
-				uriPath = f.toURI().toString();
-				routePath = uriPath.substring(uriPath
-					.lastIndexOf(deployFolderPath)
-					+ (deployFolderPath.length()));
-				route = new FileRoute(String.format(
-					"/%s%s", appname, routePath), f);
-				DeployResourceManager.FILES.add(route);
-				LOGGER.info(String.format(
-					"Resource file '%s' has been deployed! [%s]",
-					f.getName(), routePath));
-			}
-		} catch (FileNotFoundException ex) {
-			LOGGER.error("Error while deploying webapp", ex);
-		}
-	}
+    public static void deployWebApp(String deployFolderPath,
+        String appname) {
+        File deployFolder = new File(deployFolderPath);
+        try {
+            if (!deployFolder.exists() || !deployFolder.isDirectory()) {
+                throw new FileNotFoundException(String.format(
+                    "The deploy folder '%s can not be located",
+                    deployFolderPath));
+            }
+            FileRoute route;
+            String uriPath;
+            String routePath;
+            for (File f : DeployUtils.getAllFiles(deployFolder,
+                NemoLightConstants.RECURSIVE_SEARCH)) {
+                uriPath = f.toURI().toString();
+                routePath = uriPath.substring(uriPath
+                    .lastIndexOf(deployFolderPath)
+                    + (deployFolderPath.length()));
+                route = new FileRoute(routePath, appname, f);
+                DeployResourceManager.FILES.add(route);
+                LOGGER.info(String.format(
+                    "Resource file '%s' has been deployed! [/%s%s]",
+                    f.getName(), appname, routePath));
+            }
+        } catch (FileNotFoundException ex) {
+            LOGGER.error("Error while deploying webapp", ex);
+        }
+    }
 
-	public static void startServer() {
-		startServer(8080);
-	}
+    public static void startServer() {
+        startServer(8080);
+    }
 
-	public static void startServer(int port) {
-		startServer(port, 8181);
-	}
+    public static void startServer(int port) {
+        startServer(port, 8181);
+    }
 
-	public static void startServer(int port, int adminPort) {
+    public static void startServer(int port, int adminPort) {
 
-		if (adminPort != port) {
-			AdminConnection ac = new AdminConnection(adminPort);
-			ac.start();
-		} else {
-			LOGGER.error("The admin port can not be the same as deployment port");
-		}
+        if (adminPort != port) {
+            AdminConnection ac = new AdminConnection(adminPort);
+            ac.start();
+        } else {
+            LOGGER.error("The admin port can not be the same as deployment port");
+        }
 
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-			@Override
-			public void run() {
-				Thread.currentThread().setName("Shutdown-Hook");
-				LOGGER.info("Server stopped... I'll miss you ;)");
-			}
-		});
-		Spark.setPort(port);
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                Thread.currentThread().setName("Shutdown-Hook");
+                LOGGER.info("Server stopped... I'll miss you ;)");
+            }
+        });
+        Spark.setPort(port);
 
-		startListening();
-	}
+        startListening();
+    }
 
-	public static void startListening() {
-		for (IWebRouteServlet servlet
-			: DeployResourceManager.SERVLETS.values()) {
-			Spark.get(servlet.getGetRoute());
-			Spark.post(servlet.getPostRoute());
-		}
-		for (FileRoute route : DeployResourceManager.FILES) {
-			Spark.get(route);
-		}
-	}
+    public static void startListening() {
+        for (IWebRouteServlet servlet
+            : DeployResourceManager.SERVLETS.values()) {
+            Spark.get(servlet.getGetRoute());
+            Spark.post(servlet.getPostRoute());
+        }
+        for (FileRoute route : DeployResourceManager.FILES) {
+            Spark.get(route);
+        }
+    }
 
-	public static Map<String, String> initializeClassLoader() {
+    public static Map<String, String> initializeClassLoader() {
 
-		List<URL> urls = new ArrayList<>();
-		ClassLoader parentClassLoader = Launcher.class
-			.getClassLoader();
-		URLClassLoader classLoader = new URLClassLoader(
-			urls.toArray(new URL[0]), parentClassLoader);
+        List<URL> urls = new ArrayList<>();
+        ClassLoader parentClassLoader = Launcher.class
+            .getClassLoader();
+        URLClassLoader classLoader = new URLClassLoader(
+            urls.toArray(new URL[0]), parentClassLoader);
 
-		List<InputStream> deployFiles = new ArrayList<>();
+        List<InputStream> deployFiles = new ArrayList<>();
 
-		/*
-		 * Load applications.
-		 */
-		File deployFolder = new File(NemoLightConstants.DEPLOY_FOLDER);
+        /*
+         * Load applications.
+         */
+        File deployFolder = new File(NemoLightConstants.DEPLOY_FOLDER);
 
-		if (deployFolder.listFiles().length > 0) {
-			InputStream is;
-			URL url;
-			for (File f : deployFolder.listFiles()) {
-				try {
-					url = f.toURI().toURL();
-					urls.add(url);
-					classLoader = new URLClassLoader(
-						(URL[]) urls.toArray(new URL[0]),
-						parentClassLoader);
-				} catch (MalformedURLException ex) {
-					System.err.printf(
-						"Can not load deployment file from jar '%s': %s\n",
-						f.getName(), ex.getMessage());
-					continue;
-				}
-				is = classLoader
-					.getResourceAsStream(
-						NemoLightConstants.JAR_DEPLOY_FILE);
-				DeployUtils.addMavenDependencies(url, classLoader);
-				if (is != null) {
-					deployFiles.add(is);
-				}
-			}
-		}
+        if (deployFolder.listFiles().length > 0) {
+            InputStream is;
+            URL url;
+            for (File f : deployFolder.listFiles()) {
+                try {
+                    url = f.toURI().toURL();
+                    urls.add(url);
+                    classLoader = new URLClassLoader(
+                        (URL[]) urls.toArray(new URL[0]),
+                        parentClassLoader);
+                } catch (MalformedURLException ex) {
+                    System.err.printf(
+                        "Can not load deployment file from jar '%s': %s\n",
+                        f.getName(), ex.getMessage());
+                    continue;
+                }
+                is = classLoader
+                    .getResourceAsStream(
+                        NemoLightConstants.JAR_DEPLOY_FILE);
+                DeployUtils.addMavenDependencies(url, classLoader);
+                if (is != null) {
+                    deployFiles.add(is);
+                }
+            }
+        }
 
-		/*
-		 * Load dependencies.
-		 */
-		File dependenciesFolder = new File(
-			NemoLightConstants.DEPENDENCIES_FOLDER);
+        /*
+         * Load dependencies.
+         */
+        File dependenciesFolder = new File(
+            NemoLightConstants.DEPENDENCIES_FOLDER);
 
-		if (dependenciesFolder.listFiles().length > 0) {
-			URL url;
-			for (File f : dependenciesFolder.listFiles()) {
-				try {
-					url = f.toURI().toURL();
-					urls.add(url);
-					classLoader = new URLClassLoader(
-						(URL[]) urls.toArray(new URL[0]),
-						parentClassLoader);
-				} catch (MalformedURLException ex) {
-					System.err.printf(
-						"Can not load deployment file from jar '%s': %s\n",
-						f.getName(), ex.getMessage());
-				}
-			}
-		}
+        if (dependenciesFolder.listFiles().length > 0) {
+            URL url;
+            for (File f : dependenciesFolder.listFiles()) {
+                try {
+                    url = f.toURI().toURL();
+                    urls.add(url);
+                    classLoader = new URLClassLoader(
+                        (URL[]) urls.toArray(new URL[0]),
+                        parentClassLoader);
+                } catch (MalformedURLException ex) {
+                    System.err.printf(
+                        "Can not load deployment file from jar '%s': %s\n",
+                        f.getName(), ex.getMessage());
+                }
+            }
+        }
 
-		/*
-		 * Set Application Deployment ClassLoader.
-		 */
-		WebConfig.getInstance()
-			.setConfig(WebConfig.DEPLOYMENT_CLASSLOADER,
-				classLoader);
+        /*
+         * Set Application Deployment ClassLoader.
+         */
+        WebConfig.getInstance()
+            .setConfig(WebConfig.DEPLOYMENT_CLASSLOADER,
+                classLoader);
 
-		/*
-		 * Add the package name if specified.
-		 */
-		Map<String, String> packagesName = new HashMap<>();
+        /*
+         * Add the package name if specified.
+         */
+        Map<String, String> packagesName = new HashMap<>();
 
-		try {
-			DeployConfig deployConfig;
-			String packageName;
-			String appName;
-			ConcurrentHashMap<String, Object> infos;
-			for (InputStream is : deployFiles) {
+        try {
+            DeployConfig deployConfig;
+            String packageName;
+            String appName;
+            ConcurrentHashMap<String, Object> infos;
+            for (InputStream is : deployFiles) {
 
-				deployConfig = DeployConfig.loadConfig(is);
-				packageName = deployConfig
-					.getString(DeployConfig.DEPLOY_PACKAGE);
-				appName = deployConfig
-					.getString(DeployConfig.DEPLOY_APP_NAME);
+                deployConfig = DeployConfig.loadConfig(is);
+                packageName = deployConfig
+                    .getString(DeployConfig.DEPLOY_PACKAGE);
+                appName = deployConfig
+                    .getString(DeployConfig.DEPLOY_APP_NAME);
 
-				if (packageName != null) {
-					packagesName.put(appName, packageName);
-				}
-			}
-		} catch (JAXBException ex) {
-			LOGGER.error("Can not load config", ex);
-		}
+                if (packageName != null) {
+                    packagesName.put(appName, packageName);
+                }
+            }
+        } catch (JAXBException ex) {
+            LOGGER.error("Can not load config", ex);
+        }
 
-		return packagesName;
-	}
+        return packagesName;
+    }
 
-	public static List<String> getBeans() {
-		return new ArrayList<>(
-			DeployResourceManager.SERVLETS.keySet());
-	}
+    public static List<String> getBeans() {
+        return new ArrayList<>(
+            DeployResourceManager.SERVLETS.keySet());
+    }
 
-	public static IWebRouteServlet getBean(String beanName) {
-		return DeployResourceManager.SERVLETS.get(beanName);
-	}
+    public static IWebRouteServlet getBean(String beanName) {
+        return DeployResourceManager.SERVLETS.get(beanName);
+    }
 
 }

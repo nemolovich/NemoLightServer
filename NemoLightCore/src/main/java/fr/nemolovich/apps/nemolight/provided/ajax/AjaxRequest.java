@@ -21,80 +21,80 @@ import spark.Response;
 @RouteElement(path = "/ajax/:uid", page = "ajax.tpl")
 public class AjaxRequest extends WebRouteServletAdapter {
 
-	public AjaxRequest(String routePath, String page, Configuration config)
-		throws IOException {
-		super(routePath, page, config);
-	}
+    public AjaxRequest(String routePath, String context, String page,
+        Configuration config) throws IOException {
+        super(routePath, context, page, config);
+    }
 
-	@Override
-	protected void doPost(Request request, Response response, SimpleHash root)
-		throws ServerException {
+    @Override
+    protected void doPost(Request request, Response response, SimpleHash root)
+        throws ServerException {
 
-		String passedUid = request.params("uid");
-		String value = request.raw().getParameter("value");
-		String uid = request.raw().getParameter("uid");
-		String bean = request.raw().getParameter("bean");
+        String passedUid = request.params("uid");
+        String value = request.raw().getParameter("value");
+        String uid = request.raw().getParameter("uid");
+        String bean = request.raw().getParameter("bean");
 
-		JSONObject result;
-		if (value == null || bean == null || uid == null
-			|| passedUid == null) {
-			result = new JSONObject();
+        JSONObject result;
+        if (value == null || bean == null || uid == null
+            || passedUid == null) {
+            result = new JSONObject();
 
-			result.put(NemoLightConstants.AJAX_ERROR_KEY,
-				NemoLightConstants.AJAX_ERROR_INVALID_REQUEST);
-			result.put(NemoLightConstants.AJAX_ERROR_DESC,
-				"Request parameters are incorrect");
+            result.put(NemoLightConstants.AJAX_ERROR_KEY,
+                NemoLightConstants.AJAX_ERROR_INVALID_REQUEST);
+            result.put(NemoLightConstants.AJAX_ERROR_DESC,
+                "Request parameters are incorrect");
 
-			root.put(NemoLightConstants.AJAX_ACTION_KEY, bean);
-			root.put(NemoLightConstants.AJAX_VALUE_KEY, result);
-		} else if (uid.equals(passedUid)) {
-			IWebRouteServlet beanRoute = null;
-			for (String beanName : DeployResourceManager.getBeans()) {
-				if (beanName.equalsIgnoreCase(bean)) {
-					beanRoute = DeployResourceManager.getBean(beanName);
-					break;
-				}
-			}
-			if (beanRoute == null) {
-				result = new JSONObject();
-				result.put(NemoLightConstants.AJAX_ERROR_KEY,
-					NemoLightConstants.AJAX_ERROR_UNKNOWN_BEAN);
-				result.put(NemoLightConstants.AJAX_ERROR_DESC,
-					String.format("Can not find bean named '%s'", bean));
+            root.put(NemoLightConstants.AJAX_ACTION_KEY, bean);
+            root.put(NemoLightConstants.AJAX_VALUE_KEY, result);
+        } else if (uid.equals(passedUid)) {
+            IWebRouteServlet beanRoute = null;
+            for (String beanName : DeployResourceManager.getBeans()) {
+                if (beanName.equalsIgnoreCase(bean)) {
+                    beanRoute = DeployResourceManager.getBean(beanName);
+                    break;
+                }
+            }
+            if (beanRoute == null) {
+                result = new JSONObject();
+                result.put(NemoLightConstants.AJAX_ERROR_KEY,
+                    NemoLightConstants.AJAX_ERROR_UNKNOWN_BEAN);
+                result.put(NemoLightConstants.AJAX_ERROR_DESC,
+                    String.format("Can not find bean named '%s'", bean));
 
-				root.put(NemoLightConstants.AJAX_ACTION_KEY,
-					NemoLightConstants.AJAX_ERROR_KEY);
-				root.put(NemoLightConstants.AJAX_VALUE_KEY, result);
-			} else {
-				try {
-					result = new JSONObject(value);
-					beanRoute.getAjaxRequest(result, root);
-				} catch (JSONException je) {
-					result = new JSONObject();
+                root.put(NemoLightConstants.AJAX_ACTION_KEY,
+                    NemoLightConstants.AJAX_ERROR_KEY);
+                root.put(NemoLightConstants.AJAX_VALUE_KEY, result);
+            } else {
+                try {
+                    result = new JSONObject(value);
+                    beanRoute.getAjaxRequest(result, root);
+                } catch (JSONException je) {
+                    result = new JSONObject();
 
-					result.put(NemoLightConstants.AJAX_ERROR_KEY,
-						NemoLightConstants.AJAX_ERROR_INVALID_SYNTAX);
-					result.put(NemoLightConstants.AJAX_ERROR_DESC, String
-						.format("Value '%s' is not a valid JSON object: %s",
-							value, je.getMessage()));
+                    result.put(NemoLightConstants.AJAX_ERROR_KEY,
+                        NemoLightConstants.AJAX_ERROR_INVALID_SYNTAX);
+                    result.put(NemoLightConstants.AJAX_ERROR_DESC, String
+                        .format("Value '%s' is not a valid JSON object: %s",
+                            value, je.getMessage()));
 
-					root.put(NemoLightConstants.AJAX_ACTION_KEY,
-						NemoLightConstants.AJAX_ERROR_KEY);
-					root.put(NemoLightConstants.AJAX_VALUE_KEY, result);
-				}
-			}
+                    root.put(NemoLightConstants.AJAX_ACTION_KEY,
+                        NemoLightConstants.AJAX_ERROR_KEY);
+                    root.put(NemoLightConstants.AJAX_VALUE_KEY, result);
+                }
+            }
 
-		} else {
-			result = new JSONObject();
+        } else {
+            result = new JSONObject();
 
-			result.put(NemoLightConstants.AJAX_ERROR_KEY,
-				NemoLightConstants.AJAX_ERROR_INVALID_REQUEST);
-			result.put(NemoLightConstants.AJAX_ERROR_DESC,
-				"Given request UUID is not the same as parameter");
+            result.put(NemoLightConstants.AJAX_ERROR_KEY,
+                NemoLightConstants.AJAX_ERROR_INVALID_REQUEST);
+            result.put(NemoLightConstants.AJAX_ERROR_DESC,
+                "Given request UUID is not the same as parameter");
 
-			root.put(NemoLightConstants.AJAX_ACTION_KEY,
-				NemoLightConstants.AJAX_ERROR_KEY);
-			root.put(NemoLightConstants.AJAX_VALUE_KEY, result);
-		}
-	}
+            root.put(NemoLightConstants.AJAX_ACTION_KEY,
+                NemoLightConstants.AJAX_ERROR_KEY);
+            root.put(NemoLightConstants.AJAX_VALUE_KEY, result);
+        }
+    }
 }

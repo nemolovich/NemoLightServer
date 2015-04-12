@@ -13,9 +13,9 @@ import spark.Response;
  */
 public abstract class WebRouteServletAdapter extends WebRouteServlet {
 
-	public WebRouteServletAdapter(String path, String templateName,
+	public WebRouteServletAdapter(String path, String context, String templateName,
 		Configuration config) throws IOException {
-		super(path, templateName, config);
+		super(path, context, templateName, config);
 	}
 
 	@Override

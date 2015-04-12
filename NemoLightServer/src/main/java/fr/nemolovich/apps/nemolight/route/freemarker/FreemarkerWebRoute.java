@@ -21,9 +21,9 @@ public abstract class FreemarkerWebRoute extends WebRoute
 	private static final Logger LOGGER = Logger
 		.getLogger(FreemarkerWebRoute.class);
 
-	protected FreemarkerWebRoute(final String path,
+	protected FreemarkerWebRoute(final String path, String context,
 		Configuration cfg) throws IOException {
-		super(path);
+		super(path, context);
 	}
 
 	@Override
@@ -31,6 +31,7 @@ public abstract class FreemarkerWebRoute extends WebRoute
 		StringWriter writer = new StringWriter();
 		try {
 			doHandle(request, response, writer);
+//			writer.session().attribute("error_details", details.toString());
 		} catch (ServerException ex) {
 			LOGGER.log(Level.ERROR, "Error while processing with route", ex);
 			StringBuilder details = new StringBuilder(String.format("%s<br/>\n",
