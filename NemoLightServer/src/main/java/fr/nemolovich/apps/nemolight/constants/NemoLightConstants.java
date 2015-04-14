@@ -10,7 +10,7 @@ public interface NemoLightConstants {
 	 * ***********************
 	 */
 	public static final String PACKAGE_NAME = "fr/nemolovich/apps/nemolight/";
-	public static final String APPICATION_CONTEXT = "AppicationContext";
+	public static final String APPLICATION_CONTEXT = "ApplicationContext";
 
 	/* ***********************
 	 * Web folders

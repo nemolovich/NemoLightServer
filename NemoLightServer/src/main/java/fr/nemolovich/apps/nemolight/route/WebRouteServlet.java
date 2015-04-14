@@ -92,7 +92,7 @@ abstract class WebRouteServlet implements
         fields.put(NemoLightConstants.AJAX_FIELDS_KEY,
             new JSONArray(fieldsList.values()));
         root.put(NemoLightConstants.AJAX_FIELDS_KEY, fields.toString());
-        root.put(NemoLightConstants.APPICATION_CONTEXT, "/".concat(this.context));
+        root.put(NemoLightConstants.APPLICATION_CONTEXT, "/".concat(this.context));
         for (String field : fieldsList.values()) {
             root.put(field, "");
         }
