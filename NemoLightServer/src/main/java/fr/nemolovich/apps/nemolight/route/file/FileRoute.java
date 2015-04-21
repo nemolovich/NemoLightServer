@@ -1,5 +1,6 @@
 package fr.nemolovich.apps.nemolight.route.file;
 
+import fr.nemolovich.apps.concurrentmultimap.ConcurrentMultiMap;
 import fr.nemolovich.apps.nemolight.route.WebRoute;
 import fr.nemolovich.apps.nemolight.route.file.mimetype.ForcedMimeType;
 import java.io.File;
@@ -9,6 +10,8 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentMap;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -99,13 +102,22 @@ public class FileRoute extends WebRoute {
 		resp.setContentType(mimeType);
 		OutputStream out;
 		StringBuilder outBuff = new StringBuilder();
+		ConcurrentMap<Integer, byte[]> bytes
+			= new ConcurrentMultiMap<>();
 		try (FileInputStream in = new FileInputStream(this.file)) {
 			out = resp.getOutputStream();
-            byte[] buf = new byte[2048];
-            int count;
-            while ((count = in.read(buf)) >= 0) {
+			byte[] buf = new byte[2048];
+			byte[] tmp;
+			int count;
+			while ((count = in.read(buf)) >= 0) {
 //                outBuff.append(buf);
-				out.write(buf, 0, count);
+//				out.write(buf, 0, count);
+				tmp = new byte[count];
+				System.arraycopy(buf, 0, tmp, 0, count);
+				bytes.put(count, tmp);
+			}
+			for (Entry<Integer, byte[]> entry : bytes.entrySet()) {
+				out.write(entry.getValue(), 0, entry.getKey());
 			}
 //            out.write(outBuff.toString().replaceAll(String.format(
 //                "\\$\\{%s\\}", "/".concat(NemoLightConstants.APPICATION_CONTEXT)),

@@ -27,6 +27,13 @@
             <artifactId>nemolight-admin-common</artifactId>
             <version>0.1</version>
         </dependency>
+		
+		<dependency>
+			<groupId>fr.nemolovich.apps</groupId>
+			<artifactId>concurrent-multi-map</artifactId>
+			<version>0.1</version>
+			<type>jar</type>
+		</dependency>
         
         <dependency>
             <groupId>com.sparkjava</groupId>
