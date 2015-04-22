@@ -1,8 +1,5 @@
 package fr.nemolovich.apps.nemolight.route.file;
 
-import fr.nemolovich.apps.concurrentmultimap.ConcurrentMultiMap;
-import fr.nemolovich.apps.nemolight.route.WebRoute;
-import fr.nemolovich.apps.nemolight.route.file.mimetype.ForcedMimeType;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -10,13 +7,18 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentMap;
+
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
 import spark.Request;
 import spark.Response;
+import fr.nemolovich.apps.nemolight.constants.NemoLightConstants;
+import fr.nemolovich.apps.nemolight.route.WebRoute;
+import fr.nemolovich.apps.nemolight.route.file.mimetype.ForcedMimeType;
+import fr.nemolovich.apps.nemolight.stream.ReplaceOutputStream;
 
 public class FileRoute extends WebRoute {
 
@@ -27,16 +29,16 @@ public class FileRoute extends WebRoute {
 
 	static {
 		FORCED_MIMETYPES = new ArrayList<>();
-		FORCED_MIMETYPES.add(
-			ForcedMimeType.newInstance(".js", "application/javascript"));
+		FORCED_MIMETYPES.add(ForcedMimeType.newInstance(".js",
+				"application/javascript"));
 	}
 
 	public FileRoute(String route, String context, File file) {
 		super(route, context);
 		this.file = file;
 		if (this.file == null || !this.file.exists()) {
-			LOGGER.log(Level.ERROR, String.format("Can not load file '%s'",
-				file.getPath()));
+			LOGGER.log(Level.ERROR,
+					String.format("Can not load file '%s'", file.getPath()));
 		}
 		super.disableSecurity();
 	}
@@ -63,8 +65,8 @@ public class FileRoute extends WebRoute {
 	private static String getMimeType(String path) {
 		String result = null;
 		for (ForcedMimeType mimeType : FORCED_MIMETYPES) {
-			if (path.toLowerCase().endsWith(mimeType.getExtension()
-				.toLowerCase())) {
+			if (path.toLowerCase().endsWith(
+					mimeType.getExtension().toLowerCase())) {
 				result = mimeType.getMimeType();
 				break;
 			}
@@ -84,7 +86,7 @@ public class FileRoute extends WebRoute {
 	}
 
 	private void deployFile(Request request, Response response)
-		throws IOException {
+			throws IOException {
 
 		HttpServletResponse resp = response.raw();
 
@@ -95,35 +97,22 @@ public class FileRoute extends WebRoute {
 			mimeType = getMimeType(fileName);
 		} else {
 			mimeType = Files.probeContentType(this.file.toPath());
-			mimeType = mimeType == null
-				? TEXT_PLAIN_MIMETYPE : mimeType;
+			mimeType = mimeType == null ? TEXT_PLAIN_MIMETYPE : mimeType;
 		}
 
 		resp.setContentType(mimeType);
-		OutputStream out;
-		StringBuilder outBuff = new StringBuilder();
-		ConcurrentMap<Integer, byte[]> bytes
-			= new ConcurrentMultiMap<>();
+
 		try (FileInputStream in = new FileInputStream(this.file)) {
-			out = resp.getOutputStream();
-			byte[] buf = new byte[2048];
-			byte[] tmp;
-			int count;
-			while ((count = in.read(buf)) >= 0) {
-//                outBuff.append(buf);
-//				out.write(buf, 0, count);
-				tmp = new byte[count];
-				System.arraycopy(buf, 0, tmp, 0, count);
-				bytes.put(count, tmp);
-			}
-			for (Entry<Integer, byte[]> entry : bytes.entrySet()) {
-				out.write(entry.getValue(), 0, entry.getKey());
-			}
-//            out.write(outBuff.toString().replaceAll(String.format(
-//                "\\$\\{%s\\}", "/".concat(NemoLightConstants.APPICATION_CONTEXT)),
-//                this.getContext()).getBytes());
+			OutputStream out = resp.getOutputStream();
+
+			ReplaceOutputStream replaceOutputStream = new ReplaceOutputStream(
+					in, out);
+			replaceOutputStream.replace(String.format("\\$\\{%s\\}",
+									"/".concat(NemoLightConstants.APPLICATION_CONTEXT)),
+							this.getContext());
+
+			out.close();
 			in.close();
 		}
-		out.close();
 	}
 }
