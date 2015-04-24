@@ -103,13 +103,17 @@ public class FileRoute extends WebRoute {
 		resp.setContentType(mimeType);
 
 		try (FileInputStream in = new FileInputStream(this.file)) {
-			OutputStream out = resp.getOutputStream();
 
-			ReplaceOutputStream replaceOutputStream = new ReplaceOutputStream(
-					in, out);
-			replaceOutputStream.replace(String.format("\\$\\{%s\\}",
-									"/".concat(NemoLightConstants.APPLICATION_CONTEXT)),
-							this.getContext());
+			ReplaceOutputStream out = new ReplaceOutputStream(
+					resp.getOutputStream(), String.format("\\$\\{%s\\}",
+							NemoLightConstants.APPLICATION_CONTEXT),
+					"/".concat(this.getContext()));
+
+			byte[] buff = new byte[2048];
+			int count;
+			while ((count = in.read(buff)) >= 0) {
+				out.write(buff, 0, count);
+			}
 
 			out.close();
 			in.close();
