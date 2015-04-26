@@ -1,24 +1,20 @@
 package fr.nemolovich.apps.nemolight.route.file;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-
-import spark.Request;
-import spark.Response;
 import fr.nemolovich.apps.nemolight.constants.NemoLightConstants;
 import fr.nemolovich.apps.nemolight.route.WebRoute;
 import fr.nemolovich.apps.nemolight.route.file.mimetype.ForcedMimeType;
 import fr.nemolovich.apps.nemolight.stream.ReplaceOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
+import javax.servlet.http.HttpServletResponse;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import spark.Request;
+import spark.Response;
 
 public class FileRoute extends WebRoute {
 
@@ -30,7 +26,7 @@ public class FileRoute extends WebRoute {
 	static {
 		FORCED_MIMETYPES = new ArrayList<>();
 		FORCED_MIMETYPES.add(ForcedMimeType.newInstance(".js",
-				"application/javascript"));
+			"application/javascript"));
 	}
 
 	public FileRoute(String route, String context, File file) {
@@ -38,7 +34,7 @@ public class FileRoute extends WebRoute {
 		this.file = file;
 		if (this.file == null || !this.file.exists()) {
 			LOGGER.log(Level.ERROR,
-					String.format("Can not load file '%s'", file.getPath()));
+				String.format("Can not load file '%s'", file.getPath()));
 		}
 		super.disableSecurity();
 	}
@@ -66,7 +62,7 @@ public class FileRoute extends WebRoute {
 		String result = null;
 		for (ForcedMimeType mimeType : FORCED_MIMETYPES) {
 			if (path.toLowerCase().endsWith(
-					mimeType.getExtension().toLowerCase())) {
+				mimeType.getExtension().toLowerCase())) {
 				result = mimeType.getMimeType();
 				break;
 			}
@@ -86,7 +82,7 @@ public class FileRoute extends WebRoute {
 	}
 
 	private void deployFile(Request request, Response response)
-			throws IOException {
+		throws IOException {
 
 		HttpServletResponse resp = response.raw();
 
@@ -102,21 +98,19 @@ public class FileRoute extends WebRoute {
 
 		resp.setContentType(mimeType);
 
-		try (FileInputStream in = new FileInputStream(this.file)) {
-
+		try (FileInputStream in = new FileInputStream(this.file);
 			ReplaceOutputStream out = new ReplaceOutputStream(
-					resp.getOutputStream(), String.format("\\$\\{%s\\}",
-							NemoLightConstants.APPLICATION_CONTEXT),
-					"/".concat(this.getContext()));
-
+			resp.getOutputStream(), String.format("\\$\\{%s\\}",
+				NemoLightConstants.APPLICATION_CONTEXT),
+			"/".concat(this.getContext()))) {
+			
 			byte[] buff = new byte[2048];
 			int count;
 			while ((count = in.read(buff)) >= 0) {
 				out.write(buff, 0, count);
 			}
-
-			out.close();
-			in.close();
+			
 		}
+
 	}
 }
