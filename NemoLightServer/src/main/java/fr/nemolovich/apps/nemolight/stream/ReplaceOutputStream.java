@@ -14,11 +14,12 @@ public class ReplaceOutputStream extends OutputStream {
 	private static final int ARR_SIZE = 2048;
 
 	private int nbBytes;
-	private byte[] tmpBuff;
+	private final byte[] tmpBuff;
 	private final OutputStream out;
 	private final ConcurrentMap<Integer, byte[]> bytes;
 	private final String regex;
 	private final String target;
+    private final Pattern pattern;
 
 	public ReplaceOutputStream(OutputStream out, String regex, String target) {
 		this.nbBytes = 0;
@@ -27,6 +28,7 @@ public class ReplaceOutputStream extends OutputStream {
 		this.regex = regex;
 		this.target = target;
 		this.bytes = new ConcurrentMultiMap<>();
+        this.pattern=Pattern.compile(this.regex);
 	}
 
 	@Override
@@ -109,5 +111,30 @@ public class ReplaceOutputStream extends OutputStream {
 		}
 		this.out.close();
 	}
+
+    private void witeInBuff(String concat, byte[] prev, byte[] tab)
+        throws IOException {
+        Matcher matcher;
+        String replace;
+        matcher = this.pattern.matcher(concat);
+        boolean found = false;
+        while (matcher.find()) {
+            found = true;
+            replace = matcher.replaceFirst(this.target).substring(0,
+                matcher.start() + this.target.length());
+            concat = concat.substring(matcher.end(), concat.length());
+            prev = new byte[replace.getBytes().length];
+            tab = new byte[concat.getBytes().length];
+            System.arraycopy(replace.getBytes(), 0, prev, 0,
+                replace.getBytes().length);
+            System.arraycopy(concat.getBytes(), 0, tab, 0,
+                concat.getBytes().length);
+            this.out.write(prev, 0, prev.length);
+            matcher = this.pattern.matcher(concat);
+        }
+        if (!found) {
+            this.out.write(prev, 0, prev.length);
+        }
+    }
 
 }

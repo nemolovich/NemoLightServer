@@ -7,7 +7,7 @@ function request(bean, fields, callback) {
 	}
 	var value = getAjaxValues(fields);
 	var uuid = generateUUID();
-	var url = "/ajax/" + uuid;
+	var url = "${ApplicationContext}/ajax/" + uuid;
 	$.ajax({
 		type : 'POST',
 		url : url,
@@ -54,7 +54,7 @@ function ajaxFunction(funcName, param, callback) {
 function callAjaxFunction(funcName, param, callback) {
 	var res = "error";
 	var uuid = generateUUID();
-	var url = "/ajax/functions/" + uuid;
+	var url = "${ApplicationContext}/ajax/functions/" + uuid;
 	$.ajax(
 			{
 				async: false,
