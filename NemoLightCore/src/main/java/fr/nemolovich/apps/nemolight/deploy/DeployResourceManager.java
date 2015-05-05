@@ -350,7 +350,6 @@ public final class DeployResourceManager {
             DeployConfig deployConfig;
             String packageName;
             String appName;
-            ConcurrentHashMap<String, Object> infos;
             for (InputStream is : deployFiles) {
 
                 deployConfig = DeployConfig.loadConfig(is);

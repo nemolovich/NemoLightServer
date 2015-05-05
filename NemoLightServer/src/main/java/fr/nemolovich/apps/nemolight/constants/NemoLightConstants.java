@@ -21,10 +21,10 @@ public interface NemoLightConstants {
 	public static final String RESOURCES_FOLDER = "resources/";
 
 	public static final String CONFIG_FOLDER = String.format("%s%s",
-		RESOURCES_FOLDER, "/configs/");
+		RESOURCES_FOLDER, "configs/");
 
 	public static final String TEMPLATE_FOLDER = String.format("%s%s",
-		RESOURCES_FOLDER, "/freemarker/");
+		RESOURCES_FOLDER, "freemarker/");
 
 	public static final String DEPENDENCIES_FOLDER = "dependencies";
 

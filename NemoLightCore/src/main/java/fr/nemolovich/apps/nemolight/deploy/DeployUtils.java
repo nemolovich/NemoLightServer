@@ -16,9 +16,12 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.jar.JarFile;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -28,6 +31,27 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  * @author Nemolovich
  */
 final class DeployUtils {
+
+	static {
+		/**
+		 * Set trust manager to allow all hosts (skip SSL).
+		 */
+		DependenciesDownloader.setTrustManager(new TrustManager[]{
+			new X509TrustManager() {
+				@Override
+				public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+					return null;
+				}
+
+				@Override
+				public void checkClientTrusted(X509Certificate[] certs, String authType) {
+				}
+
+				@Override
+				public void checkServerTrusted(X509Certificate[] certs, String authType) {
+				}
+			}});
+	}
 
 	static void addMavenDependencies(URL url,
 		URLClassLoader classLoader) {

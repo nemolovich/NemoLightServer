@@ -16,4 +16,11 @@ Any value defined here will override the pom.xml file value but is only applicab
         <netbeans.hint.jdkPlatform>JDK_1.7</netbeans.hint.jdkPlatform>
         <org-netbeans-modules-javascript2-requirejs.enabled>true</org-netbeans-modules-javascript2-requirejs.enabled>
     </properties>
+    <config-data xmlns="http://www.netbeans.org/ns/maven-config-data/1">
+        <configurations>
+            <configuration id="extract" profiles=""/>
+            <configuration id="extract_nosecurity" profiles=""/>
+            <configuration id="nesecurity" profiles=""/>
+        </configurations>
+    </config-data>
 </project-shared-configuration>

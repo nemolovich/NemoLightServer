@@ -81,7 +81,6 @@ public class Launcher {
 			= DeployResourceManager.initializeClassLoader();
 		String packageName;
 		String appName;
-		int identifier;
 
 		if (extract) {
 
