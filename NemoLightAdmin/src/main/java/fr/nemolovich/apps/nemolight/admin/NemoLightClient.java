@@ -5,7 +5,9 @@ import fr.nemolovich.apps.nemolight.admin.socket.ClientSocket;
 import fr.nemolovich.apps.nemolight.security.CommonUtils;
 import java.io.Console;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.charset.Charset;
+import java.security.InvalidParameterException;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -13,10 +15,14 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  *
  * @author Nemolovich
  */
-public class NemoLightClient {
+public final class NemoLightClient {
 
     private static final ConcurrentLinkedQueue<Command> LOCAL_COMMANDS;
     private static final String HELP = "Expected parameters: <HOST> <PORT>";
+    private static final String MSG_TEMPLATE = "%s\n";
+    private static final int MIN_PORT = 100;
+    private static final PrintStream ERR;
+    private static final PrintStream OUT;
 
     static {
 
@@ -36,11 +42,17 @@ public class NemoLightClient {
                     return result;
                 }
             });
+
+        ERR = System.err;
+        OUT = System.out;
+    }
+
+    private NemoLightClient() {
     }
 
     public static void main(String[] args) throws IOException {
         if (args.length < 2) {
-            System.err.println(HELP);
+            err(MSG_TEMPLATE, HELP);
             return;
         }
         String host;
@@ -48,12 +60,12 @@ public class NemoLightClient {
         try {
             host = args[0];
             port = Integer.valueOf(args[1]);
-            if (host.length() < 2 || port < 100) {
-                throw new Exception("Invalid parameters");
+            if (host.length() < 2 || port < MIN_PORT) {
+                throw new InvalidParameterException("Invalid parameters");
             }
-        } catch (Exception ex) {
-            System.err.println(ex.getMessage());
-            System.err.println(HELP);
+        } catch (InvalidParameterException ex) {
+            err(MSG_TEMPLATE, ex.getMessage());
+            err(MSG_TEMPLATE, HELP);
             return;
         }
 
@@ -61,14 +73,14 @@ public class NemoLightClient {
         String password;
         if (console == null) {
             if (args.length < 3) {
-                System.err.printf("%s <PASSORD>", HELP);
+                err("%s <PASSORD>", HELP);
                 return;
             } else {
                 password = args[2];
             }
         } else {
             if (args.length < 3) {
-                System.out.print("Please enter the certificate password: ");
+                log("Please enter the certificate password: ");
                 password = new String(console.readPassword());
             } else {
                 password = args[2];
@@ -78,14 +90,14 @@ public class NemoLightClient {
         ClientSocket client = new ClientSocket(host, port, password);
         client.connect();
 
-        System.out.println(client.readResponse());
-        System.out.println(getLocalCommandInfo());
+        log(MSG_TEMPLATE, client.readResponse());
+        log(MSG_TEMPLATE, getLocalCommandInfo());
 
         Scanner sc = new Scanner(System.in, Charset.defaultCharset().name());
         String commandLine;
         String[] params, tmp;
         do {
-            System.out.print("> ");
+            log("> ");
             commandLine = sc.nextLine();
             tmp = commandLine.split(" ");
             String commandName = tmp[0];
@@ -94,14 +106,14 @@ public class NemoLightClient {
             Command command = getLocalCommand(commandName);
             if (command == null) {
                 client.sendRequest(commandLine);
-                System.out.println(client.readResponse());
+                log(MSG_TEMPLATE, client.readResponse());
                 if (commandLine.equals(String.format("%s%s",
                     CommandConstants.COMMAND_START,
                     CommandConstants.HELP_COMMAND))) {
-                    System.out.println(getLocalCommandInfo());
+                    log(MSG_TEMPLATE, getLocalCommandInfo());
                 }
             } else {
-                System.out.println(command.doCommand(params));
+                log(MSG_TEMPLATE, command.doCommand(params));
             }
         } while (!ClientSocket.getQuitCommand().equalsIgnoreCase(commandLine));
 
@@ -111,7 +123,8 @@ public class NemoLightClient {
     private static String getLocalCommandInfo() {
         StringBuilder result = new StringBuilder();
         for (Command command : LOCAL_COMMANDS) {
-            result.append(String.format("\t%s\n", command.getCommandName()));
+            result.append(String.format("\t".concat(MSG_TEMPLATE),
+                command.getCommandName()));
         }
         if (result.toString().endsWith("\n")) {
             result = new StringBuilder(result.substring(0, result.length() - 1));
@@ -128,5 +141,13 @@ public class NemoLightClient {
             }
         }
         return result;
+    }
+
+    private static void log(String message, Object... args) {
+        OUT.printf(message, args);
+    }
+
+    private static void err(String message, Object... args) {
+        ERR.printf(message, args);
     }
 }
