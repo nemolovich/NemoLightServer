@@ -1,19 +1,22 @@
 package fr.nemolovich.apps.nemolight.security;
 
-public class SecurityUtils {
+public final class SecurityUtils {
 
-	private static boolean IS_SECURED = false;
+    private static boolean IS_SECURED = false;
 
-	public static final void enableSecurity() {
-		IS_SECURED = true;
-	}
+    private SecurityUtils() {
+    }
 
-	public static final void disableSecurity() {
-		IS_SECURED = false;
-	}
+    public static final void enableSecurity() {
+        IS_SECURED = true;
+    }
 
-	public static final boolean isSecured() {
-		return IS_SECURED;
-	}
+    public static final void disableSecurity() {
+        IS_SECURED = false;
+    }
+
+    public static final boolean isSecured() {
+        return IS_SECURED;
+    }
 
 }

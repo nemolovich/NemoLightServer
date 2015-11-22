@@ -11,11 +11,11 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface RouteElement {
 
-	String path();
+    String path();
 
-	String page();
+    String page();
 
-	boolean login() default false;
+    boolean login() default false;
 
-	boolean secured() default true;
+    boolean secured() default true;
 }

@@ -13,21 +13,21 @@ import spark.Response;
  */
 public abstract class WebRouteServletAdapter extends WebRouteServlet {
 
-	public WebRouteServletAdapter(String path, String context, String templateName,
-		Configuration config) throws IOException {
-		super(path, context, templateName, config);
-	}
+    public WebRouteServletAdapter(String path, String context, String templateName,
+        Configuration config) throws IOException {
+        super(path, context, templateName, config);
+    }
 
-	@Override
-	protected void doGet(Request request, Response response,
-		SimpleHash root) throws ServerException{
-		
-	}
+    @Override
+    protected void doGet(Request request, Response response,
+        SimpleHash root) throws ServerException {
 
-	@Override
-	protected void doPost(Request request, Response response,
-		SimpleHash root) throws ServerException{
-		
-	}
+    }
+
+    @Override
+    protected void doPost(Request request, Response response,
+        SimpleHash root) throws ServerException {
+
+    }
 
 }

@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package fr.nemolovich.apps.nemolight.admin.commands;
 
 import fr.nemolovich.apps.nemolight.admin.Command;
@@ -13,18 +8,18 @@ import fr.nemolovich.apps.nemolight.admin.Command;
  */
 public class SayHello extends Command {
 
-	public SayHello() {
-		super("hello", "Be polite! Say Hello!");
-	}
+    public SayHello() {
+        super("hello", "Be polite! Say Hello!");
+    }
 
-	@Override
-	public String getHelp() {
-		return String.format("\t%s%n", this.getDescription());
-	}
+    @Override
+    public String getHelp() {
+        return String.format("\t%s%n", this.getDescription());
+    }
 
-	@Override
-	public String doCommand(String... args) {
-		return "Hello guy!";
-	}
+    @Override
+    public String doCommand(String... args) {
+        return "Hello guy!";
+    }
 
 }

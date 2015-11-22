@@ -11,13 +11,13 @@ package fr.nemolovich.apps.nemolight.admin.commands;
  */
 public class UnkownCommandException extends Exception {
 
-	/**
-	 * UID.
-	 */
-	private static final long serialVersionUID = -2758797314430074333L;
+    /**
+     * UID.
+     */
+    private static final long serialVersionUID = -2758797314430074333L;
 
-	public UnkownCommandException(String command) {
-		super(String.format("Unknown command '%s'", command));
-	}
+    public UnkownCommandException(String command) {
+        super(String.format("Unknown command '%s'", command));
+    }
 
 }

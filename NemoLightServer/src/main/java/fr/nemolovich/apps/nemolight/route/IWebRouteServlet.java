@@ -12,23 +12,23 @@ import spark.Response;
  */
 public interface IWebRouteServlet {
 
-	void addPageField(Field field, String pageFieldName);
+    void addPageField(Field field, String pageFieldName);
 
-	void enableSecurity();
+    void enableSecurity();
 
-	void getAjaxRequest(JSONObject request, SimpleHash root);
+    void getAjaxRequest(JSONObject request, SimpleHash root);
 
-	WebRoute getGetRoute();
+    WebRoute getGetRoute();
 
-	String getName();
+    String getName();
 
-	WebRoute getPostRoute();
+    WebRoute getPostRoute();
 
-	void redirect(Request request, Response response);
+    void redirect(Request request, Response response);
 
-	void stopProcess();
+    void stopProcess();
 
-	@Override
-	String toString();
-	
+    @Override
+    String toString();
+
 }

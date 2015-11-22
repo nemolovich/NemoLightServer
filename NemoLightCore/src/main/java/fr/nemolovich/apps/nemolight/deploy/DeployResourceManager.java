@@ -101,7 +101,7 @@ public final class DeployResourceManager {
         }
     }
 
-    public static final boolean deployWebPages(Configuration config,
+    public static boolean deployWebPages(Configuration config,
         String packageName, String appName) {
         ClassPathScanner scanner = new ClassPathScanner();
         scanner.addIncludeFilter(new AnnotationTypeFilter(
@@ -166,7 +166,7 @@ public final class DeployResourceManager {
                             pageFieldName = Utils.getFieldName(
                                 pageField.name());
                             pageFieldName = pageFieldName.isEmpty()
-                                ? field.getName() : pageFieldName;
+                                ? Utils.getFieldName(field.getName()) : pageFieldName;
                             servlet.addPageField(field,
                                 pageFieldName);
                         }
@@ -317,7 +317,8 @@ public final class DeployResourceManager {
         File dependenciesFolder = new File(
             NemoLightConstants.DEPENDENCIES_FOLDER);
 
-        if (dependenciesFolder.listFiles().length > 0) {
+        if (dependenciesFolder.exists()
+            && dependenciesFolder.listFiles().length > 0) {
             URL url;
             for (File f : dependenciesFolder.listFiles()) {
                 try {

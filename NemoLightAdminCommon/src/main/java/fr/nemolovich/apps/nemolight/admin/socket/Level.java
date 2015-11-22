@@ -10,6 +10,7 @@ package fr.nemolovich.apps.nemolight.admin.socket;
  * @author Nemolovich
  */
 public enum Level {
+
     FINE,
     INFO,
     ERROR,

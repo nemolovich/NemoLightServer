@@ -54,6 +54,9 @@ final class DeployUtils {
             }});
     }
 
+    private DeployUtils() {
+    }
+
     static void addMavenDependencies(URL url,
         URLClassLoader classLoader) {
         MavenXpp3Reader reader = new MavenXpp3Reader();

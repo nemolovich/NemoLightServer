@@ -11,13 +11,13 @@ package fr.nemolovich.apps.nemolight.admin.socket;
  */
 public interface ISocketLogger {
 
-    public void fine(String message);
+    void fine(String message);
 
-    public void info(String message);
+    void info(String message);
 
-    public void error(String message);
+    void error(String message);
 
-    public void warning(String message);
+    void warning(String message);
 
-    public void write(String message, Level level);
+    void write(String message, Level level);
 }

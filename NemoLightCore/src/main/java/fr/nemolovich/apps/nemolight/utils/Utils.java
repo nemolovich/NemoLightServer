@@ -18,7 +18,7 @@ public final class Utils {
     private static final Logger LOGGER = Logger
         .getLogger(Utils.class.getName());
 
-    public static final JarFile extractJar(URL jarURL) {
+    public static JarFile extractJar(URL jarURL) {
         String jarPath;
 
         try {
@@ -59,42 +59,42 @@ public final class Utils {
          * Check options
          */
         boolean all = false;
-        boolean only_classes = false;
-        boolean exclude_classes = false;
-        boolean only_fodlers = false;
-        boolean exclude_folders = false;
+        boolean onlyClasses = false;
+        boolean excludeClasses = false;
+        boolean onlyFodlers = false;
+        boolean excludeFolders = false;
         if (options == NemoLightConstants.INCLUDE_ALL) {
             all = true;
         } else {
             if (((options & NemoLightConstants.ONLY_CLASS_FILES))
                 == NemoLightConstants.ONLY_CLASS_FILES) {
-                only_classes = true;
+                onlyClasses = true;
             }
             if (((options & NemoLightConstants.EXCLUDE_CLASS_FILES))
                 == NemoLightConstants.EXCLUDE_CLASS_FILES) {
-                exclude_classes = true;
+                excludeClasses = true;
             }
             if (((options & NemoLightConstants.ONLY_FOLDERS))
                 == NemoLightConstants.ONLY_FOLDERS) {
-                only_fodlers = true;
+                onlyFodlers = true;
             }
             if (((options & NemoLightConstants.EXCLUDE_FOLDERS))
                 == NemoLightConstants.EXCLUDE_FOLDERS) {
-                exclude_folders = true;
+                excludeFolders = true;
             }
 
             /*
              * Check errors
              */
-            if (only_classes && exclude_classes) {
+            if (onlyClasses && excludeClasses) {
                 throw new SearchFileOptionException(
                     "Can not include and exclude classes");
             }
-            if (only_fodlers && exclude_folders) {
+            if (onlyFodlers && excludeFolders) {
                 throw new SearchFileOptionException(
                     "Can not include and exclude folders");
             }
-            if (only_classes && only_fodlers) {
+            if (onlyClasses && onlyFodlers) {
                 throw new SearchFileOptionException(
                     "Can not get only folders and only classes");
             }
@@ -111,13 +111,13 @@ public final class Utils {
                     boolean get = false;
                     boolean isClass = fileName.endsWith(".class");
                     boolean isFolder = fileName.endsWith("/");
-                    if (all || (only_classes && isClass)
-                        || (only_fodlers && isFolder)) {
+                    if (all || (onlyClasses && isClass)
+                        || (onlyFodlers && isFolder)) {
                         get = true;
-                    } else if (!only_classes && !only_fodlers) {
+                    } else if (!onlyClasses && !onlyFodlers) {
                         get = true;
-                        get ^= !(exclude_classes & isClass);
-                        get ^= !(exclude_folders & isFolder);
+                        get ^= !(excludeClasses & isClass);
+                        get ^= !(excludeFolders & isFolder);
                     }
                     if (get) {
                         files.add(String.format("%s%s", basePath, f.getName()));
@@ -141,42 +141,42 @@ public final class Utils {
          * Check options
          */
         boolean all = false;
-        boolean only_classes = false;
-        boolean exclude_classes = false;
-        boolean only_fodlers = false;
-        boolean exclude_folders = false;
+        boolean onlyClasses = false;
+        boolean excludeClasses = false;
+        boolean onlyFolders = false;
+        boolean excludeFolders = false;
         if (options == NemoLightConstants.INCLUDE_ALL) {
             all = true;
         } else {
             if (((options & NemoLightConstants.ONLY_CLASS_FILES))
                 == NemoLightConstants.ONLY_CLASS_FILES) {
-                only_classes = true;
+                onlyClasses = true;
             }
             if (((options & NemoLightConstants.EXCLUDE_CLASS_FILES))
                 == NemoLightConstants.EXCLUDE_CLASS_FILES) {
-                exclude_classes = true;
+                excludeClasses = true;
             }
             if (((options & NemoLightConstants.ONLY_FOLDERS))
                 == NemoLightConstants.ONLY_FOLDERS) {
-                only_fodlers = true;
+                onlyFolders = true;
             }
             if (((options & NemoLightConstants.EXCLUDE_FOLDERS))
                 == NemoLightConstants.EXCLUDE_FOLDERS) {
-                exclude_folders = true;
+                excludeFolders = true;
             }
 
             /*
              * Check errors
              */
-            if (only_classes && exclude_classes) {
+            if (onlyClasses && excludeClasses) {
                 throw new SearchFileOptionException(
                     "Can not include and exclude classes");
             }
-            if (only_fodlers && exclude_folders) {
+            if (onlyFolders && excludeFolders) {
                 throw new SearchFileOptionException(
                     "Can not include and exclude folders");
             }
-            if (only_classes && only_fodlers) {
+            if (onlyClasses && onlyFolders) {
                 throw new SearchFileOptionException(
                     "Can not get only folders and only classes");
             }
@@ -192,13 +192,13 @@ public final class Utils {
                     boolean get = false;
                     boolean isClass = entry.endsWith(".class");
                     boolean isFolder = entry.endsWith("/");
-                    if (all || (only_classes && isClass)
-                        || (only_fodlers && isFolder)) {
+                    if (all || (onlyClasses && isClass)
+                        || (onlyFolders && isFolder)) {
                         get = true;
-                    } else if (!only_classes && !only_fodlers) {
+                    } else if (!onlyClasses && !onlyFolders) {
                         get = true;
-                        get ^= !(exclude_classes & isClass);
-                        get ^= !(exclude_folders & isFolder);
+                        get ^= !(excludeClasses & isClass);
+                        get ^= !(excludeFolders & isFolder);
                     }
                     if (get) {
                         files.add(entry);

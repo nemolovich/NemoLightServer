@@ -7,8 +7,8 @@ import org.json.JSONObject;
  * @author Nemolovich
  */
 public interface IAjaxFunction {
-	
-	public JSONObject call(JSONObject param);
-	
-	public String getFuncName();
+
+    JSONObject call(JSONObject param);
+
+    String getFuncName();
 }

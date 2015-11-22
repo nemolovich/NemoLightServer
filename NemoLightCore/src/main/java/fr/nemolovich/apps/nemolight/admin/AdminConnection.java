@@ -19,50 +19,50 @@ import org.apache.log4j.Logger;
  */
 public class AdminConnection extends Thread {
 
-	private static final Logger LOGGER = Logger.getLogger(AdminConnection.class);
-	private final int port;
+    private static final Logger LOGGER = Logger.getLogger(AdminConnection.class);
+    private final int port;
 
-	public AdminConnection(int port) {
-		this.port = port;
-	}
-	
-	public static void setSystemProperties() {
-		System.setProperty("javax.net.ssl.keyStore", String.format("%s%s",
-			NemoLightConstants.CONFIG_FOLDER, "certificates/server.ks"));
-		System.setProperty("javax.net.ssl.keyStorePassword", "serversslpass");
-	}
+    public AdminConnection(int port) {
+        this.port = port;
+    }
 
-	@Override
-	public void run() {
+    public static void setSystemProperties() {
+        System.setProperty("javax.net.ssl.keyStore", String.format("%s%s",
+            NemoLightConstants.CONFIG_FOLDER, "certificates/server.ks"));
+        System.setProperty("javax.net.ssl.keyStorePassword", "serversslpass");
+    }
 
-		Thread.currentThread().setName("AdminSession");
-		Security.addProvider(new Provider());
+    @Override
+    public void run() {
 
-		SSLServerSocket sslServerSocket;
-		try {
-			LOGGER.info(String.format(
-				"Setting administration connection on port [%s]...",
-				String.valueOf(this.port)));
-			SSLServerSocketFactory sslServerSocketFactory
-				= (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
-			sslServerSocket = (SSLServerSocket) sslServerSocketFactory.
-				createServerSocket(this.port);
-			LOGGER.info(String.format(
-				"Administration console is available on port [%s]!",
-				String.valueOf(this.port)));
-		} catch (IOException ex) {
-			LOGGER.error(String.format("Can not open socket on port [%s]",
-				String.valueOf(this.port)));
-			return;
-		}
-		LOGGER.info("Waiting for client...");
-		while (this.isAlive()) {
-			try {
-				new ClientConnection(sslServerSocket).run();
-			} catch (IOException ex) {
-				LOGGER.error("Error while listening", ex);
-			}
-		}
-		LOGGER.info("Administration console closed!");
-	}
+        Thread.currentThread().setName("AdminSession");
+        Security.addProvider(new Provider());
+
+        SSLServerSocket sslServerSocket;
+        try {
+            LOGGER.info(String.format(
+                "Setting administration connection on port [%s]...",
+                String.valueOf(this.port)));
+            SSLServerSocketFactory sslServerSocketFactory
+                = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
+            sslServerSocket = (SSLServerSocket) sslServerSocketFactory.
+                createServerSocket(this.port);
+            LOGGER.info(String.format(
+                "Administration console is available on port [%s]!",
+                String.valueOf(this.port)));
+        } catch (IOException ex) {
+            LOGGER.error(String.format("Can not open socket on port [%s]",
+                String.valueOf(this.port)));
+            return;
+        }
+        LOGGER.info("Waiting for client...");
+        while (this.isAlive()) {
+            try {
+                new ClientConnection(sslServerSocket).run();
+            } catch (IOException ex) {
+                LOGGER.error("Error while listening", ex);
+            }
+        }
+        LOGGER.info("Administration console closed!");
+    }
 }

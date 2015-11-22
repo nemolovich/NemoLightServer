@@ -18,99 +18,99 @@ import spark.Response;
 
 public class FileRoute extends WebRoute {
 
-	private final File file;
-	private static final Logger LOGGER = Logger.getLogger(FileRoute.class);
-	private static final String TEXT_PLAIN_MIMETYPE = "text/plain";
-	private static final List<ForcedMimeType> FORCED_MIMETYPES;
+    private final File file;
+    private static final Logger LOGGER = Logger.getLogger(FileRoute.class);
+    private static final String TEXT_PLAIN_MIMETYPE = "text/plain";
+    private static final List<ForcedMimeType> FORCED_MIMETYPES;
 
-	static {
-		FORCED_MIMETYPES = new ArrayList<>();
-		FORCED_MIMETYPES.add(ForcedMimeType.newInstance(".js",
-			"application/javascript"));
-	}
+    static {
+        FORCED_MIMETYPES = new ArrayList<>();
+        FORCED_MIMETYPES.add(ForcedMimeType.newInstance(".js",
+            "application/javascript"));
+    }
 
-	public FileRoute(String route, String context, File file) {
-		super(route, context);
-		this.file = file;
-		if (this.file == null || !this.file.exists()) {
-			LOGGER.log(Level.ERROR,
-				String.format("Can not load file '%s'", file.getPath()));
-		}
-		super.disableSecurity();
-	}
+    public FileRoute(String route, String context, File file) {
+        super(route, context);
+        this.file = file;
+        if (this.file == null || !this.file.exists()) {
+            LOGGER.log(Level.ERROR,
+                String.format("Can not load file '%s'", file.getPath()));
+        }
+        super.disableSecurity();
+    }
 
-	private static boolean isForcedExtensions(String path) {
-		boolean result = false;
-		for (String ext : getForcedExtensions()) {
-			if (path.toLowerCase().endsWith(ext.toLowerCase())) {
-				result = true;
-				break;
-			}
-		}
-		return result;
-	}
+    private static boolean isForcedExtensions(String path) {
+        boolean result = false;
+        for (String ext : getForcedExtensions()) {
+            if (path.toLowerCase().endsWith(ext.toLowerCase())) {
+                result = true;
+                break;
+            }
+        }
+        return result;
+    }
 
-	private static List<String> getForcedExtensions() {
-		List<String> extensions = new ArrayList<>();
-		for (ForcedMimeType mimeType : FORCED_MIMETYPES) {
-			extensions.add(mimeType.getExtension());
-		}
-		return extensions;
-	}
+    private static List<String> getForcedExtensions() {
+        List<String> extensions = new ArrayList<>();
+        for (ForcedMimeType mimeType : FORCED_MIMETYPES) {
+            extensions.add(mimeType.getExtension());
+        }
+        return extensions;
+    }
 
-	private static String getMimeType(String path) {
-		String result = null;
-		for (ForcedMimeType mimeType : FORCED_MIMETYPES) {
-			if (path.toLowerCase().endsWith(
-				mimeType.getExtension().toLowerCase())) {
-				result = mimeType.getMimeType();
-				break;
-			}
-		}
-		return result;
-	}
+    private static String getMimeType(String path) {
+        String result = null;
+        for (ForcedMimeType mimeType : FORCED_MIMETYPES) {
+            if (path.toLowerCase().endsWith(
+                mimeType.getExtension().toLowerCase())) {
+                result = mimeType.getMimeType();
+                break;
+            }
+        }
+        return result;
+    }
 
-	@Override
-	public Object doHandle(Request request, Response response) {
-		try {
-			this.deployFile(request, response);
-		} catch (IOException e) {
-			LOGGER.log(Level.ERROR, "Error while reading file", e);
-		}
-		return null;
+    @Override
+    public Object doHandle(Request request, Response response) {
+        try {
+            this.deployFile(response);
+        } catch (IOException e) {
+            LOGGER.log(Level.ERROR, "Error while reading file", e);
+        }
+        return null;
 
-	}
+    }
 
-	private void deployFile(Request request, Response response)
-		throws IOException {
+    private void deployFile(Response response)
+        throws IOException {
 
-		HttpServletResponse resp = response.raw();
+        HttpServletResponse resp = response.raw();
 
-		String fileName = this.file.getName();
+        String fileName = this.file.getName();
 
-		String mimeType;
-		if (isForcedExtensions(fileName)) {
-			mimeType = getMimeType(fileName);
-		} else {
-			mimeType = Files.probeContentType(this.file.toPath());
-			mimeType = mimeType == null ? TEXT_PLAIN_MIMETYPE : mimeType;
-		}
+        String mimeType;
+        if (isForcedExtensions(fileName)) {
+            mimeType = getMimeType(fileName);
+        } else {
+            mimeType = Files.probeContentType(this.file.toPath());
+            mimeType = mimeType == null ? TEXT_PLAIN_MIMETYPE : mimeType;
+        }
 
-		resp.setContentType(mimeType);
+        resp.setContentType(mimeType);
 
-		try (FileInputStream in = new FileInputStream(this.file);
-			ReplaceOutputStream out = new ReplaceOutputStream(
-			resp.getOutputStream(), String.format("\\$\\{%s\\}",
-				NemoLightConstants.APPLICATION_CONTEXT),
-			"/".concat(this.getContext()))) {
-			
-			byte[] buff = new byte[2048];
-			int count;
-			while ((count = in.read(buff)) >= 0) {
-				out.write(buff, 0, count);
-			}
-			
-		}
+        try (FileInputStream in = new FileInputStream(this.file);
+            ReplaceOutputStream out = new ReplaceOutputStream(
+                resp.getOutputStream(), String.format("\\$\\{%s\\}",
+                    NemoLightConstants.APPLICATION_CONTEXT),
+                "/".concat(this.getContext()))) {
 
-	}
+            byte[] buff = new byte[2048];
+            int count;
+            while ((count = in.read(buff)) >= 0) {
+                out.write(buff, 0, count);
+            }
+
+        }
+
+    }
 }

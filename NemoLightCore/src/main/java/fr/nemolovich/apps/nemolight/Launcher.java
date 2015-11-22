@@ -25,154 +25,157 @@ import org.apache.log4j.PropertyConfigurator;
  *
  * @author Nemolovich
  */
-public class Launcher {
+public final class Launcher {
 
-	public static final Configuration CONFIG = new Configuration();
+    public static final Configuration CONFIG = new Configuration();
 
-	private static final Logger LOGGER = Logger.getLogger(Launcher.class
-		.getName());
+    private static final Logger LOGGER = Logger.getLogger(Launcher.class
+        .getName());
 
-	public static void main(String[] args) throws IOException {
+    private Launcher() {
+    }
 
-		Thread.currentThread().setName("Server");
-		boolean extract = false;
-		boolean securityDisabled = false;
-		int adminport = 8081;
-		int port = 8080;
-		if (args.length > 0) {
-			boolean needPort = false;
-			boolean needAdminPort = false;
-			for (String arg : args) {
-				if (arg.startsWith("--port")) {
-					needPort = true;
-				} else if (needPort) {
-					try {
-						port = Integer.parseInt(arg);
-					} catch (NumberFormatException e) {
-						LOGGER.log(Level.SEVERE, "Incorrect port parameter", e);
-					}
-					needPort = false;
-				} else if (arg.equals("--extract")) {
-					extract = true;
-				} else if (arg.equals("--admin-port")) {
-					needAdminPort = true;
-				} else if (arg.equals("--disable-security")) {
-					securityDisabled = true;
-				} else if (needAdminPort) {
-					try {
-						adminport = Integer.parseInt(arg);
-					} catch (NumberFormatException e) {
-						LOGGER.log(Level.SEVERE,
-							"Incorrect admin port parameter", e);
-					}
-					needAdminPort = false;
-				} else {
-					LOGGER.log(Level.SEVERE,
-						String.format("Unknown parameter '%s'", arg));
-				}
-			}
-		}
+    public static void main(String[] args) throws IOException {
 
-		if (!securityDisabled) {
-			AdminConnection.setSystemProperties();
-		}
+        Thread.currentThread().setName("Server");
+        boolean extract = false;
+        boolean securityDisabled = false;
+        int adminport = 8081;
+        int port = 8080;
+        if (args.length > 0) {
+            boolean needPort = false;
+            boolean needAdminPort = false;
+            for (String arg : args) {
+                if (arg.startsWith("--port")) {
+                    needPort = true;
+                } else if (needPort) {
+                    try {
+                        port = Integer.parseInt(arg);
+                    } catch (NumberFormatException e) {
+                        LOGGER.log(Level.SEVERE, "Incorrect port parameter", e);
+                    }
+                    needPort = false;
+                } else if (arg.equals("--extract")) {
+                    extract = true;
+                } else if (arg.equals("--admin-port")) {
+                    needAdminPort = true;
+                } else if (arg.equals("--disable-security")) {
+                    securityDisabled = true;
+                } else if (needAdminPort) {
+                    try {
+                        adminport = Integer.parseInt(arg);
+                    } catch (NumberFormatException e) {
+                        LOGGER.log(Level.SEVERE,
+                            "Incorrect admin port parameter", e);
+                    }
+                    needAdminPort = false;
+                } else {
+                    LOGGER.log(Level.SEVERE,
+                        String.format("Unknown parameter '%s'", arg));
+                }
+            }
+        }
 
-		Map<String, String> packagesName
-			= DeployResourceManager.initializeClassLoader();
-		String packageName;
-		String appName;
+        if (!securityDisabled) {
+            AdminConnection.setSystemProperties();
+        }
 
-		if (extract) {
+        Map<String, String> packagesName
+            = DeployResourceManager.initializeClassLoader();
+        String packageName;
+        String appName;
 
-			LOGGER.info("Extracting files from archive...");
+        if (extract) {
 
-			DeployResourceManager
-				.initFromPackage(NemoLightConstants.PACKAGE_NAME);
+            LOGGER.info("Extracting files from archive...");
 
-			for (Entry<String, String> entryPackage
-				: packagesName.entrySet()) {
-				packageName = entryPackage.getValue();
-				appName = entryPackage.getKey();
-				if (packageName == null) {
-					LOGGER.warning(String.format(
-						"There is no package for application '%s'",
-						appName));
-				} else {
-					DeployResourceManager.initFromPackage(packageName);
-				}
-			}
+            DeployResourceManager
+                .initFromPackage(NemoLightConstants.PACKAGE_NAME);
 
-			LOGGER.info("Extraction completed!");
+            for (Entry<String, String> entryPackage
+                : packagesName.entrySet()) {
+                packageName = entryPackage.getValue();
+                appName = entryPackage.getKey();
+                if (packageName == null) {
+                    LOGGER.warning(String.format(
+                        "There is no package for application '%s'",
+                        appName));
+                } else {
+                    DeployResourceManager.initFromPackage(packageName);
+                }
+            }
 
-		}
+            LOGGER.info("Extraction completed!");
 
-		LOGGER.info("Configuring log file...");
+        }
 
-		PropertyConfigurator.configure(String.format("%s%s",
-			NemoLightConstants.CONFIG_FOLDER,
-			NemoLightConstants.LOGGER_FILE_PATH));
-		org.apache.log4j.Logger log = org.apache.log4j.Logger
-			.getLogger(Launcher.class);
+        LOGGER.info("Configuring log file...");
 
-		log.info("Log4j appender configuration successfully loaded");
+        PropertyConfigurator.configure(String.format("%s%s",
+            NemoLightConstants.CONFIG_FOLDER,
+            NemoLightConstants.LOGGER_FILE_PATH));
+        org.apache.log4j.Logger log = org.apache.log4j.Logger
+            .getLogger(Launcher.class);
 
-		if (!securityDisabled) {
-			try {
-				log.info("Enabling security...");
-				GlobalSecurity.loadConfig();
-				try {
-					GlobalSecurity.loadPasswords();
-					SecurityUtils.enableSecurity();
-					log.info("Security enabled");
-				} catch (IOException | ClassNotFoundException ex) {
-					log.error("Can not load passwords", ex);
-				}
-			} catch (JAXBException ex) {
-				log.error("Can not load security configuration", ex);
-			}
-		}
+        log.info("Log4j appender configuration successfully loaded");
 
-		log.info(String.format("Log file settings set from '%s%s'",
-			NemoLightConstants.CONFIG_FOLDER,
-			NemoLightConstants.LOGGER_FILE_PATH));
+        if (!securityDisabled) {
+            try {
+                log.info("Enabling security...");
+                GlobalSecurity.loadConfig();
+                try {
+                    GlobalSecurity.loadPasswords();
+                    SecurityUtils.enableSecurity();
+                    log.info("Security enabled");
+                } catch (IOException | ClassNotFoundException ex) {
+                    log.error("Can not load passwords", ex);
+                }
+            } catch (JAXBException ex) {
+                log.error("Can not load security configuration", ex);
+            }
+        }
 
-		File templateFolder = new File(NemoLightConstants.TEMPLATE_FOLDER);
+        log.info(String.format("Log file settings set from '%s%s'",
+            NemoLightConstants.CONFIG_FOLDER,
+            NemoLightConstants.LOGGER_FILE_PATH));
 
-		log.info(String.format("Setting freemarker templates folder to '%s'",
-			templateFolder.getAbsolutePath()));
+        File templateFolder = new File(NemoLightConstants.TEMPLATE_FOLDER);
 
-		CONFIG.setDirectoryForTemplateLoading(templateFolder);
+        log.info(String.format("Setting freemarker templates folder to '%s'",
+            templateFolder.getAbsolutePath()));
 
-		log.info("Deploying resources...");
+        CONFIG.setDirectoryForTemplateLoading(templateFolder);
 
-		for (Entry<String, String> entryPackage : packagesName.entrySet()) {
-			packageName = entryPackage.getValue();
-			appName = entryPackage.getKey();
-			if (packageName == null) {
-				LOGGER.warning(String.format(
-					"There is no package for application '%s'",
-					entryPackage.getKey())
-				);
-			} else {
-				DeployResourceManager.deployWebPages(CONFIG,
-					packageName.replaceAll("/", "."),
-					appName
-				);
+        log.info("Deploying resources...");
 
-				DeployResourceManager.deployWebApp(WebConfig
-					.getStringValue(WebConfig.DELPOYMENT_FOLDER),
-					appName);
-			}
-		}
+        for (Entry<String, String> entryPackage : packagesName.entrySet()) {
+            packageName = entryPackage.getValue();
+            appName = entryPackage.getKey();
+            if (packageName == null) {
+                LOGGER.warning(String.format(
+                    "There is no package for application '%s'",
+                    entryPackage.getKey())
+                );
+            } else {
+                DeployResourceManager.deployWebPages(CONFIG,
+                    packageName.replaceAll("/", "."),
+                    appName
+                );
 
-		log.info("Resources deployed!");
+                DeployResourceManager.deployWebApp(WebConfig
+                    .getStringValue(WebConfig.DELPOYMENT_FOLDER),
+                    appName);
+            }
+        }
 
-		log.info(String.format("Starting server on port [%s]...",
-			String.valueOf(port)));
-		DeployResourceManager.startServer(port, adminport);
+        log.info("Resources deployed!");
 
-		log.info(String.format("Server started on port [%s]!",
-			String.valueOf(port)));
+        log.info(String.format("Starting server on port [%s]...",
+            String.valueOf(port)));
+        DeployResourceManager.startServer(port, adminport);
 
-	}
+        log.info(String.format("Server started on port [%s]!",
+            String.valueOf(port)));
+
+    }
 }

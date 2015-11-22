@@ -9,69 +9,69 @@ import javax.xml.bind.annotation.XmlTransient;
 @XmlRootElement(name = "user")
 public class User implements Serializable {
 
-	/**
-	 * UID
-	 */
-	private static final long serialVersionUID = -7593826775848734917L;
+    /**
+     * uid
+     */
+    private static final long serialVersionUID = -7593826775848734917L;
 
-	private String name;
-	private String password;
-	private String UID;
+    private String name;
+    private String password;
+    private String uid;
 
-	private User() {
-		this.name = "guest";
-		this.UID = null;
-	}
+    private User() {
+        this.name = "guest";
+        this.uid = null;
+    }
 
-	public User(String name, String password) {
-		this.name = name;
-		this.UID = UUID.randomUUID().toString();
-		this.password = password;
-	}
+    public User(String name, String password) {
+        this.name = name;
+        this.uid = UUID.randomUUID().toString();
+        this.password = password;
+    }
 
-	/**
-	 * @return the name
-	 */
-	@XmlElement(name = "name")
-	public String getName() {
-		return this.name;
-	}
+    /**
+     * @return the name
+     */
+    @XmlElement(name = "name")
+    public String getName() {
+        return this.name;
+    }
 
-	/**
-	 * @param name the name to set
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	/**
-	 * @return the password
-	 */
-	@XmlTransient
-	protected String getPassword() {
-		return this.password;
-	}
+    /**
+     * @return the password
+     */
+    @XmlTransient
+    protected String getPassword() {
+        return this.password;
+    }
 
-	/**
-	 * @param password the password to set
-	 */
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    /**
+     * @param password the password to set
+     */
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-	/**
-	 * @return the UID
-	 */
-	@XmlElement(name = "UID")
-	public String getUID() {
-		return this.UID;
-	}
+    /**
+     * @return the uid
+     */
+    @XmlElement(name = "UID")
+    public String getUID() {
+        return this.uid;
+    }
 
-	/**
-	 * @param UID the UID to set
-	 */
-	public void setUID(String UID) {
-		this.UID = UID;
-	}
+    /**
+     * @param uid the uid to set
+     */
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
 
 }

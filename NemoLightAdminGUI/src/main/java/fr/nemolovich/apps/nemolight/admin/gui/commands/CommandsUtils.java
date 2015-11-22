@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package fr.nemolovich.apps.nemolight.admin.gui.commands;
 
 import fr.nemolovich.apps.nemolight.admin.Command;
@@ -15,7 +10,7 @@ import java.util.List;
  *
  * @author Nemolovich
  */
-public class CommandsUtils {
+public final class CommandsUtils {
 
     private static final List<Command> INTERNAL_COMMANDS;
     private static final List<String> SERVER_COMMANDS;
@@ -24,6 +19,9 @@ public class CommandsUtils {
         INTERNAL_COMMANDS = Collections
             .synchronizedList(new ArrayList<Command>());
         SERVER_COMMANDS = Collections.synchronizedList(new ArrayList<String>());
+    }
+
+    private CommandsUtils() {
     }
 
     public static void addCommand(Command command) {

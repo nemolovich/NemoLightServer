@@ -59,10 +59,10 @@ public abstract class WebRoute extends Route {
             LOGIN_PAGE.getContext(), LOGIN_PAGE.getPath());
         String expectedPage = request.pathInfo();
         if (!FileRoute.class.isAssignableFrom(this.getClass())) {
-            String UID = request.cookie(NemoLightConstants.SESSION_COOKIE);
+            String uid = request.cookie(NemoLightConstants.SESSION_COOKIE);
             // TODO: LOGGER
-            if (UID != null) {
-                user = SecurityConfiguration.getInstance().getUserByUID(UID);
+            if (uid != null) {
+                user = SecurityConfiguration.getInstance().getUserByUID(uid);
                 userSession.setUser(user);
             }
         }

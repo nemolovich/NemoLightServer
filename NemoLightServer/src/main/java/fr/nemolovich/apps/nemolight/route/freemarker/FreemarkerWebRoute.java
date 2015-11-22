@@ -31,7 +31,6 @@ public abstract class FreemarkerWebRoute extends WebRoute
         StringWriter writer = new StringWriter();
         try {
             doHandle(request, response, writer);
-//			writer.session().attribute("error_details", details.toString());
         } catch (ServerException ex) {
             LOGGER.log(Level.ERROR, "Error while processing with route", ex);
             StringBuilder details = new StringBuilder(String.format("%s<br/>\n",

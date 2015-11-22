@@ -20,7 +20,7 @@ import org.apache.log4j.Logger;
 
 import fr.nemolovich.apps.nemolight.constants.NemoLightConstants;
 
-public class GlobalSecurity implements SecurityManager {
+public final class GlobalSecurity implements SecurityManager {
 
     private static final Logger LOGGER = Logger.getLogger(GlobalSecurity.class
         .getName());

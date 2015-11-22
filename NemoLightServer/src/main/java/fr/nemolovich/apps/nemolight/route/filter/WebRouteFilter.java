@@ -9,10 +9,10 @@ import spark.Response;
  */
 public interface WebRouteFilter {
 
-	public void init();
+    void init();
 
-	public void destroy();
+    void destroy();
 
-	public void doFilter(Request request, Response response);
+    void doFilter(Request request, Response response);
 
 }

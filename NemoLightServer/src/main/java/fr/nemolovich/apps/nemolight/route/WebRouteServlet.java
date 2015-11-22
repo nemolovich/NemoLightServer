@@ -82,20 +82,45 @@ abstract class WebRouteServlet implements
 
     private SimpleHash initRoute(Request request) {
         this.processTemplate = true;
+        /*
+         * Initialize the Hash.
+         */
         SimpleHash root = new SimpleHash();
+        /*
+         * Set user session.
+         */
         Session userSession = SessionUtils.getSession(request.session());
         root.put(NemoLightConstants.SESSION_ATTR, userSession);
+        /*
+         * Set submitted request.
+         */
         root.put(NemoLightConstants.REQUEST_ATTR,
             new RequestParameters(request));
+        /*
+         * Set navigation context.
+         */
+        root.put(NemoLightConstants.APPLICATION_CONTEXT, "/".concat(this.context));
+        /*
+         * Set the ajax bean name.
+         */
         root.put(NemoLightConstants.AJAX_BEAN_KEY, this.getName());
+        /* 
+         * Set the ajax bean fields.
+         */
         JSONObject fields = new JSONObject();
         fields.put(NemoLightConstants.AJAX_FIELDS_KEY,
             new JSONArray(fieldsList.values()));
         root.put(NemoLightConstants.AJAX_FIELDS_KEY, fields.toString());
-        root.put(NemoLightConstants.APPLICATION_CONTEXT, "/".concat(this.context));
+        /*
+         * Reset all ajax fields.
+         */
         for (String field : fieldsList.values()) {
             root.put(field, "");
         }
+
+        /*
+         * Return Hash.
+         */
         return root;
     }
 
@@ -131,6 +156,9 @@ abstract class WebRouteServlet implements
             String value = request.getString(entry.getValue());
             setFieldValue(entry.getKey(), value);
         }
+        /*
+         * Define the ajax update action with the fields keys and their values.
+         */
         root.put(NemoLightConstants.AJAX_ACTION_KEY,
             NemoLightConstants.AJAX_ACTION_UPDATE);
         root.put(NemoLightConstants.AJAX_VALUE_KEY, request);

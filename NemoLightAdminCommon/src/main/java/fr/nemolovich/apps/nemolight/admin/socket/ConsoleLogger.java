@@ -5,30 +5,35 @@
  */
 package fr.nemolovich.apps.nemolight.admin.socket;
 
+import java.io.PrintStream;
+
 /**
  *
  * @author Nemolovich
  */
 public class ConsoleLogger implements ISocketLogger {
 
+    private static final PrintStream OUT = System.out;
+    private static final PrintStream ERR = System.err;
+
     @Override
     public void fine(String message) {
-        System.out.println("FINE: " + message);
+        OUT.println("FINE: " + message);
     }
-    
+
     @Override
     public void info(String message) {
-        System.out.println("INFO: " + message);
+        OUT.println("INFO: " + message);
     }
 
     @Override
     public void error(String message) {
-        System.err.println("ERROR: " + message);
+        ERR.println("ERROR: " + message);
     }
 
     @Override
     public void warning(String message) {
-        System.err.println("WARNING: " + message);
+        ERR.println("WARNING: " + message);
     }
 
     @Override

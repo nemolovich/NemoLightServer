@@ -9,8 +9,8 @@ import spark.Response;
  */
 public interface FreemarkerRoute {
 
-	public Object doHandle(Request request, Response response);
+    Object doHandle(Request request, Response response);
 
-	public void enableSecurity();
-	
+    void enableSecurity();
+
 }
