@@ -13,6 +13,6 @@ public interface WebRouteFilter {
 
     void destroy();
 
-    void doFilter(Request request, Response response);
+    void doFilter(Request request, Response response, FilterChain chain);
 
 }
